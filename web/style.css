@@ -1,15 +1,16 @@
 :root {
-  --bg-obsidian: #0b0d10;
-  --bg-panel: #111419;
-  --bg-card: #181c24;
-  --border-tech: #252b38;
-  --neon-cyan: #00f5d4;
-  --neon-amber: #ffb703;
-  --warning-crimson: #ef233c;
-  --hazard-yellow: #ffb703;
-  --hazard-black: #111419;
+  --bg-desk: #1e150f;
+  --bg-parchment: #fbf7ee;
+  --bg-dark-wood: #2a1e15;
+  --border-brass: #b45309;
+  --border-leather: #8b5a2b;
+  --text-dark-ink: #23160b;
+  --text-warm-dim: #785a3c;
+  --text-gold: #f59e0b;
   --text-white: #f8fafc;
-  --text-dim: #94a3b8;
+  --rune-purple: #7c3aed;
+  --mint-accent: #10b981;
+  --warning-crimson: #ef233c;
 }
 
 * {
@@ -21,9 +22,9 @@
 }
 
 body.cockpit-body {
-  background-color: var(--bg-obsidian);
+  background: var(--bg-desk) url('assets/ui_sprites/png/desk_wood_surface.png') center center / cover no-repeat;
   color: var(--text-white);
-  font-family: "JetBrains Mono", "Courier New", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: "JetBrains Mono", "Courier New", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   height: 100vh;
   overflow: hidden;
   display: flex;
@@ -34,27 +35,28 @@ body.cockpit-body {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 14px;
-  gap: 12px;
+  padding: 12px;
+  gap: 10px;
 }
 
-/* --- Top Tactical Header --- */
+/* --- Top System Telemetry Header (Mahogany & Brass) --- */
 .tactical-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: var(--bg-panel);
-  border: 1px solid var(--border-tech);
-  padding: 10px 16px;
-  border-radius: 4px;
-  gap: 12px;
+  background: rgba(30, 20, 14, 0.94);
+  border: 2px solid #5d3d24;
+  border-radius: 8px;
+  padding: 8px 14px;
+  gap: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.45);
 }
 
 .sys-badge {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
   color: #38bdf8;
   letter-spacing: 0.5px;
@@ -64,25 +66,37 @@ body.cockpit-body {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: var(--neon-cyan);
-  box-shadow: 0 0 8px var(--neon-cyan);
+  background-color: #00f5d4;
+  box-shadow: 0 0 8px #00f5d4;
 }
 
 .link-badge, .bpm-badge {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  color: var(--text-dim);
-  background: #191e28;
+  color: #cbd5e1;
+  background: rgba(45, 30, 20, 0.85);
   padding: 4px 10px;
-  border: 1px solid var(--border-tech);
-  border-radius: 2px;
+  border: 1px solid #785a3c;
+  border-radius: 4px;
 }
 
 .bpm-badge {
-  color: var(--neon-amber);
+  color: var(--text-gold);
 }
 
-/* Hazard Purge / Panic Button */
+.gold-coin-box {
+  display: flex;
+  align-items: center;
+}
+
+.gold-coin-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+}
+
+/* Emergency Purge / Panic Button */
 .hazard-purge-btn {
   background: repeating-linear-gradient(
     45deg,
@@ -93,319 +107,235 @@ body.cockpit-body {
   );
   color: white;
   border: 1px solid #ff4d6d;
-  padding: 8px 18px;
-  font-size: 12px;
+  padding: 6px 14px;
+  font-size: 11px;
   font-weight: 900;
   letter-spacing: 1px;
   cursor: pointer;
-  box-shadow: 0 0 15px rgba(239, 35, 60, 0.45);
+  border-radius: 4px;
+  box-shadow: 0 0 12px rgba(239, 35, 60, 0.4);
   transition: transform 0.08s ease;
 }
 
 .hazard-purge-btn:active {
-  transform: scale(0.95);
-  filter: brightness(1.3);
+  transform: scale(0.96);
 }
 
 /* --- Main 3-Column Cockpit Grid --- */
 .cockpit-grid {
   flex: 1;
   display: grid;
-  grid-template-columns: 280px 1fr 340px;
+  grid-template-columns: 310px 1fr 340px;
   gap: 12px;
   overflow: hidden;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 960px) {
+  body.cockpit-body {
+    overflow-y: auto;
+    height: auto;
+    min-height: 100vh;
+  }
+  .cockpit-container {
+    height: auto;
+    overflow: visible;
+  }
   .cockpit-grid {
     grid-template-columns: 1fr;
-    overflow-y: auto;
+    overflow: visible;
   }
 }
 
 .panel {
-  background-color: var(--bg-panel);
-  border: 1px solid var(--border-tech);
-  border-radius: 4px;
-  padding: 14px;
+  border-radius: 10px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   position: relative;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
 }
 
 .panel-header {
   font-size: 11px;
   font-weight: 900;
-  color: var(--text-dim);
   letter-spacing: 1px;
-  border-bottom: 1px solid var(--border-tech);
-  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(139, 90, 43, 0.25);
+  padding-bottom: 4px;
 }
 
-.mission-tag {
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 1px;
+/* --- Left: Diegetic Setlist Notebook (Moonlighter / Animal Crossing) --- */
+.panel.setlist-deck {
+  background: #fbf7ee url('assets/ui_sprites/png/notebook_page_parchment.png') center top / 100% 100% no-repeat;
+  border: 2px solid var(--border-leather);
+  color: var(--text-dark-ink);
+  overflow: hidden;
+  padding-right: 28px;
 }
 
-.active-tag { color: var(--neon-amber); }
-.next-tag { color: var(--neon-cyan); }
-.lyric-tag { color: #a5b4fc; }
-
-/* Slanted Mission Cards (Persona 5 style) */
-.mission-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-tech);
-  padding: 10px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  text-align: left;
-  cursor: pointer;
-  transform: skewX(-4deg);
-  transition: all 0.12s ease;
-}
-
-.mission-card:active {
-  transform: skewX(-4deg) scale(0.97);
-}
-
-.mission-card.active-card {
-  background: #202734;
-  border-color: var(--neon-cyan);
-  box-shadow: 0 0 15px rgba(0, 245, 212, 0.25);
-}
-
-.mission-num {
-  font-size: 11px;
-  font-weight: 900;
-  color: var(--neon-amber);
-}
-
-.mission-title {
-  font-size: 15px;
-  font-weight: 900;
-  color: white;
-}
-
-.mission-patch {
-  font-size: 11px;
-  color: var(--text-dim);
-}
-
-.next-missions-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* Center Coach Panel */
-.coach-panel {
-  justify-content: center;
-  align-items: center;
-  gap: 16px;
-}
-
-.accuracy-banner {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-}
-
-.verdict-tag {
-  background: rgba(0, 245, 212, 0.15);
-  color: var(--neon-cyan);
-  border: 1px solid var(--neon-cyan);
-  padding: 6px 14px;
-  font-size: 14px;
-  font-weight: 900;
-  box-shadow: 0 0 10px rgba(0, 245, 212, 0.25);
-}
-
-.score-tag {
-  background: rgba(255, 183, 3, 0.15);
-  color: var(--neon-amber);
-  border: 1px solid var(--neon-amber);
-  padding: 6px 14px;
-  font-size: 14px;
-  font-weight: 900;
-}
-
-.strike-gauge-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  width: 100%;
-}
-
-.gauge-label {
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 1.5px;
-  color: var(--text-dim);
-}
-
-.gauge-meter {
-  font-size: 14px;
-  font-weight: 900;
-  color: #38bdf8;
-  letter-spacing: 1px;
-}
-
-.rank-badge {
-  font-size: 26px;
-  font-weight: 900;
-  color: #ef233c;
-  text-shadow: 0 0 12px rgba(239, 35, 60, 0.6);
-}
-
-.beat-stepper {
-  display: flex;
-  gap: 10px;
-}
-
-.beat-stepper .step {
-  padding: 4px 10px;
-  font-size: 12px;
-  font-weight: 800;
-  border: 1px solid var(--border-tech);
-  color: var(--text-dim);
-}
-
-.beat-stepper .step.active {
-  background: var(--neon-cyan);
-  color: black;
-  border-color: var(--neon-cyan);
-  box-shadow: 0 0 12px var(--neon-cyan);
-}
-
-.retro-btn {
-  background: #1b212c;
-  border: 1px solid var(--neon-amber);
-  color: var(--neon-amber);
-  font-weight: 900;
-  font-size: 12px;
-  padding: 10px 18px;
-  cursor: pointer;
-  letter-spacing: 1px;
-  box-shadow: 0 0 10px rgba(255, 183, 3, 0.2);
-}
-
-.retro-btn:active {
-  background: var(--neon-amber);
-  color: black;
-}
-
-/* Right Chord HUD */
-.chord-tactical-hud {
-  justify-content: center;
-}
-
-.chord-hero-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: #161a22;
-  border: 1px solid var(--border-tech);
-  padding: 16px;
-}
-
-.chord-giant {
-  font-size: 64px;
-  font-weight: 900;
-  color: white;
-  text-shadow: 0 0 24px rgba(0, 245, 212, 0.4);
-  font-family: "Impact", sans-serif;
-}
-
-.transpose-tag {
-  font-size: 11px;
-  font-weight: 800;
-  color: var(--neon-cyan);
-}
-
-.next-chord-pill {
-  background: #1e2430;
-  border: 1px solid var(--neon-amber);
-  color: var(--neon-amber);
-  padding: 10px;
-  text-align: center;
-  font-size: 16px;
-  font-weight: 900;
-}
-
-.lyric-box {
-  position: relative;
-  background: #14171f;
-  border: 1px solid var(--border-tech);
-  padding: 14px;
-  font-size: 14px;
-  font-weight: 700;
-  color: #e2e8f0;
-  text-align: center;
-  line-height: 1.5;
-  font-style: italic;
-}
-
-/* Bottom Split Footer */
-.split-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--bg-panel);
-  border: 1px solid var(--border-tech);
-  padding: 8px 16px;
-  font-size: 11px;
-  font-weight: 800;
-}
-
-.zone-a { color: var(--neon-amber); }
-.split-divider { color: #f43f5e; }
-.zone-b { color: var(--neon-cyan); }
-
-/* --- 12-Master Game UI Sprites & Widgets --- */
-.cadence-beat-widget {
-  display: flex;
-  align-items: center;
-  height: 32px;
-}
-.beat-pulse-img {
-  height: 28px;
-  object-fit: contain;
-  transition: transform 0.08s ease, filter 0.08s ease;
-}
-.beat-pulse-img.pulse {
-  transform: scale(1.15);
-  filter: drop-shadow(0 0 10px #ff0055);
+.setlist-deck::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 24px;
+  background: url('assets/ui_sprites/png/spiral_wire_binding.png') right center / contain repeat-y;
+  pointer-events: none;
+  z-index: 5;
 }
 
 .setlist-badge-banner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
+
 .moonlighter-tab {
   height: 24px;
   object-fit: contain;
 }
+
 .washi-tape {
   height: 20px;
   object-fit: contain;
 }
 
+.rpg-tabs-row {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.rpg-tab {
+  height: 24px;
+  object-fit: contain;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.rpg-tab:hover {
+  transform: translateY(-2px);
+}
+
+.panel.setlist-deck .panel-header {
+  color: #3e2712;
+}
+
+.mission-tag {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.active-tag { color: #b45309; }
+.next-tag { color: #2e5a36; }
+.lyric-tag { color: #6b46c1; }
+
+/* Animal Crossing DIY Recipe Cards */
+.mission-card {
+  background: #fffcf5 url('assets/ui_sprites/png/card_ac_recipe_item.png') center center / 100% 100% no-repeat;
+  border: 1px solid #d4c2a5;
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.mission-card:active {
+  transform: scale(0.97);
+}
+
+.mission-card.active-card {
+  background: #fff8e8 url('assets/ui_sprites/png/card_ac_recipe_item.png') center center / 100% 100% no-repeat;
+  border: 2px solid var(--text-gold);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-star-badge {
+  display: flex;
+  align-items: center;
+}
+
+.star-pin-img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.card-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.mission-card .mission-num {
+  font-size: 11px;
+  font-weight: 900;
+  color: #b45309;
+}
+
+.mission-card .mission-title {
+  font-size: 14px;
+  font-weight: 900;
+  color: #1e1b18;
+}
+
+.mission-card .mission-patch {
+  font-size: 11px;
+  color: #786450;
+}
+
+.next-missions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* --- Center Coach Panel --- */
+.coach-panel {
+  background: rgba(24, 18, 14, 0.92);
+  border: 2px solid #5a3d28;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 12px;
+}
+
+.scalloped-cloud-header {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.cloud-banner-img {
+  width: 100%;
+  max-height: 44px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3));
+}
+
 .minimetro-transit-container {
   width: 100%;
-  margin-bottom: 8px;
-  background: #11141c;
+  background: rgba(15, 12, 10, 0.9);
   padding: 4px;
-  border-radius: 4px;
+  border-radius: 6px;
+  border: 1px solid #453020;
 }
+
 .transit-map-img {
   width: 100%;
-  height: 34px;
+  height: 32px;
   object-fit: contain;
 }
 
@@ -413,24 +343,141 @@ body.cockpit-body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  margin-bottom: 10px;
+  gap: 10px;
 }
+
 .djmax-badge {
   height: 26px;
   object-fit: contain;
 }
-.fever-gauge {
-  height: 26px;
+
+.rpg-mana-gauge {
+  height: 28px;
   object-fit: contain;
 }
-.hifi-burst {
+
+.cheer-emoji {
+  width: 32px;
   height: 32px;
   object-fit: contain;
   transition: transform 0.1s ease;
 }
+
+.cheer-emoji:hover {
+  transform: scale(1.15);
+}
+
+.hifi-burst {
+  height: 30px;
+  object-fit: contain;
+  transition: transform 0.1s ease;
+}
+
 .hifi-burst.hit {
   transform: scale(1.25) rotate(-6deg);
+}
+
+.accuracy-banner {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.verdict-tag {
+  background: rgba(0, 245, 212, 0.15);
+  color: #00f5d4;
+  border: 1px solid #00f5d4;
+  padding: 4px 12px;
+  font-size: 13px;
+  font-weight: 900;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(0, 245, 212, 0.25);
+}
+
+.score-tag {
+  background: rgba(255, 183, 3, 0.15);
+  color: var(--text-gold);
+  border: 1px solid var(--text-gold);
+  padding: 4px 12px;
+  font-size: 13px;
+  font-weight: 900;
+  border-radius: 4px;
+}
+
+.strike-gauge-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.gauge-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #94a3b8;
+}
+
+.gauge-meter {
+  font-size: 13px;
+  font-weight: 900;
+  color: #38bdf8;
+  letter-spacing: 1px;
+}
+
+.rank-badge {
+  font-size: 24px;
+  font-weight: 900;
+  color: #ef233c;
+  text-shadow: 0 0 12px rgba(239, 35, 60, 0.6);
+}
+
+.beat-stepper {
+  display: flex;
+  gap: 8px;
+}
+
+.beat-stepper .step {
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 800;
+  border: 1px solid #5a3d28;
+  border-radius: 3px;
+  color: #94a3b8;
+}
+
+.beat-stepper .step.active {
+  background: #00f5d4;
+  color: black;
+  border-color: #00f5d4;
+  box-shadow: 0 0 10px #00f5d4;
+}
+
+.retro-btn {
+  background: #2a1c12;
+  border: 1px solid var(--text-gold);
+  color: var(--text-gold);
+  font-weight: 900;
+  font-size: 11px;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  box-shadow: 0 0 10px rgba(255, 183, 3, 0.2);
+}
+
+.retro-btn:active {
+  background: var(--text-gold);
+  color: black;
+}
+
+/* --- Right: Chord Tactical HUD & Codex Scroll --- */
+.chord-tactical-hud {
+  background: rgba(24, 18, 14, 0.92);
+  border: 2px solid #5a3d28;
+  justify-content: flex-start;
+  gap: 8px;
 }
 
 .nostalgia-ornament-wrap {
@@ -439,11 +486,38 @@ body.cockpit-body {
   right: 6px;
   pointer-events: none;
 }
+
 .nostalgia-corner {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   object-fit: contain;
   opacity: 0.85;
+}
+
+/* Arcane RPG Spell Card */
+.chord-hero-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #181024 url('assets/ui_sprites/png/card_rpg_spell_harmony.png') center center / 100% 100% no-repeat;
+  border: 2px solid #8b5cf6;
+  border-radius: 8px;
+  padding: 14px;
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.35);
+}
+
+.chord-giant {
+  font-size: 58px;
+  font-weight: 900;
+  color: #fffaf0;
+  text-shadow: 0 0 16px rgba(245, 158, 11, 0.6), 2px 2px 4px #000;
+  font-family: "Impact", sans-serif;
+}
+
+.transpose-tag {
+  font-size: 11px;
+  font-weight: 800;
+  color: #fbbf24;
 }
 
 .taiko-drum-widget {
@@ -451,28 +525,94 @@ body.cockpit-body {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin: 6px 0;
+  margin: 4px 0;
   padding: 4px;
-  background: #131722;
+  background: rgba(20, 15, 12, 0.85);
   border-radius: 4px;
 }
+
 .taiko-img {
   height: 24px;
   object-fit: contain;
 }
+
 .taiko-label {
   font-size: 11px;
-  color: var(--neon-cyan);
+  color: #00f5d4;
   font-weight: 700;
+}
+
+.next-chord-pill {
+  background: #fffcf5 url('assets/ui_sprites/png/card_ac_recipe_item.png') center center / 100% 100% no-repeat;
+  border: 1px solid #d4c2a5;
+  border-radius: 8px;
+  color: var(--text-dark-ink);
+  padding: 8px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 900;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Rolled Archival Codex Scroll (AC Mirage) */
+.lyric-box {
+  position: relative;
+  background: #fbf7ee url('assets/ui_sprites/png/parchment_codex_scroll.png') center center / 100% 100% no-repeat;
+  border: none;
+  border-radius: 6px;
+  padding: 24px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #2b1d0c;
+  text-align: center;
+  line-height: 1.5;
+  font-style: italic;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
 }
 
 .snipperclips-sticker {
   position: absolute;
   top: -8px;
   right: -6px;
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
   object-fit: contain;
   transform: rotate(8deg);
   pointer-events: none;
+}
+
+/* Bottom Split Footer */
+.split-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(30, 20, 14, 0.94);
+  border: 2px solid #5d3d24;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 11px;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.zone-a { color: var(--text-gold); }
+.split-divider { color: #f43f5e; }
+.zone-b { color: #00f5d4; }
+
+/* Cadence Beat Heart Animation */
+.cadence-beat-widget {
+  display: flex;
+  align-items: center;
+  height: 30px;
+}
+
+.beat-pulse-img {
+  height: 26px;
+  object-fit: contain;
+  transition: transform 0.08s ease, filter 0.08s ease;
+}
+
+.beat-pulse-img.pulse {
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 10px #ff0055);
 }

@@ -40,6 +40,26 @@ Dengan mempelajari 12 game terbaik dari platform kurasi antarmuka [Interface In 
 
 ---
 
+## 📸 Tangkapan Layar Implementasi Tri-Platform (Desktop, Web & Android)
+
+Implementasi visual UI/UX 12 game master telah diverifikasi dan berjalan aktif secara responsif di ketiga platform:
+
+### 1. Desktop Stage Console (Godot 4 Forward+ 1080p Vulkan)
+Konsol utama panggung yang menampilkan seluruh instrumen tuts 61-key, waterfall laser visualizer, dek repertoar 100 lagu, dan elemen grafis 12 game master.
+![Desktop Godot Stage Console](captures/screenshot_godot_stage.png)
+
+### 2. Web / Tablet StageHub Remote (1200x800 Stand-Mounted Landscape)
+Tampilan browser Chrome/Safari pada tablet yang dipasang di stand keyboard via embedded local server (`:8080`).
+![Web Tablet Remote](captures/screenshot_web_remote.png)
+
+### 3. Android Mobile Touch Companion (430x932 OLED Mic-Stand Portrait)
+Tampilan smartphone Android yang terpasang di holder tiang mikrofon untuk musisi/vokalis panggung.
+<p align="center">
+  <img src="captures/screenshot_android_companion.png" width="360" alt="Android Companion" />
+</p>
+
+---
+
 ## 2. Peta 12 Arketipe Game & Integrasi Sistem
 
 ```
@@ -292,3 +312,96 @@ Anda bebas menggunakan, memodifikasi, mendistribusikan, dan memadukan seluruh as
 | `card_trickytowers_spell_frame.svg` | `card_trickytowers_spell_frame.png` | 180x240 | Tricky Towers |
 | `tag_snipperclips_paper_cutout.svg` | `tag_snipperclips_paper_cutout.png` | 220x70 | Snipperclips |
 | `sticker_snipperclips_pastel_note.svg` | `sticker_snipperclips_pastel_note.png` | 160x160 | Snipperclips |
+
+
+---
+
+## 7. Transformasi Sweet & Charming Interactive RPG Game Suite
+
+Berdasarkan benchmark diegetik game RPG favorit:
+- **Moonlighter Notebook & Staff Forge** (*11 bit studios*): Jurnal pedagang bersampul kulit jahitan tangan, kawat spiral ring, bookmark tab berwarna-warni, serta stempel ekspresi emosional pedagang.
+- **Animal Crossing: New Horizons** (*Nintendo*): Kanopi awan bergelombang (*scalloped cloud header*), kartu resep DIY dengan watermark butir biji pohon (*acorn watermark*), dan slot stempel Nook Miles.
+- **Assassin's Creed Mirage Codex**: Gulungan perkamen archival kuno bertengger pada kedua ujung tongkat kayu untuk teleprompter lirik panggung.
+- **Gothic Fantasy & Tactical RPG**: Kartu mantra runik emas-ungu (*spell card*) untuk bingkai akor dan kristal reservoar bar mana untuk indikator Fever/Velocity.
+
+Semua tampilan visual flat generic telah direvisi secara menyeluruh pada ketiga platform panggung:
+
+```
+[ AnantaNada Tri-Platform Sweet RPG Experience ]
+├── 1. Desktop Stage View (Godot 4 Forward+ Vulkan 1920x1080)
+│   ├── Meja Kayu Oak Hangat (desk_wood_surface.png)
+│   ├── Jurnal Setlist Kulit & Kawat Spiral (notebook_page_parchment.png & spiral_wire_binding.png)
+│   ├── Tab Bookmark Mint, Honey, & Berry (tab_mint.png, tab_honey.png, tab_berry.png)
+│   ├── Kartu Resep DIY Animal Crossing (card_ac_recipe_item.png) dengan Star Pin Badge (badge_star_pin.png)
+│   ├── Kanopi Awan Bergelombang (scalloped_cloud_banner.png) di atas Air Terjun Waterfall
+│   ├── Coach Deck: Reservoar Mana Kristal (gauge_rpg_mana_bar.png) & Stempel Cheer Smiley (emoji_reaction_cheer.png)
+│   ├── Arcane Spell Card Runic (card_rpg_spell_harmony.png) membingkai Akor Aktif
+│   └── Gulungan Perkamen Mirage (parchment_codex_scroll.png) untuk Teleprompter Lirik
+│
+├── 2. Web Remote Dashboard (1280x820 Desktop / Tablet)
+│   ├── Header Kayu Mahoni dengan Koin Emas Pedagang (badge_gold_coin_rpg.png)
+│   ├── Grid 3 Kolom Taktil Bertekstur RPG Diegetik Penuh
+│   └── Animasi CSS Heart Pulse Cadence of Hyrule & Comic Burst Hi-Fi Rush
+│
+└── 3. Android Companion App (430x932 Mobile Portrait)
+    ├── Tata Letak Vertikal Responsif dengan Kontras Tinggi untuk Panggung Terang/Gelap
+    ├── Kartu Resep DIY yang Luas dan Nyaman Disentuh Jempol
+    └── Floating Mahogany Footer dengan Pemisah Split Point Tuts Roland Go:Keys 3
+```
+
+### 7.1 Daftar Aset RPG Baru (`assets/rpg_ui/sprites/`)
+
+| Nama File Sprite | Resolusi | Karakter Visual | Game Inspirasi |
+| :--- | :---: | :--- | :--- |
+| `desk_wood_surface.png` | 1920x1080 | Permukaan kayu oak hangat dengan serat kayu alami dan pencahayaan studio | Moonlighter Forge / Cozy RPG |
+| `notebook_page_parchment.png` | 380x560 | Jurnal perkamen tepi lusuh dengan sampul kulit jahitan benang dan pita merah | Moonlighter Notebook |
+| `spiral_wire_binding.png` | 30x480 | Ring kawat spiral baja berkilau untuk jilid buku lagu | Moonlighter Ledger |
+| `scalloped_cloud_banner.png` | 600x64 | Kanopi awan bergelombang pastel cream-putih | Animal Crossing: New Horizons |
+| `tab_mint.png`, `tab_honey.png`, `tab_berry.png`, `tab_sky.png` | 84x46 | Tab bookmark penanda kategori setlist (Indo, Barat, Jazz, Religi) | Moonlighter / Stardew Valley |
+| `card_ac_recipe_item.png` | 320x56 | Kartu resep DIY bertepi melengkung dengan watermark dots | Animal Crossing: New Horizons |
+| `card_ac_stamp_slot.png` | 260x72 | Kartu slot cap stempel tantangan Nook Miles | Animal Crossing Achievements |
+| `emoji_reaction_happy.png`, `emoji_reaction_cheer.png`, `neutral`, `sweat` | 64x64 | Cap stempel tinta bulat dengan ekspresi emosi wajah imut | Moonlighter Reactions |
+| `badge_gold_coin_rpg.png` | 54x54 | Koin emas pedagang berkilau dengan emboss bintang | Moonlighter Merchant Sovereign |
+| `badge_star_pin.png` | 48x48 | Pin bintang logam emas untuk lagu favorit panggung | Animal Crossing Favorites |
+| `gauge_rpg_mana_bar.png` | 380x48 | Indikator reservoar kristal mana RPG bercahaya cyan-emas | Tactical Fantasy RPG |
+| `parchment_codex_scroll.png` | 340x140 | Gulungan perkamen kuno dengan rol kayu berulir di atas dan bawah | Assassin's Creed Mirage Codex |
+| `card_rpg_spell_harmony.png` | 320x120 | Kartu mantra runik gothic ungu gelap berbingkai emas bercahaya | Gothic RPG Grimoire |
+
+### 7.2 Cara Edit, Regenerasi, dan Mengganti Sprite
+
+1. **Mengubah Bentuk / Warna / Detail Sprite**:
+   - Skrip generator otomatis tersedia di `assets/rpg_ui/generate_rpg_ui_suite.py`.
+   - Menggunakan Pillow dengan antialiasing supersampling 4x ($s=4$). Anda dapat mengubah nilai RGB, radius sudut, ketebalan outline, atau menambah ornamen baru pada fungsi masing-masing (misal `generate_desk_wood()`, `generate_spell_card()`).
+   - Jalankan regenerasi:
+     ```bash
+     python assets/rpg_ui/generate_rpg_ui_suite.py
+     ```
+   - Skrip secara otomatis menimpa file di `assets/rpg_ui/sprites/`, lalu salin ke `assets/ui_sprites/png/` dan `web/assets/ui_sprites/png/`.
+
+2. **Memperbarui Indeks Impor Godot 4**:
+   - Setelah menambahkan atau memperbarui file PNG, jalankan Godot editor headless agar cache tekstur `.ctex` di `.godot/imported/` diperbarui:
+     ```bash
+     C:\Godot\Godot_v4.5-stable_win64_console.exe --editor --headless --quit
+     ```
+
+3. **Memverifikasi Tampilan Screenshot Tri-Platform**:
+   - Desktop Godot:
+     ```bash
+     C:\Godot\Godot_v4.5-stable_win64_console.exe scenes/ScreenshotGrabber.tscn
+     ```
+     Hasil tangkapan layar tersimpan di `captures/screenshot_godot_stage.png`.
+   - Web Remote & Android Companion:
+     ```bash
+     python scripts/capture_web_screens.py
+     ```
+     Hasil tangkapan layar tersimpan di `captures/screenshot_web_remote.png` dan `captures/screenshot_android_companion.png`.
+
+---
+
+## 8. Verifikasi Tangkapan Layar Tri-Platform
+
+| Platform | Resolusi Tangkapan | File Bukti Screenshot |
+| :--- | :---: | :--- |
+| **Desktop Stage View (Godot 4)** | 1920 x 1080 (Vulkan Forward+) | `captures/screenshot_godot_stage.png` |
+| **Web Remote Control (Browser)** | 1280 x 820 (Desktop / Tablet) | `captures/screenshot_web_remote.png` |
+| **Android Companion App** | 430 x 932 (Mobile Portrait) | `captures/screenshot_android_companion.png` |

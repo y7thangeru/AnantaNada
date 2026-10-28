@@ -117,3 +117,27 @@
 - [x] Full integration into Godot 4 Forward+ native stage console (`scenes/MainStageView.tscn` and `src/UI/MainStageController.gd`)
 - [x] Full integration into mobile companion Web Remote (`web/index.html`, `web/style.css`, `web/app.js`, and `web/assets/ui_sprites/`)
 - [x] Dedicated UI Sprite suite documentation (`assets/ui_sprites/README.md`) with 100% Free / Creative Commons CC0 public domain licensing
+
+
+## 10. Sweet & Charming Interactive RPG Game Suite (Moonlighter, Animal Crossing, AC Mirage, Gothic Grimoire)
+- [x] Complete visual revision from flat techwear into warm, charming, tactile diegetic RPG stage console
+- [x] 14 newly generated supersampled sprites via `assets/rpg_ui/generate_rpg_ui_suite.py`:
+  - [x] Warm oak desk studio background (`desk_wood_surface.png`, 1920x1080)
+  - [x] Leather-bound stitched journal notebook with bookmark ribbon (`notebook_page_parchment.png`, 380x560)
+  - [x] Spiral wire steel binding (`spiral_wire_binding.png`, 30x480)
+  - [x] Animal Crossing scalloped cloud header canopy (`scalloped_cloud_banner.png`, 600x64)
+  - [x] Moonlighter bookmark category tabs: Mint, Honey, Berry, Sky (`tab_*.png`, 84x46)
+  - [x] Animal Crossing DIY recipe cards with acorn dots watermark (`card_ac_recipe_item.png`, 320x56)
+  - [x] Animal Crossing Nook Miles achievement stamp cards (`card_ac_stamp_slot.png`, 260x72)
+  - [x] Moonlighter merchant emoji reaction stamps: Happy, Cheer, Neutral, Sweat (`emoji_reaction_*.png`, 64x64)
+  - [x] Merchant gold sovereign coin (`badge_gold_coin_rpg.png`, 54x54) & Star pin badge (`badge_star_pin.png`, 48x48)
+  - [x] Tactical RPG crystal mana reservoir gauge (`gauge_rpg_mana_bar.png`, 380x48)
+  - [x] Assassin's Creed Mirage rolled archival parchment codex scroll (`parchment_codex_scroll.png`, 340x140)
+  - [x] Gothic fantasy arcane spell card with glowing runic borders (`card_rpg_spell_harmony.png`, 320x120)
+- [x] Godot 4 Forward+ Vulkan scene overhaul (`scenes/MainStageView.tscn` & `src/UI/MainStageController.gd`)
+- [x] Web Remote companion overhaul (`web/index.html` & `web/style.css`)
+- [x] Android Companion mobile responsive layout overhaul (stacked tactile panels, touch-optimized recipe cards)
+- [x] Tri-platform screenshot capture and verification:
+  - [x] Desktop Stage View: `captures/screenshot_godot_stage.png` (1920x1080)
+  - [x] Web Remote: `captures/screenshot_web_remote.png` (1280x820)
+  - [x] Android Companion: `captures/screenshot_android_companion.png` (430x932)

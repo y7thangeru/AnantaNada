@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://grabber1080p"]
+
+[ext_resource type="Script" path="res://scripts/screenshot_grabber.gd" id="1_grabber"]
+[ext_resource type="PackedScene" path="res://scenes/MainStageView.tscn" id="2_main"]
+
+[node name="ScreenshotGrabber" type="Node"]
+script = ExtResource("1_grabber")
+
+[node name="MainStageView" parent="." instance=ExtResource("2_main")]
