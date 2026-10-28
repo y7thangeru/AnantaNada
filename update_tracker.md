@@ -107,3 +107,11 @@ This file logs all file creations, modifications, deletions, refactorings, and f
 ### [2026-10-28 12:58:30 +07:00] - [MODIFY] `Report-To-GeminiProject.md`
 - **Action**: Updated consolidated master report with complete unabridged compilation of all 10 markdown documentation files across the project.
 - **Reason**: Comply with Antigravity Rule 2.5 (Consolidated Master Report).
+
+### [2026-10-28 13:16:12 +07:00] - [NEW] `addons/godot_mcp/`
+- **Action**: Installed `godot-live` Godlink WebSocket bridge addon into the project.
+- **Reason**: Enables real-time two-way synchronization over port 6505 between Antigravity and Godot Editor.
+
+### [2026-10-28 13:16:19 +07:00] - [MODIFY] `project.godot`
+- **Action**: Enabled `res://addons/godot_mcp/plugin.cfg` under `[editor_plugins]`.
+- **Reason**: Auto-initializes Godot MCP bridge upon opening project in Godot Editor.
