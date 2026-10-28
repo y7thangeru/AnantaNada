@@ -123,3 +123,15 @@ This file logs all file creations, modifications, deletions, refactorings, and f
 ### [2026-10-28 13:21:44 +07:00] - [NEW] `captures/screenshot_godot_stage.png`
 - **Action**: Rendered 1080p Vulkan Forward+ screenshot of `MainStageView.tscn`.
 - **Reason**: Visual verification artifact showcasing the kinetic diegetic stage HUD, 61-key keybed shader, and teleprompter layout.
+
+### [2026-10-28 13:44:03 +07:00] - [NEW] `captures/screenshot_web_remote.png`
+- **Action**: Captured and structured visual snapshot of the mobile stage teleprompter HUD.
+- **Reason**: Visual verification artifact showcasing the stand-mounted responsive teleprompter, OLED dark theme, and persistent Panic button.
+
+### [2026-10-28 13:44:40 +07:00] - [MODIFY] `README.md`
+- **Action**: Enhanced root documentation with Visual Stage Showcase gallery and updated directory architecture containing `addons/godot_mcp/` and `scripts/`.
+- **Reason**: Keep project showcase immediately accessible on GitHub front page.
+
+### [2026-10-28 13:45:10 +07:00] - [MODIFY] `Report-To-GeminiProject.md`
+- **Action**: Synchronized master report with visual stage verification captures and directory updates.
+- **Reason**: Ensure master report maintains 100% parity with repo state.

@@ -13,6 +13,14 @@
 
 ---
 
+## 🎨 Visual Stage Showcase
+
+| Godot 4 Native Stage Console (1080p Forward+) | Stand-Mounted Mobile Teleprompter & Setlist Remote |
+| :---: | :---: |
+| ![Godot Stage HUD](captures/screenshot_godot_stage.png) | <img src="captures/screenshot_web_remote.png" width="340" alt="Mobile Remote HUD" /> |
+
+---
+
 ## 🌟 Architecture & Core Guarantees
 
 ```mermaid
@@ -111,9 +119,14 @@ flowchart TD
 
 ```text
 AnantaNada_RolandGoKeys3/
+├── addons/
+│   └── godot_mcp/                      # Godlink WebSocket Editor Bridge (Port 6505)
 ├── scenes/
 │   ├── MainStageView.tscn              # Godot 4 main stage scene & stylized node hierarchy
 │   └── README.md                       # Documentation for scene hierarchy and HUD layout
+├── scripts/
+│   ├── capture_stage_screenshot.gd     # Headless 1080p stage HUD capture tool
+│   └── capture_web_remote.py           # Web remote companion client capture utility
 ├── src/
 │   ├── Core/
 │   │   └── Midi/
@@ -140,7 +153,9 @@ AnantaNada_RolandGoKeys3/
 │   ├── style.css                       # Stylized high-contrast dark theme
 │   ├── app.js                          # WebSocket client & teleprompter canvas renderer
 │   └── README.md                       # Documentation for mobile remote client
-├── captures/                           # Output directory for retroactive .mid exports
+├── captures/                           # Output directory for retroactive .mid exports and screenshots
+│   ├── screenshot_godot_stage.png      # 1080p visual capture of native stage console
+│   └── screenshot_web_remote.png       # Visual capture of mobile stage teleprompter HUD
 ├── project.godot                       # Godot 4.3 project configuration
 ├── AnantaNada.csproj                   # .NET 8 / C# 12 project file with GodotSharp integration
 ├── ANANTANADA_SPEC.md                  # Comprehensive architectural specification

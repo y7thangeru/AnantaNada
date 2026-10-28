@@ -64,6 +64,9 @@ Musicians and bands using modern entry/mid-tier portable synthesizers like the *
   - `TRIGGER_PANIC`: Immediately triggers the hardware panic reset.
 
 ### 3.4. Stylized Diegetic UI/UX & Shaders (Godot 4)
+- **Visual Verification Artifacts**:
+  - `captures/screenshot_godot_stage.png`: 1080p native stage HUD capture with keybed and waterfall visualizer.
+  - `captures/screenshot_web_remote.png`: High-contrast stand-mounted mobile teleprompter capture.
 - **Palette**: Deep Obsidian (`#0b0d10`), Panel Grey (`#161920`), Electric Amber (`#ffb703`), Cyber Cyan (`#00f5d4`), Warning Crimson (`#ef233c`).
 - **61-Key Keybed Shader (`piano_keybed.gdshader`)**:
   - Dynamically renders 36 white keys and 25 black keys based on Roland Go:Keys 3 note range (MIDI 36 to 96).
@@ -110,6 +113,7 @@ The engine was compiled and verified using the embedded `VerificationHarness`:
 
 - **.NET Build**: Succeeded with 0 Warnings and 0 Errors (`GodotSharp 4.3.0` + .NET 8).
 - **SMF Output**: Validated binary file `captures/test_scratchpad.mid` with correct `MThd` and `MTrk` chunk headers.
+- **Visual Capture**: Verified rendering output at `captures/screenshot_godot_stage.png` and `captures/screenshot_web_remote.png`.
 
 ---
 
