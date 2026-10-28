@@ -13,6 +13,7 @@ uniform vec4 color_neon_cyan : source_color = vec4(0.0, 0.96, 0.83, 1.0);       
 uniform vec4 color_neon_amber : source_color = vec4(1.0, 0.72, 0.01, 1.0);      // Zone A Bass (#ffb703)
 uniform vec4 color_slit_dark : source_color = vec4(0.03, 0.04, 0.05, 1.0);      // Slit gap
 uniform vec4 color_split_marker : source_color = vec4(1.0, 0.20, 0.35, 1.0);    // C4 Split Marker
+uniform float split_point_white_key : hint_range(0.0, 36.0) = 14.0;
 
 uniform float black_key_length : hint_range(0.5, 0.75) = 0.60;
 uniform float black_key_width : hint_range(0.4, 0.7) = 0.58;
@@ -181,9 +182,8 @@ void fragment() {
         }
     }
 
-    // 5. SPLIT POINT C4 DIVIDER BAND (White Key #14 -> Note 60)
-    // In white key units, boundary is at exactly 14.0
-    float split_u = 14.0;
+    // 5. SPLIT POINT DIVIDER BAND
+    float split_u = split_point_white_key;
     float dist_split = abs(w_coord - split_u);
     if (dist_split < 0.08) {
         float split_glow = smoothstep(0.08, 0.0, dist_split);

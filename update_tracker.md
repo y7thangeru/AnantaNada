@@ -303,3 +303,7 @@ This file logs all file creations, modifications, deletions, refactorings, and f
 ### [2026-10-28 18:36:00 +07:00] - [MODIFY] `src/UI/MainStageController.gd`
 - **Action**: Implemented 64x128 scrolling note stream canvas (`waterfall_image`, `waterfall_texture`) updated in real time via native `blit_rect`, automated falling chord note injection on song downbeats (`_inject_chord_falling_notes`), and dynamic chord note calculation (`_get_chord_notes`).
 - **Reason**: Activates the falling note cascade down the 3D perspective runway towards the strike line.
+
+### [2026-10-28 18:52:00 +07:00] - [MODIFY] `src/Shaders/piano_keybed.gdshader` & `src/UI/MainStageController.gd`
+- **Action**: Added `split_point_white_key` uniform to `piano_keybed.gdshader` and dynamically computed white key offsets in `MainStageController.gd`.
+- **Reason**: Ensures the red split marker line slides dynamically to match the exact split point defined in any song mission (e.g. C3, C4, C5).

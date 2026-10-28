@@ -288,8 +288,11 @@ func _select_song(idx: int) -> void:
 	lbl_zone_b.text = "ZONE B: NEO-SOLO LEAD (CYAN OVERDRIVE // %s // %s-C7)" % [pt_name, split_name]
 
 	if keybed_material:
-		var norm_split = float(split_pt - LOWEST_NOTE) / 60.0
-		keybed_material.set_shader_parameter("split_point_norm", norm_split)
+		var s_oct = int((split_pt - LOWEST_NOTE) / 12)
+		var s_rem = int((split_pt - LOWEST_NOTE) % 12)
+		var white_offsets = [0.0, 0.5, 1.0, 1.5, 2.0, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0]
+		var split_w = float(s_oct * 7) + white_offsets[s_rem]
+		keybed_material.set_shader_parameter("split_point_white_key", split_w)
 
 	# Send WebSocket command to C# hardware MIDI engine
 	if is_ws_connected:
