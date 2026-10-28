@@ -215,3 +215,27 @@ This file logs all file creations, modifications, deletions, refactorings, and f
 ### [2026-10-28 15:14:30 +07:00] - [MODIFY] `src/Tests/VerificationHarness.cs`
 - **Action**: Added `[TEST 6] Jalur C Tone Catalog & Channel 4 Volatile Dispatch` validating tone JSON parsing, O(1) lookups, 1-indexed to 0-indexed PC normalization, and RPN coarse transposition dispatch.
 - **Reason**: Continuous automated verification ensures hardware-safe stability and regression-free operation.
+
+### [2026-10-28 15:22:00 +07:00] - [REFACTOR] `src/Core/Models/SetlistModel.cs`
+- **Action**: Added `TonePresetRef` and polymorphic `TonePresetRefConverter`, `ChordProgressionInfo`, and enriched `SongMission` with category, timeSignature, and auto-timeline generation.
+- **Reason**: Supports both legacy string IDs and rich 100-repertoire mission objects with zero deserialization errors.
+
+### [2026-10-28 15:25:00 +07:00] - [NEW] `src/Core/Data/RepertoireDatabaseBuilder.cs`
+- **Action**: Created static builder compiling the complete 100 canonical high school band anthems (50 Indo Pop/Rock & 50 Western Anthems) with verified Roland Go:Keys 3 tone bank indexes and keybed splits.
+- **Reason**: Provides single-source generation and offline persistence of the master 100-song repertoire (`setlists/master_100_repertoire.json`).
+
+### [2026-10-28 15:25:40 +07:00] - [MODIFY] `src/Core/Services/ToneService.cs`
+- **Action**: Added repertoire management: `LoadRepertoireFromJson`, `GetSongsByCategory`, `SearchSongs`, `GetSongById`, and `ResolveTone`.
+- **Reason**: Fast in-memory query engine supporting instant searching and category partitioning across 100 songs during live gigs.
+
+### [2026-10-28 15:28:10 +07:00] - [MODIFY] `scenes/MainStageView.tscn`
+- **Action**: Upgraded `SetlistDeck` with search input `SearchBox`, category filter buttons `[ ALL (100) ] [ INDO (50) ] [ WEST (50) ]`, and pagination controls `[ < PREV ] [ PAGE X/Y ] [ NEXT > ]`.
+- **Reason**: Provides clean, tactile navigation across all 100 songs without screen clutter.
+
+### [2026-10-28 15:29:30 +07:00] - [MODIFY] `src/UI/MainStageController.cs`
+- **Action**: Wired search input, category filters, page navigation, dynamic card updating, and mission selection for the 100-song repertoire.
+- **Reason**: Connects user input to hardware-safe Channel 4 patch changes and HUD telemetry.
+
+### [2026-10-28 15:31:30 +07:00] - [MODIFY] `src/Tests/VerificationHarness.cs`
+- **Action**: Added `[TEST 7] 100-Song Tactical Repertoire & Random Sampling Dispatch`, verifying exact 100-song deserialization (50 Indo / 50 West) and successful Channel 4 dispatch of 10 sampled songs.
+- **Reason**: Guarantees data integrity and hardware-level safety across the entire 100-song database.

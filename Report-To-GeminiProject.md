@@ -92,10 +92,41 @@ Eksekusi build .NET 8 dan suite pengujian otomatis (`VerificationHarness.cs`):
 [TEST 4] Hardware Panic Circuit (CC120, 123, 64 on 16 Ch)... PASS (Broadcasted CC 120/123/64 + All Notes Off to all 16 channels)
 [TEST 5] Embedded StageHub Server & WS Telemetry Loop... SKIP (Port binding restricted in environment)
 [TEST 6] Jalur C Tone Catalog & Channel 4 Volatile Dispatch... PASS (26 tones loaded across 7 categories; Ch 4 dispatch + RPN verified)
+[TEST 7] 100-Song Tactical Repertoire & Random Sampling Dispatch... PASS (100 songs verified [50 Indo / 50 West]; 10 random dispatches on Ch 4 OK)
 =================================================
-  AUDIT RESULT: 5 PASSED, 0 FAILED
+  AUDIT RESULT: 6 PASSED, 0 FAILED
 =================================================
 ```
+
+---
+
+## 5. Master 100-Song Stage Repertoire Database & Preset Matrices
+
+Basis data 100 lagu repertoar panggung festival band SMP/SMA (`setlists/master_100_repertoire.json`) telah diintegrasikan:
+1. **50 Lagu Band Pop / Rock Indonesia**:
+   - Sheila on 7 (*Dan*, *Kisah Klasik*, *Melompat Lebih Tinggi*, *Sahabat Sejati*, *Sephia*, *J.A.P*, *Kita*, *Radio*)
+   - Dewa 19 (*Kangen*, *Pupus*, *Separuh Nafas*, *Kamulah Satu-Satunya*, *Cemburu*, *Pangeran Cinta*)
+   - Andra and the Backbone (*Sempurna*, *Main Hati*)
+   - Nidji (*Laskar Pelangi*, *Hapus Aku*)
+   - The Adams (*Disco Darurat*, *Konservatif*)
+   - Diskoria & Laleilmanino (*C.H.R.I.S.Y.E.*, *Serenata Jiwa Disko*)
+   - Hindia & .Feast (*Evaluasi*, *Rumah ke Rumah*, *Secukupnya*, *Berita Kehilangan*, *Peradaban*)
+   - RAN, Glenn Fredly, Ari Lasso, Fourtwnty, Iwan Fals, Pamungkas, dsb.
+2. **50 Lagu Band Pop / Rock Mancanegara**:
+   - Oasis (*Don't Look Back in Anger*, *Wonderwall*)
+   - Coldplay (*Yellow*, *The Scientist*, *Fix You*, *Viva La Vida*, *Adventure of a Lifetime*)
+   - Maroon 5 (*Sunday Morning*, *This Love*, *She Will Be Loved*, *Payphone*, *Moves Like Jagger*)
+   - Bon Jovi (*It's My Life*, *Livin' on a Prayer*)
+   - Radiohead (*Creep*, *Karma Police*, *High and Dry*, *No Surprises*)
+   - Green Day (*Basket Case*, *Wake Me Up When September Ends*, *21 Guns*, *American Idiot*, *Boulevard of Broken Dreams*)
+   - Blink-182 (*All The Small Things*, *I Miss You*, *What's My Age Again?*)
+   - Bruno Mars (*Count on Me*, *Just the Way You Are*, *Treasure*, *Uptown Funk*, *Locked Out of Heaven*, *When I Was Your Man*)
+   - Imagine Dragons, OneRepublic, Ed Sheeran, The Chainsmokers, dsb.
+3. **Pencarian Real-Time & Paginasi UI**:
+   - Filter Kategori: `[ ALL (100) ]`, `[ INDO (50) ]`, `[ WEST (50) ]`.
+   - Text Search Box real-time matching judul, artis, dan tags.
+   - Paginasi `< PREV` dan `NEXT >` dengan kartu miring bergaya diegetic.
+   - Pemilihan kartu mengeksekusi otomatis MIDI Channel 4 patch change volatile, coarse transposition via RPN, pembaruan split zone, dan pengiriman broadcast `PLAYBACK_TICK` ke browser mobile.
 
 ---
 

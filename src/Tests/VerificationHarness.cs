@@ -1,5 +1,7 @@
 using System.Net.WebSockets;
 using System.Text;
+using System.Text.Json;
+using AnantaNada.Core.Data;
 using AnantaNada.Core.Midi;
 using AnantaNada.Core.Models;
 using AnantaNada.Core.Services;
@@ -227,6 +229,91 @@ public static class VerificationHarness
             {
                 Console.WriteLine($"FAIL (Catalog validation failed. Loaded count: {allTones.Count})");
                 failed++;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"FAIL: {ex.Message}");
+            failed++;
+        }
+
+        // Test 7: 100-Song Tactical Repertoire & Random Sampling Channel 4 Dispatch
+        try
+        {
+            Console.Write("[TEST 7] 100-Song Tactical Repertoire & Random Sampling Dispatch... ");
+
+            // 1. Ensure master_100_repertoire.json is compiled to disk
+            string repPath = Path.Combine(Directory.GetCurrentDirectory(), "setlists", "master_100_repertoire.json");
+            RepertoireDatabaseBuilder.ExportMasterRepertoireJson(repPath);
+
+            // 2. Load and validate schema parsing
+            string json = File.ReadAllText(repPath);
+            var repertoire = JsonSerializer.Deserialize<List<SongMission>>(json);
+
+            if (repertoire == null || repertoire.Count != 100)
+            {
+                Console.WriteLine($"FAIL (Expected 100 songs, deserialized: {repertoire?.Count ?? 0})");
+                failed++;
+            }
+            else
+            {
+                var toneService = new ToneService(repertoireFilePath: repPath);
+                var indoSongs = toneService.GetSongsByCategory("Indo_Band");
+                var westSongs = toneService.GetSongsByCategory("Western_Band");
+                var sheilaSongs = toneService.SearchSongs("Sheila");
+                var coldplaySongs = toneService.SearchSongs("Coldplay");
+
+                bool countsValid = indoSongs.Count == 50 && westSongs.Count == 50 &&
+                                   sheilaSongs.Count >= 6 && coldplaySongs.Count >= 5;
+
+                if (!countsValid)
+                {
+                    Console.WriteLine($"FAIL (Category partition invalid: Indo={indoSongs.Count}, West={westSongs.Count})");
+                    failed++;
+                }
+                else
+                {
+                    // 3. Random Sampling of 10 songs for Channel 4 Dispatch
+                    using var midi = new NativeMidiEngine();
+                    var rng = new Random(42);
+                    var sampleIndexes = Enumerable.Range(0, 100).OrderBy(_ => rng.Next()).Take(10).ToList();
+
+                    bool sampleDispatchSuccess = true;
+                    foreach (int idx in sampleIndexes)
+                    {
+                        var song = repertoire[idx];
+                        if (song.PrimaryTone == null || song.PrimaryTone.Msb == 0 || song.PrimaryTone.Lsb == 0)
+                        {
+                            sampleDispatchSuccess = false;
+                            break;
+                        }
+
+                        // Dispatch Volatile Tone on Roland Go:Keys 3 Channel 4
+                        midi.SelectPatchVolatile(
+                            MidiConstants.GoKeys3DefaultPatchChannel,
+                            song.PrimaryTone.Msb,
+                            song.PrimaryTone.Lsb,
+                            song.PrimaryTone.RawProgramChange
+                        );
+
+                        // Dispatch Coarse Transposition via RPN
+                        midi.SetCoarseTranspose(
+                            MidiConstants.GoKeys3DefaultPatchChannel,
+                            song.Transpose
+                        );
+                    }
+
+                    if (sampleDispatchSuccess)
+                    {
+                        Console.WriteLine($"PASS (100 songs verified [50 Indo / 50 West]; 10 random dispatches on Ch 4 OK)");
+                        passed++;
+                    }
+                    else
+                    {
+                        Console.WriteLine("FAIL (Sample dispatch encountered invalid tone metadata)");
+                        failed++;
+                    }
+                }
             }
         }
         catch (Exception ex)

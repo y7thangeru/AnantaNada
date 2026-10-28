@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Godot;
+using AnantaNada.Core.Data;
 using AnantaNada.Core.Midi;
 using AnantaNada.Core.Models;
 using AnantaNada.Core.Services;
@@ -50,6 +51,21 @@ public partial class MainStageController : Control
     private PanelContainer _nextCard1 = null!;
     private PanelContainer _nextCard2 = null!;
     private PanelContainer _nextCard3 = null!;
+    private Label _lblNextCard1 = null!;
+    private Label _lblNextCard2 = null!;
+    private Label _lblNextCard3 = null!;
+    private LineEdit _searchBox = null!;
+    private Button _btnFilterAll = null!;
+    private Button _btnFilterIndo = null!;
+    private Button _btnFilterWestern = null!;
+    private Button _btnPrevPage = null!;
+    private Button _btnNextPage = null!;
+    private Label _lblPageIndicator = null!;
+
+    private string _currentCategory = "ALL";
+    private string _searchKeyword = "";
+    private int _currentPage = 0;
+    private readonly List<SongMission> _displayedSongs = new();
     private Control _hudContainer = null!;
 
     // Shaders
@@ -142,6 +158,18 @@ public partial class MainStageController : Control
         _nextCard2 = GetNodeOrNull<PanelContainer>("HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard2") ?? new PanelContainer();
         _nextCard3 = GetNodeOrNull<PanelContainer>("HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard3") ?? new PanelContainer();
 
+        _lblNextCard1 = GetNodeOrNull<Label>("HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard1/Label") ?? new Label();
+        _lblNextCard2 = GetNodeOrNull<Label>("HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard2/Label") ?? new Label();
+        _lblNextCard3 = GetNodeOrNull<Label>("HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard3/Label") ?? new Label();
+
+        _searchBox = GetNodeOrNull<LineEdit>("HUD/CenterSplit/SetlistDeck/MissionContainer/SearchBox") ?? new LineEdit();
+        _btnFilterAll = GetNodeOrNull<Button>("HUD/CenterSplit/SetlistDeck/MissionContainer/FilterRow/BtnFilterAll") ?? new Button();
+        _btnFilterIndo = GetNodeOrNull<Button>("HUD/CenterSplit/SetlistDeck/MissionContainer/FilterRow/BtnFilterIndo") ?? new Button();
+        _btnFilterWestern = GetNodeOrNull<Button>("HUD/CenterSplit/SetlistDeck/MissionContainer/FilterRow/BtnFilterWestern") ?? new Button();
+        _btnPrevPage = GetNodeOrNull<Button>("HUD/CenterSplit/SetlistDeck/MissionContainer/PaginationRow/BtnPrevPage") ?? new Button();
+        _btnNextPage = GetNodeOrNull<Button>("HUD/CenterSplit/SetlistDeck/MissionContainer/PaginationRow/BtnNextPage") ?? new Button();
+        _lblPageIndicator = GetNodeOrNull<Label>("HUD/CenterSplit/SetlistDeck/MissionContainer/PaginationRow/PageIndicator") ?? new Label();
+
         // 4. Shaders
         if (_keybedRect.Material is ShaderMaterial km) _keybedMaterial = km;
         if (_waterfallRect.Material is ShaderMaterial wm) _waterfallMaterial = wm;
@@ -166,14 +194,21 @@ public partial class MainStageController : Control
         HubServer.OnPanicTriggered += () => CallDeferred(nameof(TriggerPanicPurge));
         HubServer.OnSetlistItemTriggered += payload => CallDeferred(nameof(SelectMission), payload.SongIndex);
 
-        // 8. Wire UI Button Actions
+        // 8. Wire UI Button Actions & Repertoire Filtering
         _btnPanic.Pressed += TriggerPanicPurge;
         _btnNeverLostMelody.Pressed += OnNeverLostMelodyPressed;
 
+        _searchBox.TextChanged += OnSearchTextChanged;
+        _btnFilterAll.Pressed += () => SetFilterCategory("ALL");
+        _btnFilterIndo.Pressed += () => SetFilterCategory("Indo_Band");
+        _btnFilterWestern.Pressed += () => SetFilterCategory("Western_Band");
+        _btnPrevPage.Pressed += OnPrevPagePressed;
+        _btnNextPage.Pressed += OnNextPagePressed;
+
         // Desktop Setlist Card Click handlers
-        _nextCard1.GuiInput += @event => HandleCardClick(@event, 1);
-        _nextCard2.GuiInput += @event => HandleCardClick(@event, 2);
-        _nextCard3.GuiInput += @event => HandleCardClick(@event, 3);
+        _nextCard1.GuiInput += @event => HandleCardSlotClick(@event, 0);
+        _nextCard2.GuiInput += @event => HandleCardSlotClick(@event, 1);
+        _nextCard3.GuiInput += @event => HandleCardSlotClick(@event, 2);
 
         // 9. Connect Hardware & Start Mini-Server
         MidiEngine.Connect("Go:Keys");
@@ -189,44 +224,130 @@ public partial class MainStageController : Control
 
     private void LoadSetlist()
     {
-        string setlistPath = Path.Combine(Directory.GetCurrentDirectory(), "setlists", "default_band_setlist.json");
-        if (File.Exists(setlistPath))
+        // Prioritize the 100-song master repertoire if available
+        if (ToneLibrary.AllSongs.Count > 0)
         {
-            try
+            _setlist = new SetlistDocument
             {
-                string json = File.ReadAllText(setlistPath);
-                var doc = JsonSerializer.Deserialize<SetlistDocument>(json);
-                if (doc != null && doc.Songs.Count > 0)
+                SetlistName = "Master 100 Stage Repertoire",
+                Songs = ToneLibrary.AllSongs.ToList()
+            };
+        }
+        else
+        {
+            string repPath = Path.Combine(Directory.GetCurrentDirectory(), "setlists", "master_100_repertoire.json");
+            if (File.Exists(repPath))
+            {
+                try
                 {
-                    _setlist = doc;
-                    return;
+                    string json = File.ReadAllText(repPath);
+                    var list = JsonSerializer.Deserialize<List<SongMission>>(json);
+                    if (list != null && list.Count > 0)
+                    {
+                        _setlist = new SetlistDocument { SetlistName = "Master 100 Stage Repertoire", Songs = list };
+                        RefreshFilteredSongs();
+                        return;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    GD.PrintErr($"[Setlist] Notice parsing master repertoire: {ex.Message}");
                 }
             }
-            catch (Exception ex)
+
+            _setlist = new SetlistDocument
             {
-                GD.PrintErr($"[Setlist] Warning parsing setlist file: {ex.Message}");
-            }
+                SetlistName = "Fallback 100 Repertoire",
+                Songs = RepertoireDatabaseBuilder.Build100Repertoire()
+            };
         }
 
-        // Baseline fallback if setlist file is missing
-        _setlist = new SetlistDocument
-        {
-            SetlistName = "Fallback Tour Setlist",
-            Songs = new List<SongMission>
-            {
-                new() { SongId = "m_01", Title = "01. SENJA DUST", Bpm = 128, PrimaryTone = "PR022", SplitTone = "PR033", SplitPoint = 60 },
-                new() { SongId = "m_02", Title = "02. KELANA BEAT", Bpm = 134, PrimaryTone = "CM089_14", SplitTone = "CM089_22", SplitPoint = 60 },
-                new() { SongId = "m_03", Title = "03. FAJAR REVERIE", Bpm = 92, PrimaryTone = "PR001", SplitTone = "PR046", SplitPoint = 60 },
-                new() { SongId = "m_04", Title = "04. OVERDRIVE ANTHEM", Bpm = 140, PrimaryTone = "CM088_06", SplitTone = "CM089_22", SplitPoint = 60, Transpose = 1 }
-            }
-        };
+        RefreshFilteredSongs();
     }
 
-    private void HandleCardClick(InputEvent @event, int missionIndex)
+    private void SetFilterCategory(string category)
+    {
+        _currentCategory = category;
+        _currentPage = 0;
+        RefreshFilteredSongs();
+    }
+
+    private void OnSearchTextChanged(string newText)
+    {
+        _searchKeyword = newText;
+        _currentPage = 0;
+        RefreshFilteredSongs();
+    }
+
+    private void OnPrevPagePressed()
+    {
+        if (_currentPage > 0)
+        {
+            _currentPage--;
+            RefreshCardsUI();
+        }
+    }
+
+    private void OnNextPagePressed()
+    {
+        int maxPage = Math.Max(0, (_displayedSongs.Count - 1) / 3);
+        if (_currentPage < maxPage)
+        {
+            _currentPage++;
+            RefreshCardsUI();
+        }
+    }
+
+    private void RefreshFilteredSongs()
+    {
+        _displayedSongs.Clear();
+        var results = ToneLibrary.SearchSongs(_searchKeyword, _currentCategory);
+        _displayedSongs.AddRange(results);
+        RefreshCardsUI();
+    }
+
+    private void RefreshCardsUI()
+    {
+        int total = _displayedSongs.Count;
+        int maxPage = Math.Max(1, (int)Math.Ceiling(total / 3.0));
+        _currentPage = Math.Clamp(_currentPage, 0, Math.Max(0, maxPage - 1));
+
+        _lblPageIndicator.Text = $"PAGE {_currentPage + 1}/{maxPage} ({total})";
+
+        int startIdx = _currentPage * 3;
+        UpdateCardSlot(_nextCard1, _lblNextCard1, startIdx);
+        UpdateCardSlot(_nextCard2, _lblNextCard2, startIdx + 1);
+        UpdateCardSlot(_nextCard3, _lblNextCard3, startIdx + 2);
+    }
+
+    private void UpdateCardSlot(PanelContainer card, Label label, int index)
+    {
+        if (index < _displayedSongs.Count)
+        {
+            card.Visible = true;
+            var s = _displayedSongs[index];
+            label.Text = $"  {s.Id}. {s.Title} [{s.KeySignature} // {s.Bpm} BPM]";
+        }
+        else
+        {
+            card.Visible = false;
+        }
+    }
+
+    private void HandleCardSlotClick(InputEvent @event, int slotOffset)
     {
         if (@event is InputEventMouseButton mb && mb.Pressed && mb.ButtonIndex == MouseButton.Left)
         {
-            SelectMission(missionIndex);
+            int targetIdx = (_currentPage * 3) + slotOffset;
+            if (targetIdx >= 0 && targetIdx < _displayedSongs.Count)
+            {
+                var targetSong = _displayedSongs[targetIdx];
+                int setlistIdx = _setlist.Songs.IndexOf(targetSong);
+                if (setlistIdx >= 0)
+                {
+                    SelectMission(setlistIdx);
+                }
+            }
         }
     }
 
@@ -498,7 +619,7 @@ public partial class MainStageController : Control
         }
 
         // Broadcast telemetry to connected mobile teleprompters
-        var primaryTone = ToneLibrary.GetToneById(song.PrimaryTone);
+        var primaryTone = ToneLibrary.ResolveTone(song.PrimaryTone);
         var tickData = new PlaybackTickData
         {
             SongId = song.SongId,
@@ -507,7 +628,7 @@ public partial class MainStageController : Control
             Bpm = _currentBpm,
             CurrentChord = currentChord,
             NextChord = nextChord,
-            ActivePatch = primaryTone?.Name ?? song.PrimaryTone
+            ActivePatch = primaryTone?.Name ?? song.PrimaryTone.Name
         };
 
         _ = HubServer.BroadcastPlaybackTickAsync(tickData);
@@ -531,8 +652,8 @@ public partial class MainStageController : Control
         _perfectHits = 0;
 
         // Resolve Tones from ToneService
-        var primaryTone = ToneLibrary.GetToneById(song.PrimaryTone);
-        var splitTone = !string.IsNullOrEmpty(song.SplitTone) ? ToneLibrary.GetToneById(song.SplitTone) : null;
+        var primaryTone = ToneLibrary.ResolveTone(song.PrimaryTone);
+        var splitTone = song.SplitTone != null ? ToneLibrary.ResolveTone(song.SplitTone) : null;
 
         // 1. Dispatch Hardware-Safe Volatile Tone Change to Roland Go:Keys 3 on Channel 4 (0-indexed 3)
         if (primaryTone != null)
@@ -552,13 +673,25 @@ public partial class MainStageController : Control
         );
 
         // 3. Update HUD Display Elements
-        _lblActiveMission.Text = $"> {song.Title}";
-        _lblBpmBeat.Text = $"[BPM: {_currentBpm} /// 4/4] [BEAT: 01/4]";
+        _lblActiveMission.Text = $"> {song.Title.ToUpper()} - {song.Artist.ToUpper()}";
+        _lblBpmBeat.Text = $"[BPM: {_currentBpm} /// {song.TimeSignature}] [BEAT: 01/4]";
         _lblTranspose.Text = $"TRANSPOSE: [ {(song.Transpose >= 0 ? "+" : "")}{song.Transpose} SEMITONES ]";
         _lblLyricBar.Text = ">> CURRENT BAR 001 // BEAT 1 OF 4";
 
-        string currentChord = song.ChordsTimeline.Count > 0 ? song.ChordsTimeline[0].CurrentChord : "G#m7";
-        string nextChord = song.ChordsTimeline.Count > 0 ? song.ChordsTimeline[0].NextChord : "C#m7";
+        string currentChord = "C";
+        string nextChord = "G";
+        if (song.ChordsTimeline.Count > 0)
+        {
+            currentChord = song.ChordsTimeline[0].CurrentChord;
+            nextChord = song.ChordsTimeline[0].NextChord;
+        }
+        else if (song.ChordProgression != null)
+        {
+            var parts = song.ChordProgression.Intro.Split(new[] { '-', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length > 0) currentChord = parts[0];
+            if (parts.Length > 1) nextChord = parts[1];
+        }
+
         _lblCurrentChord.Text = $"[ {currentChord} ]";
         _lblNextChord.Text = $"NEXT CHORD -> {nextChord}";
 
@@ -566,18 +699,22 @@ public partial class MainStageController : Control
         {
             _lblLyricTeleprompter.Text = $"\"{song.LyricsTimeline[0].Text}\"";
         }
+        else if (song.ChordProgression != null)
+        {
+            _lblLyricTeleprompter.Text = $"\"{song.Title} - {song.Artist} // Intro: {song.ChordProgression.Intro}\"";
+        }
 
         // 4. Update Split Zone Labels
         string splitNoteName = $"C{song.SplitPoint / 12 - 1}"; // e.g. 60 -> C4
         _lblSplitLine.Text = $"[ SPLIT POINT: {splitNoteName} ]";
-        _lblZoneA.Text = $"ZONE A: SUB-BASS (AMBER PULSE // {splitTone?.Name ?? "BASS"} // C2-{splitNoteName})";
+        _lblZoneA.Text = $"ZONE A: SUB-BASS (AMBER PULSE // {splitTone?.Name ?? "PAD/BASS"} // C2-{splitNoteName})";
         _lblZoneB.Text = $"ZONE B: NEO-SOLO LEAD (CYAN OVERDRIVE // {primaryTone?.Name ?? "LEAD"} // {splitNoteName}-C7)";
 
         // Set shader split point parameter
         float splitNorm = (song.SplitPoint - MidiConstants.LowestNote) / 60.0f;
         _keybedMaterial?.SetShaderParameter("split_point_norm", splitNorm);
 
-        GD.PrintRich($"[color=cyan][b]Jalur C Activated:[/b] Mission '{song.Title}' -> Ch4 MSB:{primaryTone?.Msb} LSB:{primaryTone?.Lsb} PC:{primaryTone?.Pc} (Raw:{primaryTone?.RawProgramChange}) Transpose:{song.Transpose}[/color]");
+        GD.PrintRich($"[color=cyan][b]100-Repertoire Mission Activated:[/b] '{song.Title}' ({song.Artist}) -> Ch4 MSB:{primaryTone?.Msb} LSB:{primaryTone?.Lsb} PC:{primaryTone?.Pc} Transpose:{song.Transpose}[/color]");
     }
 
     public void TriggerPanicPurge()

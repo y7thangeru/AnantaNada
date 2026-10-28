@@ -219,21 +219,45 @@ size_flags_vertical = 3
 theme_override_constants/separation = 16
 
 [node name="SetlistDeck" type="PanelContainer" parent="HUD/CenterSplit"]
-custom_minimum_size = Vector2(330, 0)
+custom_minimum_size = Vector2(340, 0)
 layout_mode = 2
 
 [node name="MissionContainer" type="VBoxContainer" parent="HUD/CenterSplit/SetlistDeck"]
 layout_mode = 2
 offset_left = 14.0
-offset_top = 12.0
+offset_top = 10.0
 offset_right = -14.0
-offset_bottom = -12.0
-theme_override_constants/separation = 12
+offset_bottom = -10.0
+theme_override_constants/separation = 8
 
 [node name="HeaderLabel" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
-text = "[SETLIST DECK] /// SLANTED CARDS"
+text = "[SETLIST DECK] /// 100-SONG REPERTOIRE"
+
+[node name="SearchBox" type="LineEdit" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+placeholder_text = "Search song, artist, tag..."
+
+[node name="FilterRow" type="HBoxContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="BtnFilterAll" type="Button" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/FilterRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "ALL (100)"
+
+[node name="BtnFilterIndo" type="Button" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/FilterRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "INDO (50)"
+
+[node name="BtnFilterWestern" type="Button" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/FilterRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "WEST (50)"
 
 [node name="ActiveHeader" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
 layout_mode = 2
@@ -242,13 +266,13 @@ theme_override_font_sizes/font_size = 12
 text = "// ACTIVE MISSION"
 
 [node name="ActiveCard" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
-custom_minimum_size = Vector2(0, 68)
+custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 
 [node name="MissionName" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/ActiveCard"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "> 01. SENJA DUST"
+theme_override_font_sizes/font_size = 15
+text = "> 01. DAN - SHEILA ON 7"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -256,37 +280,59 @@ vertical_alignment = 1
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0.96, 0.83, 1)
 theme_override_font_sizes/font_size = 12
-text = "// NEXT MISSIONS"
+text = "// NEXT QUEUED MISSIONS"
 
 [node name="NextCard1" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
-custom_minimum_size = Vector2(0, 50)
+custom_minimum_size = Vector2(0, 46)
 layout_mode = 2
 
 [node name="Label" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard1"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "    02. KELANA BEAT"
+theme_override_font_sizes/font_size = 13
+text = "    02. KISAH KLASIK [A // 114 BPM]"
 vertical_alignment = 1
 
 [node name="NextCard2" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
-custom_minimum_size = Vector2(0, 50)
+custom_minimum_size = Vector2(0, 46)
 layout_mode = 2
 
 [node name="Label" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard2"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "    03. FAJAR REVERIE"
+theme_override_font_sizes/font_size = 13
+text = "    03. MELOMPAT TINGGI [D // 136 BPM]"
 vertical_alignment = 1
 
 [node name="NextCard3" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
-custom_minimum_size = Vector2(0, 50)
+custom_minimum_size = Vector2(0, 46)
 layout_mode = 2
 
 [node name="Label" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard3"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "    04. OVERDRIVE ANTHEM"
+theme_override_font_sizes/font_size = 13
+text = "    04. SAHABAT SEJATI [C // 120 BPM]"
 vertical_alignment = 1
+
+[node name="PaginationRow" type="HBoxContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="BtnPrevPage" type="Button" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/PaginationRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "< PREV"
+
+[node name="PageIndicator" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/PaginationRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 12
+text = "PAGE 1/25"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BtnNextPage" type="Button" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/PaginationRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "NEXT >"
 
 [node name="CenterCascade" type="VBoxContainer" parent="HUD/CenterSplit"]
 layout_mode = 2

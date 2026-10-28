@@ -1,10 +1,11 @@
 using System.Text.Json;
+using AnantaNada.Core.Data;
 using AnantaNada.Core.Models;
 
 namespace AnantaNada.Core.Services;
 
 /// <summary>
-/// Service managing the Roland Go:Keys 3 Tone Library Catalog.
+/// Service managing the Roland Go:Keys 3 Tone Library Catalog and Stage Repertoire.
 /// Provides O(1) ID lookups, category grouping, and multi-tag search filters.
 /// </summary>
 public sealed class ToneService
@@ -13,10 +14,17 @@ public sealed class ToneService
     private readonly Dictionary<string, List<ToneItem>> _tonesByCategory = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<ToneItem> _allTones = new();
 
+    private readonly Dictionary<string, SongMission> _songsById = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, List<SongMission>> _songsByCategory = new(StringComparer.OrdinalIgnoreCase);
+    private readonly List<SongMission> _allSongs = new();
+
     public IReadOnlyList<ToneItem> AllTones => _allTones;
     public IEnumerable<string> Categories => _tonesByCategory.Keys;
 
-    public ToneService(string? jsonFilePath = null)
+    public IReadOnlyList<SongMission> AllSongs => _allSongs;
+    public IEnumerable<string> SongCategories => _songsByCategory.Keys;
+
+    public ToneService(string? jsonFilePath = null, string? repertoireFilePath = null)
     {
         string path = ResolveCatalogFilePath(jsonFilePath);
         if (File.Exists(path))
@@ -28,6 +36,9 @@ public sealed class ToneService
             // Fallback: Populate baseline Roland Go:Keys 3 presets in-memory if file not found
             PopulateBaselineFallback();
         }
+
+        // Initialize 100-song repertoire database
+        LoadRepertoireFromJson(repertoireFilePath);
     }
 
     private static string ResolveCatalogFilePath(string? preferredPath)
@@ -86,11 +97,31 @@ public sealed class ToneService
         }
     }
 
-    public ToneItem? GetToneById(string id)
+    public ToneItem? GetToneById(string? id)
     {
         if (string.IsNullOrWhiteSpace(id)) return null;
         _tonesById.TryGetValue(id, out var tone);
         return tone;
+    }
+
+    public ToneItem? ResolveTone(TonePresetRef? toneRef)
+    {
+        if (toneRef == null) return null;
+        if (!string.IsNullOrEmpty(toneRef.Id) && _tonesById.TryGetValue(toneRef.Id, out var existing))
+        {
+            return existing;
+        }
+
+        return new ToneItem
+        {
+            Id = toneRef.Id,
+            Name = toneRef.Name,
+            Category = toneRef.Category,
+            Msb = toneRef.Msb,
+            Lsb = toneRef.Lsb,
+            Pc = toneRef.Pc,
+            DefaultSplitKey = 60
+        };
     }
 
     public IReadOnlyList<ToneItem> GetTonesByCategory(string category)
@@ -158,5 +189,148 @@ public sealed class ToneService
             }
             list.Add(tone);
         }
+    }
+
+    public void LoadRepertoireFromJson(string? preferredPath = null)
+    {
+        string path = ResolveRepertoireFilePath(preferredPath);
+        if (File.Exists(path))
+        {
+            try
+            {
+                string json = File.ReadAllText(path);
+                List<SongMission>? songs = null;
+                if (json.TrimStart().StartsWith("["))
+                {
+                    songs = JsonSerializer.Deserialize<List<SongMission>>(json);
+                }
+                else
+                {
+                    var doc = JsonSerializer.Deserialize<SetlistDocument>(json);
+                    songs = doc?.Songs;
+                }
+
+                if (songs != null && songs.Count > 0)
+                {
+                    PopulateRepertoire(songs);
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ToneService] Warning: Failed to parse repertoire from {path}: {ex.Message}. Using in-memory builder.");
+            }
+        }
+
+        // If file not found or failed to parse, build 100 repertoire in-memory and write to disk
+        var fallbackSongs = RepertoireDatabaseBuilder.Build100Repertoire();
+        PopulateRepertoire(fallbackSongs);
+        try
+        {
+            RepertoireDatabaseBuilder.ExportMasterRepertoireJson(path);
+        }
+        catch
+        {
+            // Ignore write errors in restricted environments
+        }
+    }
+
+    private void PopulateRepertoire(IEnumerable<SongMission> songs)
+    {
+        _songsById.Clear();
+        _songsByCategory.Clear();
+        _allSongs.Clear();
+
+        foreach (var song in songs)
+        {
+            song.EnsureTimelineGenerated();
+            _songsById[song.Id] = song;
+            if (!string.IsNullOrEmpty(song.SongId) && !song.SongId.Equals(song.Id, StringComparison.OrdinalIgnoreCase))
+            {
+                _songsById[song.SongId] = song;
+            }
+            _allSongs.Add(song);
+
+            if (!_songsByCategory.TryGetValue(song.Category, out var list))
+            {
+                list = new List<SongMission>();
+                _songsByCategory[song.Category] = list;
+            }
+            list.Add(song);
+        }
+    }
+
+    private static string ResolveRepertoireFilePath(string? preferredPath)
+    {
+        if (!string.IsNullOrEmpty(preferredPath) && File.Exists(preferredPath))
+        {
+            return preferredPath;
+        }
+
+        string[] candidates =
+        {
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "setlists", "master_100_repertoire.json"),
+            Path.Combine(Directory.GetCurrentDirectory(), "setlists", "master_100_repertoire.json"),
+            Path.Combine(Directory.GetCurrentDirectory(), "master_100_repertoire.json")
+        };
+
+        foreach (var c in candidates)
+        {
+            if (File.Exists(c)) return c;
+        }
+
+        return candidates[1];
+    }
+
+    public SongMission? GetSongById(string songId)
+    {
+        if (string.IsNullOrWhiteSpace(songId)) return null;
+        _songsById.TryGetValue(songId, out var song);
+        return song;
+    }
+
+    public IReadOnlyList<SongMission> GetSongsByCategory(string category)
+    {
+        if (string.IsNullOrWhiteSpace(category) || category.Equals("ALL", StringComparison.OrdinalIgnoreCase))
+        {
+            return _allSongs;
+        }
+
+        if (_songsByCategory.TryGetValue(category, out var list))
+        {
+            return list;
+        }
+
+        return _allSongs.Where(s => s.Category.Equals(category, StringComparison.OrdinalIgnoreCase)).ToList();
+    }
+
+    public IReadOnlyList<SongMission> SearchSongs(string keyword, string? category = null)
+    {
+        var source = string.IsNullOrWhiteSpace(category) || category.Equals("ALL", StringComparison.OrdinalIgnoreCase)
+            ? _allSongs
+            : GetSongsByCategory(category);
+
+        if (string.IsNullOrWhiteSpace(keyword))
+        {
+            return source;
+        }
+
+        string q = keyword.Trim();
+        var results = new List<SongMission>();
+
+        foreach (var s in source)
+        {
+            bool matchTitle = s.Title.Contains(q, StringComparison.OrdinalIgnoreCase);
+            bool matchArtist = s.Artist.Contains(q, StringComparison.OrdinalIgnoreCase);
+            bool matchId = s.Id.Contains(q, StringComparison.OrdinalIgnoreCase) || s.SongId.Contains(q, StringComparison.OrdinalIgnoreCase);
+            bool matchTags = s.Tags.Any(tag => tag.Contains(q, StringComparison.OrdinalIgnoreCase));
+
+            if (matchTitle || matchArtist || matchId || matchTags)
+            {
+                results.Add(s);
+            }
+        }
+
+        return results;
     }
 }
