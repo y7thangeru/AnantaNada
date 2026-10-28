@@ -291,3 +291,15 @@ This file logs all file creations, modifications, deletions, refactorings, and f
 ### [2026-10-28 18:19:10 +07:00] - [MODIFY] `src/UI/MainStageController.gd`
 - **Action**: Upgraded pagination to 6 cards per page (`CARDS_PER_PAGE = 6`), added interactive hover cyan neon highlighting on all song cards and active card, hooked card click signals, added `TRIGGER_EXPORT_MIDI` WebSocket dispatch, and handled `CAPTURE_SAVED` toast updates.
 - **Reason**: Delivers tactile, game-grade feedback when navigating the setlist and selecting songs.
+
+### [2026-10-28 18:35:00 +07:00] - [FIX] `src/Shaders/piano_keybed.gdshader`
+- **Action**: Corrected key state sampling formula from normalized `(note - 36) / 60.0` to exact texel center `(float(note - 36) + 0.5) / 64.0`, and replaced drifting black key approximation with strict octave-bounded scanning.
+- **Reason**: Fixes critical texel distortion where black key D#3 (Note 51) failed to illuminate and higher octaves through C7 (Note 96) drifted across adjacent lanes.
+
+### [2026-10-28 18:35:30 +07:00] - [FIX] `src/Shaders/waterfall_visualizer.gdshader`
+- **Action**: Integrated `key_states` dynamic sampling for real-time laser columns shooting up the lane of any pressed Roland key, and corrected lane texel sampling on the 64-column note runway.
+- **Reason**: Provides immediate visual feedback in the center visualizer whenever physical keys are pressed on the Roland Go:Keys 3.
+
+### [2026-10-28 18:36:00 +07:00] - [MODIFY] `src/UI/MainStageController.gd`
+- **Action**: Implemented 64x128 scrolling note stream canvas (`waterfall_image`, `waterfall_texture`) updated in real time via native `blit_rect`, automated falling chord note injection on song downbeats (`_inject_chord_falling_notes`), and dynamic chord note calculation (`_get_chord_notes`).
+- **Reason**: Activates the falling note cascade down the 3D perspective runway towards the strike line.

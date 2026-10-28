@@ -89,6 +89,11 @@ var key_state_texture: ImageTexture
 var key_velocities: PackedFloat32Array = PackedFloat32Array()
 var key_impacts: PackedFloat32Array = PackedFloat32Array()
 
+# Note Stream Runway for Waterfall Visualizer
+var waterfall_image: Image
+var waterfall_texture: ImageTexture
+var waterfall_scroll_timer: float = 0.0
+
 # Feedback FX
 var beat_pulse: float = 0.0
 var hit_beam_flash: float = 0.0
@@ -110,11 +115,19 @@ func _ready() -> void:
 	if waterfall_rect and waterfall_rect.material is ShaderMaterial:
 		waterfall_material = waterfall_rect.material
 
-	# Dynamic 64x1 RGBA8 Texture for Keybed Shader
+	# Dynamic 64x1 RGBA8 Texture for Keybed & Waterfall Laser Columns
 	key_state_image = Image.create_empty(64, 1, false, Image.FORMAT_RGBA8)
 	key_state_texture = ImageTexture.create_from_image(key_state_image)
 	if keybed_material:
 		keybed_material.set_shader_parameter("key_states", key_state_texture)
+	if waterfall_material:
+		waterfall_material.set_shader_parameter("key_states", key_state_texture)
+
+	# Dynamic 64x128 RGBA8 Falling Note Stream Runway for Waterfall Visualizer
+	waterfall_image = Image.create_empty(64, 128, false, Image.FORMAT_RGBA8)
+	waterfall_texture = ImageTexture.create_from_image(waterfall_image)
+	if waterfall_material:
+		waterfall_material.set_shader_parameter("note_stream_texture", waterfall_texture)
 
 	# 2. Wire UI Buttons
 	btn_panic.pressed.connect(_on_panic_pressed)
@@ -380,6 +393,22 @@ func _process(delta: float) -> void:
 		waterfall_material.set_shader_parameter("hit_beam_intensity", hit_beam_flash)
 
 	_push_key_texture()
+	_update_waterfall_stream(delta)
+
+func _update_waterfall_stream(delta: float) -> void:
+	if not waterfall_image or not waterfall_texture:
+		return
+
+	waterfall_scroll_timer += delta
+	# Continuous scroll ~55 frames/sec
+	if waterfall_scroll_timer >= 0.018:
+		waterfall_scroll_timer = 0.0
+		# Blit image downward by 1 pixel (rows 0..126 -> rows 1..127)
+		waterfall_image.blit_rect(waterfall_image, Rect2i(0, 0, 64, 127), Vector2i(0, 1))
+		# Clear top row
+		for x in range(64):
+			waterfall_image.set_pixel(x, 0, Color.BLACK)
+		waterfall_texture.update(waterfall_image)
 
 func _advance_beat() -> void:
 	current_beat += 1
@@ -390,6 +419,72 @@ func _advance_beat() -> void:
 	beat_pulse = 1.0
 	lbl_bpm_beat.text = "[BPM: %d /// 4/4] [BAR: %03d . BEAT: %d/4]" % [current_bpm, current_bar, current_beat]
 	lbl_lyric_bar.text = ">> CURRENT BAR %03d // BEAT %d OF 4" % [current_bar, current_beat]
+
+	_inject_chord_falling_notes()
+
+func _inject_chord_falling_notes() -> void:
+	if not waterfall_image or all_songs.size() <= current_song_index:
+		return
+
+	var song = all_songs[current_song_index]
+	var prog = song.get("chordProgression", {})
+	var intro_chords = str(prog.get("intro", "C - G - Am - F"))
+	var tokens = intro_chords.split("-", false)
+	if tokens.is_empty():
+		return
+
+	var chord_idx = (current_bar - 1) % tokens.size()
+	var cur_chord = tokens[chord_idx].strip_edges()
+	var next_idx = (chord_idx + 1) % tokens.size()
+	var next_chord = tokens[next_idx].strip_edges()
+
+	# Dynamically update HUD chord display on bar change
+	lbl_current_chord.text = "[ %s ]" % cur_chord
+	lbl_next_chord.text = "NEXT CHORD -> %s" % next_chord
+
+	var notes = _get_chord_notes(cur_chord)
+	var split_pt = int(song.get("splitPoint", 60))
+
+	# Spawn chord note pills at top row (rows 0, 1, 2)
+	for n in notes:
+		var idx = n - LOWEST_NOTE
+		if idx >= 0 and idx < 61:
+			var is_zone_b = 1.0 if n >= split_pt else 0.0
+			var col = Color(0.95, is_zone_b, 0.0, 1.0)
+			waterfall_image.set_pixel(idx, 0, col)
+			waterfall_image.set_pixel(idx, 1, col)
+			waterfall_image.set_pixel(idx, 2, col)
+
+func _get_chord_notes(chord_str: String) -> Array[int]:
+	var result: Array[int] = []
+	var c = chord_str.strip_edges()
+	if c.is_empty():
+		return [48, 52, 55]
+
+	var root_map = {
+		"C": 0, "C#": 1, "Db": 1, "D": 2, "D#": 3, "Eb": 3,
+		"E": 4, "F": 5, "F#": 6, "Gb": 6, "G": 7, "G#": 8,
+		"Ab": 8, "A": 9, "A#": 10, "Bb": 10, "B": 11
+	}
+
+	var root_name = ""
+	var is_minor = false
+	if c.length() >= 2 and (c[1] == '#' or c[1] == 'b'):
+		root_name = c.substr(0, 2)
+		is_minor = c.contains("m") and not c.contains("maj")
+	else:
+		root_name = c.substr(0, 1)
+		is_minor = c.contains("m") and not c.contains("maj")
+
+	var root_offset = root_map.get(root_name, 0)
+	var root_midi = 48 + root_offset # C3 octave base
+
+	if is_minor:
+		result = [root_midi, root_midi + 3, root_midi + 7, root_midi + 12]
+	else:
+		result = [root_midi, root_midi + 4, root_midi + 7, root_midi + 12]
+
+	return result
 
 func _handle_ws_packet(json_text: String) -> void:
 	var parsed = JSON.parse_string(json_text)

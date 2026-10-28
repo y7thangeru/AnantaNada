@@ -76,10 +76,10 @@ void fragment() {
     if (uv.y < black_key_length) {
         float half_bk_w = black_key_width * 0.5;
 
-        // Check closest black keys in proximity
-        int approx_bk = int(floor(w_coord * (25.0 / 36.0)));
-        int bk_start = max(0, approx_bk - 2);
-        int bk_end = min(24, approx_bk + 2);
+        // Check closest black keys in current octave and boundaries
+        int oct = int(floor(w_coord / 7.0));
+        int bk_start = max(0, oct * 5 - 1);
+        int bk_end = min(24, (oct + 1) * 5);
 
         for (int k = bk_start; k <= bk_end; k++) {
             float bk_center = get_black_key_center(k);
@@ -95,8 +95,8 @@ void fragment() {
         }
     }
 
-    // 3. Sample Key State Texture (Note 36 to 96 -> Normalized 0..1)
-    float sample_u = clamp(float(active_midi_note - 36) / 60.0, 0.0, 1.0);
+    // 3. Sample Key State Texture (Note 36 to 96 -> Exact texel center in 64x1 texture)
+    float sample_u = (float(active_midi_note - 36) + 0.5) / 64.0;
     vec4 state = texture(key_states, vec2(sample_u, 0.5));
     float velocity = state.r;
     float hand_split = state.g; // 0.0 = Zone A Amber, 1.0 = Zone B Cyan
@@ -146,9 +146,9 @@ void fragment() {
         // Soft drop shadow cast by nearby black keys on upper 60% of keybed
         if (uv.y < black_key_length + 0.04) {
             float shadow_intensity = 0.0;
-            int approx_bk = int(floor(w_coord * (25.0 / 36.0)));
-            int bk_start = max(0, approx_bk - 1);
-            int bk_end = min(24, approx_bk + 1);
+            int oct = int(floor(w_coord / 7.0));
+            int bk_start = max(0, oct * 5 - 1);
+            int bk_end = min(24, (oct + 1) * 5);
 
             for (int k = bk_start; k <= bk_end; k++) {
                 float bk_center = get_black_key_center(k);

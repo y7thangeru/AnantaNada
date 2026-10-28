@@ -23,6 +23,8 @@ uniform float trapezoid_perspective : hint_range(0.5, 1.0) = 0.76; // 18° inwar
 // Note stream buffer: R=velocity (0..1), G=hand/channel (0=Left Amber, 1=Right Cyan)
 // hint_default_black ensures unassigned texture defaults to 0.0 (pitch black)
 uniform sampler2D note_stream_texture : hint_default_black, filter_linear;
+// Live key state buffer: 64x1 texture driven directly by physical Roland keybed
+uniform sampler2D key_states : hint_default_black, filter_nearest;
 
 void fragment() {
     vec2 uv = UV;
@@ -53,8 +55,8 @@ void fragment() {
         float beat_mask = smoothstep(0.0, 0.012, beat_line) * smoothstep(0.025, 0.012, beat_line);
         col = mix(col, beat_marker_color * (1.0 + beat_pulse * 1.6), beat_mask * 0.65);
 
-        // 4. Note Stream Sampling (Guaranteed black when empty)
-        vec2 stream_uv = vec2(clamp(centered_x, 0.0, 1.0), uv.y);
+        // 4. Note Stream Sampling (Falling notes from repertoire stream)
+        vec2 stream_uv = vec2((float(lane_idx) + 0.5) / 64.0, uv.y);
         vec4 note_data = texture(note_stream_texture, stream_uv);
         float note_velocity = note_data.r;
         float note_channel  = note_data.g;
@@ -71,6 +73,23 @@ void fragment() {
             float intensity = note_velocity * 1.8;
             col = mix(col, note_color * intensity, pill_mask * 0.95);
             col += note_color * (1.0 - smoothstep(0.0, 0.45, pill_dist)) * 0.4;
+        }
+
+        // 4b. Live Key Reaction Laser Column (Rising from strike line when physical key is pressed)
+        float key_sample_u = (float(lane_idx) + 0.5) / 64.0;
+        vec4 live_key_data = texture(key_states, vec2(key_sample_u, 0.5));
+        float live_vel = live_key_data.r;
+        float live_split = live_key_data.g; // 0=Amber, 1=Cyan
+        float live_impact = live_key_data.b;
+
+        if (live_vel > 0.01) {
+            vec4 live_color = mix(vec4(1.0, 0.72, 0.01, 1.0), vec4(0.0, 0.96, 0.83, 1.0), live_split);
+            float pill_dist = abs(lane_frac - 0.5);
+            float lane_mask = smoothstep(0.48, 0.20, pill_dist);
+            // Laser beam shoots upward from the strike line (uv.y <= strike_line_y)
+            float beam_reach = smoothstep(0.0, strike_line_y, uv.y);
+            col += live_color * (live_vel * 2.2 + live_impact * 2.0) * beam_reach * lane_mask;
+            col += spark_flash_color * live_impact * smoothstep(0.06, 0.0, abs(uv.y - strike_line_y));
         }
 
         // 5. HIT BEAM Strike Zone (Target collision bar at y = 0.94)
