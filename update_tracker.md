@@ -115,3 +115,11 @@ This file logs all file creations, modifications, deletions, refactorings, and f
 ### [2026-10-28 13:16:19 +07:00] - [MODIFY] `project.godot`
 - **Action**: Enabled `res://addons/godot_mcp/plugin.cfg` under `[editor_plugins]`.
 - **Reason**: Auto-initializes Godot MCP bridge upon opening project in Godot Editor.
+
+### [2026-10-28 13:21:21 +07:00] - [NEW] `scripts/capture_stage_screenshot.gd`
+- **Action**: Created headless offscreen screenshot capture script for Godot Forward+ engine.
+- **Reason**: Enables automated rendering and capture of the 1080p native stage HUD without requiring an active desktop display server.
+
+### [2026-10-28 13:21:44 +07:00] - [NEW] `captures/screenshot_godot_stage.png`
+- **Action**: Rendered 1080p Vulkan Forward+ screenshot of `MainStageView.tscn`.
+- **Reason**: Visual verification artifact showcasing the kinetic diegetic stage HUD, 61-key keybed shader, and teleprompter layout.
