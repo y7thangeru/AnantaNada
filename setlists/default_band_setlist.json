@@ -1,0 +1,92 @@
+{
+  "setlistName": "AnantaNada Roland Go:Keys 3 Tour Setlist",
+  "version": "1.0",
+  "songs": [
+    {
+      "songId": "mission_01",
+      "title": "01. SENJA DUST",
+      "artist": "AnantaNada Ensemble",
+      "bpm": 128,
+      "keySignature": "G#m",
+      "transpose": 0,
+      "primaryTone": "PR022",
+      "splitTone": "PR033",
+      "splitPoint": 60,
+      "chordsTimeline": [
+        { "bar": 1, "beat": 1, "currentChord": "G#m7", "nextChord": "C#m7" },
+        { "bar": 5, "beat": 1, "currentChord": "Emaj7", "nextChord": "D#7" },
+        { "bar": 9, "beat": 1, "currentChord": "G#m7", "nextChord": "F#" },
+        { "bar": 13, "beat": 1, "currentChord": "Bmaj7", "nextChord": "D#m7" }
+      ],
+      "lyricsTimeline": [
+        { "bar": 1, "text": "Kala fajar tiba," },
+        { "bar": 2, "text": "melangkah di tanah tua" },
+        { "bar": 3, "text": "gemuruh nada membelah malam" },
+        { "bar": 4, "text": "kita berdiri tak tergoyahkan" }
+      ]
+    },
+    {
+      "songId": "mission_02",
+      "title": "02. KELANA BEAT",
+      "artist": "Cyber Groove Collective",
+      "bpm": 134,
+      "keySignature": "F#",
+      "transpose": 0,
+      "primaryTone": "CM089_14",
+      "splitTone": "CM089_22",
+      "splitPoint": 60,
+      "chordsTimeline": [
+        { "bar": 1, "beat": 1, "currentChord": "F#maj7", "nextChord": "B7" },
+        { "bar": 5, "beat": 1, "currentChord": "G#m7", "nextChord": "C#7" }
+      ],
+      "lyricsTimeline": [
+        { "bar": 1, "text": "Denyut neon memanggil," },
+        { "bar": 2, "text": "menembus batas waktu" },
+        { "bar": 3, "text": "alirkan melodi tanpa henti" },
+        { "bar": 4, "text": "di ujung cakrawala siber" }
+      ]
+    },
+    {
+      "songId": "mission_03",
+      "title": "03. FAJAR REVERIE",
+      "artist": "Acoustic Horizon",
+      "bpm": 92,
+      "keySignature": "E",
+      "transpose": 0,
+      "primaryTone": "PR001",
+      "splitTone": "PR046",
+      "splitPoint": 60,
+      "chordsTimeline": [
+        { "bar": 1, "beat": 1, "currentChord": "Emaj9", "nextChord": "A#dim7" },
+        { "bar": 5, "beat": 1, "currentChord": "F#m7", "nextChord": "B7sus4" }
+      ],
+      "lyricsTimeline": [
+        { "bar": 1, "text": "Hening merayap pelan," },
+        { "bar": 2, "text": "menyapa tuts gading" },
+        { "bar": 3, "text": "setiap resonansi berbisik" },
+        { "bar": 4, "text": "tentang mimpi yang tersisa" }
+      ]
+    },
+    {
+      "songId": "mission_04",
+      "title": "04. OVERDRIVE ANTHEM",
+      "artist": "Neo Shibuya Brass",
+      "bpm": 140,
+      "keySignature": "D#m",
+      "transpose": 1,
+      "primaryTone": "CM088_06",
+      "splitTone": "CM089_22",
+      "splitPoint": 60,
+      "chordsTimeline": [
+        { "bar": 1, "beat": 1, "currentChord": "D#m7", "nextChord": "G#7" },
+        { "bar": 5, "beat": 1, "currentChord": "Bmaj7", "nextChord": "C#" }
+      ],
+      "lyricsTimeline": [
+        { "bar": 1, "text": "Semua mata tertuju," },
+        { "bar": 2, "text": "bersiap menyulut bara" },
+        { "bar": 3, "text": "hantam ketukan puncak" },
+        { "bar": 4, "text": "kemenangan di genggaman!" }
+      ]
+    }
+  ]
+}

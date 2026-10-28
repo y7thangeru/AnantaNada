@@ -403,6 +403,35 @@ public sealed class NativeMidiEngine : IDisposable
     }
 
     /// <summary>
+    /// Coarse Transposition via standard MIDI RPN (Registered Parameter Number).
+    /// Roland Go:Keys 3 RPN coarse tuning: RPN MSB 0, RPN LSB 2, Data Entry 64 + transpose.
+    /// Resets RPN to Null (127/127) afterwards to prevent parameter contamination.
+    /// </summary>
+    public void SetCoarseTranspose(byte channel, int semitones)
+    {
+        if (channel > 15) throw new ArgumentOutOfRangeException(nameof(channel));
+
+        byte ccStatus = (byte)(MidiConstants.ControlChange | channel);
+        int clampedSemitones = Math.Clamp(semitones, -24, 24);
+        byte dataValue = (byte)(64 + clampedSemitones); // 64 = 0 semitones (center)
+
+        // 1. RPN MSB = 0
+        SendShortMessage(ccStatus, MidiConstants.RpnMsb, 0);
+
+        // 2. RPN LSB = 2 (Coarse Tuning)
+        SendShortMessage(ccStatus, MidiConstants.RpnLsb, 2);
+
+        // 3. Data Entry MSB = 64 + transpose
+        SendShortMessage(ccStatus, MidiConstants.DataEntryMsb, dataValue);
+
+        // 4. RPN Null (127 / 127) failsafe termination
+        SendShortMessage(ccStatus, MidiConstants.RpnMsb, 127);
+        SendShortMessage(ccStatus, MidiConstants.RpnLsb, 127);
+
+        OnLog?.Invoke($"[Transpose Sent] Ch:{channel + 1} Semitones:{clampedSemitones:+#;-#;0} (Data:{dataValue})");
+    }
+
+    /// <summary>
     /// Enqueues a SysEx packet into the rate-limited FIFO queue with a strict 20ms debounce delay.
     /// Protects Roland Go:Keys 3 processor from buffer overflow.
     /// </summary>

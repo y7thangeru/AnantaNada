@@ -25,21 +25,26 @@ public static class MidiConstants
     public const byte BankSelectMsb = 0x00; // CC 0: Bank Select MSB (Volatile)
     public const byte BankSelectLsb = 0x20; // CC 32: Bank Select LSB (Volatile)
     public const byte ModulationWheel = 0x01; // CC 1
+    public const byte DataEntryMsb = 0x06; // CC 6: Data Entry MSB for RPN/NRPN
     public const byte ChannelVolume = 0x07; // CC 7
     public const byte ExpressionController = 0x0B; // CC 11
     public const byte SustainPedal = 0x40; // CC 64: Hold 1 / Damper Pedal
+    public const byte RpnLsb = 0x64; // CC 100: Registered Parameter Number LSB
+    public const byte RpnMsb = 0x65; // CC 101: Registered Parameter Number MSB
 
     // Panic / Channel Mode Messages
     public const byte AllSoundOff = 0x78; // CC 120: Immediately silences all sound generators
     public const byte ResetAllControllers = 0x79; // CC 121
     public const byte AllNotesOff = 0x7B; // CC 123: Turns off all sounding notes
 
-    // Go:Keys 3 Hardware Dimensions
-    public const int TotalKeys = 61;
+    // Roland Go:Keys 3 Specific Channels & Parameters
+    // Go:Keys 3 receives patch changes on MIDI Channel 4 (0-indexed channel 3)
+    public const byte GoKeys3DefaultPatchChannel = 3; // Channel 4
+    public const byte TotalKeys = 61;
     public const int LowestNote = 36; // C2
     public const int HighestNote = 96; // C7
     public const int TotalChannels = 16;
 
     // Hardware Safety Constraints
-    public const int SysExDebounceMs = 20; // Strict 20ms debounce between SysEx dispatches to prevent buffer overflow
+    public const int SysExDebounceMs = 20; // Strict 20ms debounce between SysEx dispatches
 }

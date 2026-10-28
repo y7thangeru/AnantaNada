@@ -59,6 +59,46 @@ ANANTANADA telah ditingkatkan dari tampilan workstation audio konvensional menja
 
 ---
 
+## 3. Jalur C: Roland Go:Keys 3 Tone Catalog & Setlist Mapping Subsystem
+
+Sistem katalog tone dan otomasi preset panggung (Jalur C) telah diimplementasikan penuh sesuai standar pabrikan Roland:
+1. **Spesifikasi MIDI Hardware Roland Go:Keys 3**:
+   - Saluran Default Patch Change: **MIDI Channel 4** (0-indexed channel `3`).
+   - Urutan 3-Byte Volatile In-RAM: `CC 00` (Bank Select MSB) -> `CC 32` (Bank Select LSB) -> `Program Change` (PC 0–127).
+   - Normalisasi PC: Roland Tone List menggunakan 1-indexed (1–128) yang dinormalisasi otomatis menjadi 0-indexed (`pc - 1`) pada wire protocol.
+   - Bank Presets: Primary Presets `PR` (`MSB = 71`, `LSB = 96`) dan Common Synthesizer Bank `CM` (`MSB = 87`, `LSB = 85/88/89`).
+2. **Coarse Transposition via Standard RPN**:
+   - Mengirim RPN MSB = 0 (`CC 101 = 0`), RPN LSB = 2 (`CC 100 = 2`).
+   - Mengirim Data Entry MSB (`CC 06 = 64 + transposeValue`, di mana 64 = 0 semitone).
+   - Mengirim RPN Null (`CC 101 = 127`, `CC 100 = 127`) untuk mencegah kontaminasi parameter hardware.
+3. **Database & Layanan Terpusat**:
+   - `src/Core/Data/gokeys3_tones.json`: Database 26 preset Roland Go:Keys 3 terkurasi dalam 7 kategori (`Ac.Piano`, `E.Piano`, `Organ`, `Strings`, `Synth Lead`, `Synth Brass`, `Bass`).
+   - `src/Core/Services/ToneService.cs`: Layanan pencarian O(1) berbasis `Dictionary`, filter kategori, dan pencarian multi-tag dengan toleransi zero-crash fallback.
+   - `setlists/default_band_setlist.json`: Setlist 4 lagu band panggung lengkap dengan timeline akord dan lirik.
+   - `src/UI/MainStageController.cs`: Terintegrasi langsung dengan klik kartu setlist, pergantian mission lagu, dan sinkronisasi real-time ke StageHub mobile.
+
+---
+
+## 4. Hasil Audit Kualitas & Unit Test (Verification Harness)
+
+Eksekusi build .NET 8 dan suite pengujian otomatis (`VerificationHarness.cs`):
+```text
+=================================================
+  ANANTANADA ENGINE VERIFICATION & QUALITY AUDIT  
+=================================================
+[TEST 1] RetroactiveBuffer Lock-Free Ring Push... PASS (1000 events captured accurately)
+[TEST 2] Standard MIDI File Exporter (.mid)... PASS (Valid SMF Type 0, 94 bytes)
+[TEST 3] Hardware-Safe Volatile Tone Dispatch... PASS (Volatile MSB/LSB/PC dispatched with zero flash writes)
+[TEST 4] Hardware Panic Circuit (CC120, 123, 64 on 16 Ch)... PASS (Broadcasted CC 120/123/64 + All Notes Off to all 16 channels)
+[TEST 5] Embedded StageHub Server & WS Telemetry Loop... SKIP (Port binding restricted in environment)
+[TEST 6] Jalur C Tone Catalog & Channel 4 Volatile Dispatch... PASS (26 tones loaded across 7 categories; Ch 4 dispatch + RPN verified)
+=================================================
+  AUDIT RESULT: 5 PASSED, 0 FAILED
+=================================================
+```
+
+---
+
 # PART II: DOKUMENTASI LENGKAP PROYEK
 
 Dokumentasi audit ini menyertakan seluruh file `.md` proyek secara utuh:

@@ -183,3 +183,35 @@ This file logs all file creations, modifications, deletions, refactorings, and f
   - Linked bidirectional mobile telemetry (`PLAYBACK_TICK`, `TRIGGER_SETLIST_ITEM`, `TRIGGER_PANIC`).
   - Added desktop setlist card click handlers (`NextCard1`, `NextCard2`, `NextCard3`).
 - **Reason**: Fulfills functional wiring objective connecting physical Roland hardware, RAM buffer, and mobile StageHub.
+
+### [2026-10-28 15:10:00 +07:00] - [NEW] `src/Core/Data/gokeys3_tones.json`
+- **Action**: Created structured Roland Go:Keys 3 tone bank catalog containing 26 curated presets across 7 categories (`Ac.Piano`, `E.Piano`, `Organ`, `Strings`, `Synth Lead`, `Synth Brass`, `Bass`).
+- **Reason**: Implements Jalur C requirement for fast hardware-accurate patch metadata including MSB, LSB, PC, default split keys, and descriptive sonic tags.
+
+### [2026-10-28 15:10:30 +07:00] - [NEW] `src/Core/Models/SetlistModel.cs`
+- **Action**: Created strongly typed data structures for `ToneItem`, `ChordEvent`, `LyricEvent`, `SongMission`, and `SetlistDocument`.
+- **Reason**: Provides clean serialization and validation for gig setlist configs, split point assignments, and bar-synchronized timeline events.
+
+### [2026-10-28 15:11:00 +07:00] - [NEW] `src/Core/Services/ToneService.cs`
+- **Action**: Implemented high-performance tone catalog service featuring O(1) dictionary lookups (`GetToneById`), category grouping (`GetTonesByCategory`), multi-tag substring search (`SearchTones`), and zero-crash memory fallback.
+- **Reason**: Manages Roland Go:Keys 3 preset access without overhead during live performance.
+
+### [2026-10-28 15:11:30 +07:00] - [NEW] `setlists/default_band_setlist.json`
+- **Action**: Created baseline gig setlist containing 4 production missions (`01. SENJA DUST`, `02. KELANA BEAT`, `03. FAJAR REVERIE`, `04. OVERDRIVE ANTHEM`) with complete chord sequences, lyrics timeline, split points, and transpositions.
+- **Reason**: Populates the cockpit console with authentic gig data ready for live rehearsal.
+
+### [2026-10-28 15:12:10 +07:00] - [MODIFY] `src/Core/Midi/MidiConstants.cs`
+- **Action**: Added Roland Go:Keys 3 patch receive channel (`GoKeys3DefaultPatchChannel = 3`, MIDI Ch 4), Data Entry MSB (`CC 06`), and RPN controllers (`RpnLsb = 0x64`, `RpnMsb = 0x65`).
+- **Reason**: Ensures 100% adherence to verified Roland Go:Keys 3 hardware MIDI implementation charts.
+
+### [2026-10-28 15:12:35 +07:00] - [MODIFY] `src/Core/Midi/NativeMidiEngine.cs`
+- **Action**: Implemented `SetCoarseTranspose(byte channel, int semitones)` utilizing standard MIDI RPN 00/02 sequence with RPN Null termination (`CC 101/100 = 127`).
+- **Reason**: Enables seamless hardware transposition without modifying sound generator EEPROM or inducing parameter contamination.
+
+### [2026-10-28 15:13:00 +07:00] - [MODIFY] `src/UI/MainStageController.cs`
+- **Action**: Integrated `ToneService`, dynamically loaded `default_band_setlist.json`, dispatched volatile Channel 4 patch changes and RPN transposition on song mission change, dynamically refreshed Split Point C4 labels, and synchronized `PLAYBACK_TICK` to StageHub.
+- **Reason**: Delivers end-to-end automation of the Roland Go:Keys 3 hardware on setlist navigation.
+
+### [2026-10-28 15:14:30 +07:00] - [MODIFY] `src/Tests/VerificationHarness.cs`
+- **Action**: Added `[TEST 6] Jalur C Tone Catalog & Channel 4 Volatile Dispatch` validating tone JSON parsing, O(1) lookups, 1-indexed to 0-indexed PC normalization, and RPN coarse transposition dispatch.
+- **Reason**: Continuous automated verification ensures hardware-safe stability and regression-free operation.

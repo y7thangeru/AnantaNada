@@ -1,0 +1,262 @@
+[
+  {
+    "id": "PR001",
+    "name": "Concert Piano",
+    "category": "Ac.Piano",
+    "msb": 71,
+    "lsb": 96,
+    "pc": 1,
+    "defaultSplitKey": 60,
+    "tags": ["Acoustic", "Solo", "Classical", "Pop", "Concert Grand"]
+  },
+  {
+    "id": "PR002",
+    "name": "Mellow Grand",
+    "category": "Ac.Piano",
+    "msb": 71,
+    "lsb": 96,
+    "pc": 2,
+    "defaultSplitKey": 60,
+    "tags": ["Acoustic", "Ballad", "Warm", "Intimate"]
+  },
+  {
+    "id": "PR003",
+    "name": "Bright Piano",
+    "category": "Ac.Piano",
+    "msb": 71,
+    "lsb": 96,
+    "pc": 3,
+    "defaultSplitKey": 60,
+    "tags": ["Acoustic", "Bright", "Rock", "Band Mix"]
+  },
+  {
+    "id": "PR004",
+    "name": "Pop Piano",
+    "category": "Ac.Piano",
+    "msb": 71,
+    "lsb": 96,
+    "pc": 4,
+    "defaultSplitKey": 60,
+    "tags": ["Acoustic", "Modern", "Compressed", "Dance Pop"]
+  },
+  {
+    "id": "PR022",
+    "name": "70s Suitcase EP",
+    "category": "E.Piano",
+    "msb": 71,
+    "lsb": 96,
+    "pc": 22,
+    "defaultSplitKey": 60,
+    "tags": ["Electric", "Vintage", "Rhodes", "Neo Soul", "Jazz"]
+  },
+  {
+    "id": "PR023",
+    "name": "Lite Tine EP",
+    "category": "E.Piano",
+    "msb": 71,
+    "lsb": 96,
+    "pc": 23,
+    "defaultSplitKey": 60,
+    "tags": ["Electric", "Bells", "80s Ballad", "Chime"]
+  },
+  {
+    "id": "PR025",
+    "name": "Wurly 200A",
+    "category": "E.Piano",
+    "msb": 71,
+    "lsb": 96,
+    "pc": 25,
+    "defaultSplitKey": 60,
+    "tags": ["Electric", "Reed", "Funk", "Classic Rock"]
+  },
+  {
+    "id": "PR028",
+    "name": "Phase EP",
+    "category": "E.Piano",
+    "msb": 71,
+    "lsb": 96,
+    "pc": 28,
+    "defaultSplitKey": 60,
+    "tags": ["Electric", "Phaser", "Fusion", "R&B"]
+  },
+  {
+    "id": "CM085_01",
+    "name": "B3 Jazz Organ",
+    "category": "Organ",
+    "msb": 87,
+    "lsb": 85,
+    "pc": 1,
+    "defaultSplitKey": 60,
+    "tags": ["Organ", "Drawbar", "Leslie", "Jazz", "Blues"]
+  },
+  {
+    "id": "CM085_02",
+    "name": "Rock Perc Organ",
+    "category": "Organ",
+    "msb": 87,
+    "lsb": 85,
+    "pc": 2,
+    "defaultSplitKey": 60,
+    "tags": ["Organ", "Percussion", "Drive", "Rock"]
+  },
+  {
+    "id": "CM085_05",
+    "name": "Gospel Rotary",
+    "category": "Organ",
+    "msb": 87,
+    "lsb": 85,
+    "pc": 5,
+    "defaultSplitKey": 60,
+    "tags": ["Organ", "Fast Rotary", "Gospel", "Soul"]
+  },
+  {
+    "id": "CM085_12",
+    "name": "Ana Cathedral Organ",
+    "category": "Organ",
+    "msb": 87,
+    "lsb": 85,
+    "pc": 12,
+    "defaultSplitKey": 60,
+    "tags": ["Organ", "Pipe", "Majestic", "Church"]
+  },
+  {
+    "id": "PR045",
+    "name": "Concert Strings Sect",
+    "category": "Strings",
+    "msb": 71,
+    "lsb": 96,
+    "pc": 45,
+    "defaultSplitKey": 60,
+    "tags": ["Strings", "Ensemble", "Orchestral", "Cinematic"]
+  },
+  {
+    "id": "PR046",
+    "name": "Warm Chamber Strings",
+    "category": "Strings",
+    "msb": 71,
+    "lsb": 96,
+    "pc": 46,
+    "defaultSplitKey": 60,
+    "tags": ["Strings", "Legato", "Pad Layer", "Warm"]
+  },
+  {
+    "id": "PR050",
+    "name": "Pizzicato Strings",
+    "category": "Strings",
+    "msb": 71,
+    "lsb": 96,
+    "pc": 50,
+    "defaultSplitKey": 60,
+    "tags": ["Strings", "Plucked", "Staccato", "Acoustic"]
+  },
+  {
+    "id": "PR060",
+    "name": "NSoul Synth Lead",
+    "category": "Synth Lead",
+    "msb": 71,
+    "lsb": 96,
+    "pc": 60,
+    "defaultSplitKey": 60,
+    "tags": ["Synth", "Lead", "Glide", "Mono", "R&B", "Solo"]
+  },
+  {
+    "id": "CM089_04",
+    "name": "Windy Pulse Lead",
+    "category": "Synth Lead",
+    "msb": 87,
+    "lsb": 89,
+    "pc": 4,
+    "defaultSplitKey": 60,
+    "tags": ["Synth", "Lead", "Pulse", "Cyberpunk"]
+  },
+  {
+    "id": "CM089_08",
+    "name": "Square Chiptune Lead",
+    "category": "Synth Lead",
+    "msb": 87,
+    "lsb": 89,
+    "pc": 8,
+    "defaultSplitKey": 60,
+    "tags": ["Synth", "8-bit", "Retro", "Square"]
+  },
+  {
+    "id": "CM089_14",
+    "name": "Overdrive Fat Saw",
+    "category": "Synth Lead",
+    "msb": 87,
+    "lsb": 89,
+    "pc": 14,
+    "defaultSplitKey": 60,
+    "tags": ["Synth", "Saw", "Distortion", "EDM", "Solo"]
+  },
+  {
+    "id": "CM088_01",
+    "name": "Analog Brass Sect 1",
+    "category": "Synth Brass",
+    "msb": 87,
+    "lsb": 88,
+    "pc": 1,
+    "defaultSplitKey": 60,
+    "tags": ["Brass", "Synth", "Warm", "80s Poly"]
+  },
+  {
+    "id": "CM088_06",
+    "name": "80s Punch Brass",
+    "category": "Synth Brass",
+    "msb": 87,
+    "lsb": 88,
+    "pc": 6,
+    "defaultSplitKey": 60,
+    "tags": ["Brass", "Attack", "Punch", "Synthwave"]
+  },
+  {
+    "id": "CM088_12",
+    "name": "Heroic Fanfare Brass",
+    "category": "Synth Brass",
+    "msb": 87,
+    "lsb": 88,
+    "pc": 12,
+    "defaultSplitKey": 60,
+    "tags": ["Brass", "Bright", "Anthem", "Stage"]
+  },
+  {
+    "id": "PR032",
+    "name": "Acoustic Upright Bass",
+    "category": "Bass",
+    "msb": 71,
+    "lsb": 96,
+    "pc": 32,
+    "defaultSplitKey": 60,
+    "tags": ["Bass", "Acoustic", "Jazz", "Walking"]
+  },
+  {
+    "id": "PR033",
+    "name": "Finger Electric Bass",
+    "category": "Bass",
+    "msb": 71,
+    "lsb": 96,
+    "pc": 33,
+    "defaultSplitKey": 60,
+    "tags": ["Bass", "Electric", "Groove", "Pop"]
+  },
+  {
+    "id": "PR035",
+    "name": "Funk Slap Bass",
+    "category": "Bass",
+    "msb": 71,
+    "lsb": 96,
+    "pc": 35,
+    "defaultSplitKey": 60,
+    "tags": ["Bass", "Slap", "Thumb", "Funk"]
+  },
+  {
+    "id": "CM089_22",
+    "name": "Sub Heavy Synth Bass",
+    "category": "Bass",
+    "msb": 87,
+    "lsb": 89,
+    "pc": 22,
+    "defaultSplitKey": 60,
+    "tags": ["Bass", "Synth", "Sub", "Resonant", "Low End"]
+  }
+]

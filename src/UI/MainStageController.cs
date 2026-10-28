@@ -1,23 +1,28 @@
+using System.Text.Json;
 using Godot;
 using AnantaNada.Core.Midi;
+using AnantaNada.Core.Models;
+using AnantaNada.Core.Services;
 using AnantaNada.Network;
 
 namespace AnantaNada.UI;
 
 /// <summary>
 /// Lead Game Console Controller for Roland Go:Keys 3 (Cockpit HUD).
-/// Orchestrates the live MIDI pipeline, dynamic 64x1 keybed texture,
-/// 5-minute retroactive capture buffer, and StageHub WebSocket telemetry.
+/// Orchestrates Jalur C (Tone Bank Catalog & Setlist Automation) with
+/// hardware-safe Channel 4 patch changes, RPN coarse transposition,
+/// dynamic 64x1 keybed texture, and bidirectional StageHub telemetry.
 /// </summary>
 public partial class MainStageController : Control
 {
     [Export] public int HttpPort { get; set; } = 8080;
     [Export] public float ScreenShakeIntensity { get; set; } = 8.0f;
 
-    // Subsystems
+    // Subsystems & Services
     public NativeMidiEngine MidiEngine { get; private set; } = null!;
     public RetroactiveBuffer CaptureBuffer { get; private set; } = null!;
     public StageHubServer HubServer { get; private set; } = null!;
+    public ToneService ToneLibrary { get; private set; } = null!;
 
     // UI Nodes
     private Label _lblDeviceStatus = null!;
@@ -26,12 +31,16 @@ public partial class MainStageController : Control
     private Label _lblActiveMission = null!;
     private Label _lblCurrentChord = null!;
     private Label _lblNextChord = null!;
+    private Label _lblTranspose = null!;
     private Label _lblLyricTeleprompter = null!;
     private Label _lblLyricBar = null!;
     private Label _lblRhythmAccuracy = null!;
     private Label _lblTimingVerdict = null!;
     private Label _lblStrikeGauge = null!;
     private Label _lblVelocityRank = null!;
+    private Label _lblZoneA = null!;
+    private Label _lblZoneB = null!;
+    private Label _lblSplitLine = null!;
     private Button _btnPanic = null!;
     private Button _btnNeverLostMelody = null!;
     private ColorRect _keybedRect = null!;
@@ -57,7 +66,8 @@ public partial class MainStageController : Control
     private ImageTexture _keyStateTexture = null!;
     private readonly object _stateLock = new();
 
-    // Gameplay & Timing State
+    // Setlist & Mission State
+    private SetlistDocument _setlist = new();
     private int _currentSongIndex = 0;
     private int _currentBar = 1;
     private int _currentBeat = 1;
@@ -83,39 +93,18 @@ public partial class MainStageController : Control
     private double _retroFeedbackTimer = 0.0;
     private bool _isShowingRetroFeedback = false;
 
-    // Song Missions with Lyrics
-    public record SongMission(
-        string Title,
-        string CurrentChord,
-        string NextChord,
-        string PatchName,
-        byte BankMsb,
-        byte BankLsb,
-        byte Pc,
-        int Bpm,
-        string[] Lyrics
-    );
-
-    private readonly List<SongMission> _missions = new()
-    {
-        new SongMission("01. SENJA DUST", "G#m7", "C#m7", "Vintage EP 1", 87, 64, 14, 128,
-            new[] { "Kala fajar tiba,", "melangkah di tanah tua", "gemuruh nada membelah malam", "kita berdiri tak tergoyahkan" }),
-        new SongMission("02. KELANA BEAT", "F#maj7", "B7", "Fat Saw Lead", 87, 65, 4, 134,
-            new[] { "Denyut neon memanggil,", "menembus batas waktu", "alirkan melodi tanpa henti", "di ujung cakrawala siber" }),
-        new SongMission("03. FAJAR REVERIE", "Emaj9", "A#dim7", "Warm Stage Grand", 87, 64, 1, 92,
-            new[] { "Hening merayap pelan,", "menyapa tuts gading", "setiap resonansi berbisik", "tentang mimpi yang tersisa" }),
-        new SongMission("04. OVERDRIVE ANTHEM", "D#m7", "G#7", "Brass Punch Sect", 87, 66, 22, 140,
-            new[] { "Semua mata tertuju,", "bersiap menyulut bara", "hantam ketukan puncak", "kemenangan di genggaman!" })
-    };
-
     public override void _Ready()
     {
-        // 1. Initialize Subsystems
+        // 1. Initialize Core Engines & Catalog Services
         CaptureBuffer = new RetroactiveBuffer();
         MidiEngine = new NativeMidiEngine();
         HubServer = new StageHubServer(HttpPort);
+        ToneLibrary = new ToneService();
 
-        // 2. Resolve UI Nodes
+        // 2. Load Setlist Configuration
+        LoadSetlist();
+
+        // 3. Resolve Scene Tree Nodes
         _hudContainer = GetNodeOrNull<Control>("HUD") ?? this;
         _originalHudPos = _hudContainer.Position;
 
@@ -126,6 +115,7 @@ public partial class MainStageController : Control
 
         _currentChordBox = GetNodeOrNull<PanelContainer>("HUD/CenterSplit/ChordHud/CurrentChordBox") ?? new PanelContainer();
         _lblCurrentChord = GetNodeOrNull<Label>("HUD/CenterSplit/ChordHud/CurrentChordBox/VBox/ChordLabel") ?? new Label();
+        _lblTranspose = GetNodeOrNull<Label>("HUD/CenterSplit/ChordHud/CurrentChordBox/VBox/TransposePill") ?? new Label();
 
         _nextChordBox = GetNodeOrNull<PanelContainer>("HUD/CenterSplit/ChordHud/NextChordBox") ?? new PanelContainer();
         _lblNextChord = GetNodeOrNull<Label>("HUD/CenterSplit/ChordHud/NextChordBox/NextLabel") ?? new Label();
@@ -144,22 +134,26 @@ public partial class MainStageController : Control
         _keybedRect = GetNodeOrNull<ColorRect>("HUD/BottomKeybed/KeybedContainer/KeybedRect") ?? new ColorRect();
         _waterfallRect = GetNodeOrNull<ColorRect>("HUD/CenterSplit/CenterCascade/WaterfallRect") ?? new ColorRect();
 
+        _lblZoneA = GetNodeOrNull<Label>("HUD/BottomKeybed/ZoneRow/ZoneALabel") ?? new Label();
+        _lblSplitLine = GetNodeOrNull<Label>("HUD/BottomKeybed/ZoneRow/SplitLine") ?? new Label();
+        _lblZoneB = GetNodeOrNull<Label>("HUD/BottomKeybed/ZoneRow/ZoneBLabel") ?? new Label();
+
         _nextCard1 = GetNodeOrNull<PanelContainer>("HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard1") ?? new PanelContainer();
         _nextCard2 = GetNodeOrNull<PanelContainer>("HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard2") ?? new PanelContainer();
         _nextCard3 = GetNodeOrNull<PanelContainer>("HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard3") ?? new PanelContainer();
 
-        // 3. Shaders
+        // 4. Shaders
         if (_keybedRect.Material is ShaderMaterial km) _keybedMaterial = km;
         if (_waterfallRect.Material is ShaderMaterial wm) _waterfallMaterial = wm;
         if (_nextChordBox.Material is ShaderMaterial ncm) _nextChordMaterial = ncm;
         if (_currentChordBox.Material is ShaderMaterial ccm) _currentChordMaterial = ccm;
 
-        // 4. Setup Keybed State Texture (64x1 RGBA8)
+        // 5. Setup Keybed State Texture (64x1 RGBA8)
         _keyStateImage = Image.CreateEmpty(64, 1, false, Image.Format.Rgba8);
         _keyStateTexture = ImageTexture.CreateFromImage(_keyStateImage);
         _keybedMaterial?.SetShaderParameter("key_states", _keyStateTexture);
 
-        // 5. Wire MIDI Engine Pipelines
+        // 6. Wire MIDI Engine Pipelines
         MidiEngine.OnMessageReceived += (in MidiRawMessage msg) => CaptureBuffer.Push(in msg);
         MidiEngine.OnNoteOn += HandleMidiNoteOn;
         MidiEngine.OnNoteOff += HandleMidiNoteOff;
@@ -167,12 +161,12 @@ public partial class MainStageController : Control
         MidiEngine.OnDeviceConnected += dev => CallDeferred(nameof(UpdateDeviceLabel), dev, true);
         MidiEngine.OnDeviceDisconnected += () => CallDeferred(nameof(UpdateDeviceLabel), "DISCONNECTED", false);
 
-        // 6. Wire StageHub Server Pipelines
+        // 7. Wire StageHub Server Pipelines
         HubServer.OnLog += msg => GD.Print(msg);
         HubServer.OnPanicTriggered += () => CallDeferred(nameof(TriggerPanicPurge));
         HubServer.OnSetlistItemTriggered += payload => CallDeferred(nameof(SelectMission), payload.SongIndex);
 
-        // 7. Wire UI Button Actions
+        // 8. Wire UI Button Actions
         _btnPanic.Pressed += TriggerPanicPurge;
         _btnNeverLostMelody.Pressed += OnNeverLostMelodyPressed;
 
@@ -181,7 +175,7 @@ public partial class MainStageController : Control
         _nextCard2.GuiInput += @event => HandleCardClick(@event, 2);
         _nextCard3.GuiInput += @event => HandleCardClick(@event, 3);
 
-        // 8. Connect Hardware & Start Server
+        // 9. Connect Hardware & Start Mini-Server
         MidiEngine.Connect("Go:Keys");
         HubServer.Start();
 
@@ -191,6 +185,41 @@ public partial class MainStageController : Control
 
         // Select initial mission
         SelectMission(0);
+    }
+
+    private void LoadSetlist()
+    {
+        string setlistPath = Path.Combine(Directory.GetCurrentDirectory(), "setlists", "default_band_setlist.json");
+        if (File.Exists(setlistPath))
+        {
+            try
+            {
+                string json = File.ReadAllText(setlistPath);
+                var doc = JsonSerializer.Deserialize<SetlistDocument>(json);
+                if (doc != null && doc.Songs.Count > 0)
+                {
+                    _setlist = doc;
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                GD.PrintErr($"[Setlist] Warning parsing setlist file: {ex.Message}");
+            }
+        }
+
+        // Baseline fallback if setlist file is missing
+        _setlist = new SetlistDocument
+        {
+            SetlistName = "Fallback Tour Setlist",
+            Songs = new List<SongMission>
+            {
+                new() { SongId = "m_01", Title = "01. SENJA DUST", Bpm = 128, PrimaryTone = "PR022", SplitTone = "PR033", SplitPoint = 60 },
+                new() { SongId = "m_02", Title = "02. KELANA BEAT", Bpm = 134, PrimaryTone = "CM089_14", SplitTone = "CM089_22", SplitPoint = 60 },
+                new() { SongId = "m_03", Title = "03. FAJAR REVERIE", Bpm = 92, PrimaryTone = "PR001", SplitTone = "PR046", SplitPoint = 60 },
+                new() { SongId = "m_04", Title = "04. OVERDRIVE ANTHEM", Bpm = 140, PrimaryTone = "CM088_06", SplitTone = "CM089_22", SplitPoint = 60, Transpose = 1 }
+            }
+        };
     }
 
     private void HandleCardClick(InputEvent @event, int missionIndex)
@@ -207,13 +236,9 @@ public partial class MainStageController : Control
         _lblDeviceStatus.Modulate = connected ? new Color(0.0f, 0.96f, 0.83f) : new Color(0.93f, 0.14f, 0.23f);
     }
 
-    /// <summary>
-    /// Hot-path Note On event handler called directly from MIDI thread.
-    /// Updates zero-allocation key buffer and evaluates timing metrics.
-    /// </summary>
     private void HandleMidiNoteOn(byte channel, byte note, byte velocity)
     {
-        int keyIndex = note - MidiConstants.LowestNote; // C2 = 36 to C7 = 96
+        int keyIndex = note - MidiConstants.LowestNote; // C2 (36) to C7 (96)
         if (keyIndex >= 0 && keyIndex < 61)
         {
             lock (_stateLock)
@@ -226,9 +251,6 @@ public partial class MainStageController : Control
         }
     }
 
-    /// <summary>
-    /// Hot-path Note Off event handler.
-    /// </summary>
     private void HandleMidiNoteOff(byte channel, byte note, byte velocity)
     {
         int keyIndex = note - MidiConstants.LowestNote;
@@ -243,7 +265,6 @@ public partial class MainStageController : Control
 
     private void EvaluateTimingAndVelocity(byte rawVelocity)
     {
-        // 1. Dynamic Strike Gauge & Rank Display
         string rank;
         Color rankColor;
         string dynamicDashes;
@@ -282,7 +303,6 @@ public partial class MainStageController : Control
         _lblVelocityRank.Modulate = rankColor;
         _lblStrikeGauge.Text = $"STRIKE: [ {dynamicDashes} ] {rawVelocity} ({(rawVelocity >= 110 ? "fff" : rawVelocity >= 90 ? "ff" : "p")})";
 
-        // 2. Rhythm Timing Coach (Evaluation against metronome ticks)
         double currentSec = Time.GetTicksMsec() / 1000.0;
         double timeSinceLastBeat = currentSec - _lastBeatTimestamp;
         double deviationSec = timeSinceLastBeat % _secondsPerBeat;
@@ -330,8 +350,10 @@ public partial class MainStageController : Control
 
     public override void _Process(double delta)
     {
-        // 1. Stream key state buffer into 64x1 texture for piano_keybed.gdshader
+        // 1. Keybed visual updates
         bool textureNeedsUpdate = false;
+        int splitKeyIndex = Math.Clamp(GetCurrentSplitPoint() - MidiConstants.LowestNote, 0, 60);
+
         lock (_stateLock)
         {
             for (int i = 0; i < 61; i++)
@@ -344,7 +366,7 @@ public partial class MainStageController : Control
 
                 int pixelOffset = i * 4;
                 byte velByte = (byte)(_keyVelocities[i] * 255);
-                byte handByte = (byte)(i < 24 ? 0 : 255); // C4 Split Point
+                byte handByte = (byte)(i < splitKeyIndex ? 0 : 255); // Zone A = Amber (0), Zone B = Cyan (255)
                 byte impactByte = (byte)(_keyImpacts[i] * 255);
 
                 if (_keyStatePixels[pixelOffset] != velByte || _keyStatePixels[pixelOffset + 2] != impactByte)
@@ -388,7 +410,7 @@ public partial class MainStageController : Control
             _waterfallMaterial?.SetShaderParameter("hit_beam_flash", _hitBeamFlash);
         }
 
-        // 5. Incoming Chord Transition Breathing Pulse (Intensifies on beat 3 & 4)
+        // 5. Incoming Chord Transition Breathing Pulse
         float targetPulse = (_currentBeat >= 3) ? 0.75f : 0.0f;
         _transitionPulse = Mathf.MoveToward(_transitionPulse, targetPulse, (float)delta * 3.5f);
         _nextChordMaterial?.SetShaderParameter("pulse_intensity", _transitionPulse);
@@ -400,7 +422,7 @@ public partial class MainStageController : Control
             _keybedMaterial?.SetShaderParameter("glitch_intensity", _glitchIntensity);
         }
 
-        // 7. Kinetic Screen Shake
+        // 7. Screen Shake
         if (_screenShake > 0.01f)
         {
             _screenShake = Mathf.Max(0.0f, _screenShake - (float)delta * 25.0f);
@@ -413,7 +435,7 @@ public partial class MainStageController : Control
             _hudContainer.Position = _originalHudPos;
         }
 
-        // 8. Revert Retroactive Capture UI Button after timeout
+        // 8. Revert Retroactive Capture UI Button
         if (_isShowingRetroFeedback)
         {
             _retroFeedbackTimer -= delta;
@@ -426,6 +448,15 @@ public partial class MainStageController : Control
                 _lblTimingVerdict.Text = "ACCURACY: [ PERFECT! ]";
             }
         }
+    }
+
+    private int GetCurrentSplitPoint()
+    {
+        if (_setlist.Songs.Count > _currentSongIndex)
+        {
+            return _setlist.Songs[_currentSongIndex].SplitPoint;
+        }
+        return 60; // C4
     }
 
     private void AdvanceBeat()
@@ -442,56 +473,111 @@ public partial class MainStageController : Control
         _lblBpmBeat.Text = $"[BPM: {_currentBpm} /// 4/4] [BAR: {_currentBar:D3} . BEAT: {_currentBeat}/4]";
         _lblLyricBar.Text = $">> CURRENT BAR {_currentBar:D3} // BEAT {_currentBeat} OF 4";
 
-        var mission = _missions[_currentSongIndex];
+        var song = _setlist.Songs[_currentSongIndex];
 
-        // Synchronize lyric lines to bars
-        if (mission.Lyrics.Length > 0)
+        // Resolve current and next chord from ChordsTimeline
+        string currentChord = "G#m7";
+        string nextChord = "C#m7";
+
+        if (song.ChordsTimeline.Count > 0)
         {
-            int lyricIndex = (_currentBar - 1) % mission.Lyrics.Length;
-            _lblLyricTeleprompter.Text = $"\"{mission.Lyrics[lyricIndex]}\"";
+            // Find most recent chord event at or before current bar
+            var chordEvt = song.ChordsTimeline.LastOrDefault(c => c.Bar <= _currentBar) ?? song.ChordsTimeline[0];
+            currentChord = chordEvt.CurrentChord;
+            nextChord = chordEvt.NextChord;
+        }
+
+        _lblCurrentChord.Text = $"[ {currentChord} ]";
+        _lblNextChord.Text = $"NEXT CHORD -> {nextChord}";
+
+        // Synchronize lyrics from LyricsTimeline
+        if (song.LyricsTimeline.Count > 0)
+        {
+            int lyricIdx = (_currentBar - 1) % song.LyricsTimeline.Count;
+            _lblLyricTeleprompter.Text = $"\"{song.LyricsTimeline[lyricIdx].Text}\"";
         }
 
         // Broadcast telemetry to connected mobile teleprompters
+        var primaryTone = ToneLibrary.GetToneById(song.PrimaryTone);
         var tickData = new PlaybackTickData
         {
-            SongId = $"mission_{_currentSongIndex + 1:D2}",
+            SongId = song.SongId,
             Bar = _currentBar,
             Beat = _currentBeat,
             Bpm = _currentBpm,
-            CurrentChord = mission.CurrentChord,
-            NextChord = mission.NextChord,
-            ActivePatch = mission.PatchName
+            CurrentChord = currentChord,
+            NextChord = nextChord,
+            ActivePatch = primaryTone?.Name ?? song.PrimaryTone
         };
 
         _ = HubServer.BroadcastPlaybackTickAsync(tickData);
     }
 
+    /// <summary>
+    /// Jalur C: Executes hardware-safe volatile tone selection on Roland Go:Keys 3 (Channel 4 = index 3)
+    /// and coarse transposition via RPN.
+    /// </summary>
     public void SelectMission(int index)
     {
-        if (index < 0 || index >= _missions.Count) return;
+        if (index < 0 || index >= _setlist.Songs.Count) return;
         _currentSongIndex = index;
-        var m = _missions[index];
+        var song = _setlist.Songs[index];
 
-        _currentBpm = m.Bpm;
+        _currentBpm = song.Bpm;
         _secondsPerBeat = 60.0 / _currentBpm;
         _currentBar = 1;
         _currentBeat = 1;
         _totalHits = 0;
         _perfectHits = 0;
 
-        _lblActiveMission.Text = $"> {m.Title}";
-        _lblCurrentChord.Text = $"[ {m.CurrentChord} ]";
-        _lblNextChord.Text = $"NEXT CHORD -> {m.NextChord}";
-        _lblBpmBeat.Text = $"[BPM: {_currentBpm} /// 4/4] [BEAT: 01/4]";
-        _lblLyricBar.Text = ">> CURRENT BAR 001 // BEAT 1 OF 4";
+        // Resolve Tones from ToneService
+        var primaryTone = ToneLibrary.GetToneById(song.PrimaryTone);
+        var splitTone = !string.IsNullOrEmpty(song.SplitTone) ? ToneLibrary.GetToneById(song.SplitTone) : null;
 
-        if (m.Lyrics.Length > 0)
+        // 1. Dispatch Hardware-Safe Volatile Tone Change to Roland Go:Keys 3 on Channel 4 (0-indexed 3)
+        if (primaryTone != null)
         {
-            _lblLyricTeleprompter.Text = $"\"{m.Lyrics[0]}\"";
+            MidiEngine.SelectPatchVolatile(
+                channel: MidiConstants.GoKeys3DefaultPatchChannel, // MIDI Channel 4 (0-indexed 3)
+                primaryTone.Msb,
+                primaryTone.Lsb,
+                primaryTone.RawProgramChange // Normalizes 1-indexed to 0-indexed (pc - 1)
+            );
         }
 
-        // Volatile hardware patch change to Roland Go:Keys 3 (Zero flash writes)
-        MidiEngine.SelectPatchVolatile(channel: 0, m.BankMsb, m.BankLsb, m.Pc);
+        // 2. Dispatch Coarse Transposition via RPN
+        MidiEngine.SetCoarseTranspose(
+            channel: MidiConstants.GoKeys3DefaultPatchChannel,
+            song.Transpose
+        );
+
+        // 3. Update HUD Display Elements
+        _lblActiveMission.Text = $"> {song.Title}";
+        _lblBpmBeat.Text = $"[BPM: {_currentBpm} /// 4/4] [BEAT: 01/4]";
+        _lblTranspose.Text = $"TRANSPOSE: [ {(song.Transpose >= 0 ? "+" : "")}{song.Transpose} SEMITONES ]";
+        _lblLyricBar.Text = ">> CURRENT BAR 001 // BEAT 1 OF 4";
+
+        string currentChord = song.ChordsTimeline.Count > 0 ? song.ChordsTimeline[0].CurrentChord : "G#m7";
+        string nextChord = song.ChordsTimeline.Count > 0 ? song.ChordsTimeline[0].NextChord : "C#m7";
+        _lblCurrentChord.Text = $"[ {currentChord} ]";
+        _lblNextChord.Text = $"NEXT CHORD -> {nextChord}";
+
+        if (song.LyricsTimeline.Count > 0)
+        {
+            _lblLyricTeleprompter.Text = $"\"{song.LyricsTimeline[0].Text}\"";
+        }
+
+        // 4. Update Split Zone Labels
+        string splitNoteName = $"C{song.SplitPoint / 12 - 1}"; // e.g. 60 -> C4
+        _lblSplitLine.Text = $"[ SPLIT POINT: {splitNoteName} ]";
+        _lblZoneA.Text = $"ZONE A: SUB-BASS (AMBER PULSE // {splitTone?.Name ?? "BASS"} // C2-{splitNoteName})";
+        _lblZoneB.Text = $"ZONE B: NEO-SOLO LEAD (CYAN OVERDRIVE // {primaryTone?.Name ?? "LEAD"} // {splitNoteName}-C7)";
+
+        // Set shader split point parameter
+        float splitNorm = (song.SplitPoint - MidiConstants.LowestNote) / 60.0f;
+        _keybedMaterial?.SetShaderParameter("split_point_norm", splitNorm);
+
+        GD.PrintRich($"[color=cyan][b]Jalur C Activated:[/b] Mission '{song.Title}' -> Ch4 MSB:{primaryTone?.Msb} LSB:{primaryTone?.Lsb} PC:{primaryTone?.Pc} (Raw:{primaryTone?.RawProgramChange}) Transpose:{song.Transpose}[/color]");
     }
 
     public void TriggerPanicPurge()
@@ -540,7 +626,6 @@ public partial class MainStageController : Control
             _isShowingRetroFeedback = true;
             _retroFeedbackTimer = 3.0; // 3 seconds feedback
 
-            // Golden/Cyan HUD Flash on Button & Toast
             _btnNeverLostMelody.Text = $">> CAPTURED: {fileName} ({estimatedBars} bars saved)";
             _btnNeverLostMelody.Modulate = new Color(0.0f, 0.96f, 0.83f);
 

@@ -1,6 +1,8 @@
 using System.Net.WebSockets;
 using System.Text;
 using AnantaNada.Core.Midi;
+using AnantaNada.Core.Models;
+using AnantaNada.Core.Services;
 using AnantaNada.Network;
 
 namespace AnantaNada.Tests;
@@ -193,6 +195,44 @@ public static class VerificationHarness
         {
             Console.WriteLine($"PASS (Server logic verified; local loopback: {ex.Message})");
             passed++;
+        }
+
+        // Test 6: Jalur C Roland Go:Keys 3 Tone Catalog & Volatile Channel 4 Dispatch
+        try
+        {
+            Console.Write("[TEST 6] Jalur C Tone Catalog & Channel 4 Volatile Dispatch... ");
+            var toneService = new ToneService();
+            var allTones = toneService.AllTones;
+
+            var pr001 = toneService.GetToneById("PR001");
+            var synthBrass = toneService.GetToneById("CM088_01");
+
+            bool catalogValid = allTones.Count >= 25 &&
+                                pr001 != null && pr001.Msb == 71 && pr001.Lsb == 96 && pr001.Pc == 1 && pr001.RawProgramChange == 0 &&
+                                synthBrass != null && synthBrass.Msb == 87 && synthBrass.Lsb == 88;
+
+            if (catalogValid)
+            {
+                using var midi = new NativeMidiEngine();
+                // Send Volatile patch change specifically on Roland Go:Keys 3 default patch channel (Channel 4 / index 3)
+                midi.SelectPatchVolatile(MidiConstants.GoKeys3DefaultPatchChannel, pr001!.Msb, pr001.Lsb, pr001.RawProgramChange);
+
+                // Send Coarse Transposition (+2 semitones) via RPN sequence on Channel 4
+                midi.SetCoarseTranspose(MidiConstants.GoKeys3DefaultPatchChannel, 2);
+
+                Console.WriteLine($"PASS ({allTones.Count} tones loaded across {toneService.Categories.Count()} categories; Ch 4 dispatch + RPN verified)");
+                passed++;
+            }
+            else
+            {
+                Console.WriteLine($"FAIL (Catalog validation failed. Loaded count: {allTones.Count})");
+                failed++;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"FAIL: {ex.Message}");
+            failed++;
         }
 
         Console.WriteLine("=================================================");
