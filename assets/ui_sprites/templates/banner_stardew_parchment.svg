@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  ANANTANADA UI SPRITE TEMPLATE
+  Editable in Inkscape, Figma, Illustrator, or any vector editor.
+  License: CC0 Public Domain
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 90" width="340" height="90">
+  <defs>
+    <style>
+      .bold-text { font-family: 'Arial Black', Impact, sans-serif; font-weight: bold; }
+      .serif-text { font-family: 'Georgia', 'Times New Roman', serif; }
+      .mono-text { font-family: 'Courier New', monospace; font-weight: bold; }
+      .hand-text { font-family: 'Comic Sans MS', 'Chalkboard', cursive; font-weight: bold; }
+    </style>
+  </defs>
+
+  <defs>
+    <linearGradient id="paperGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fdf0d5" />
+      <stop offset="60%" stop-color="#ebd5a3" />
+      <stop offset="100%" stop-color="#c9ad73" />
+    </linearGradient>
+  </defs>
+  <!-- Banner Body -->
+  <path d="M 30,10 L 310,10 L 295,45 L 310,80 L 30,80 L 45,45 Z" fill="url(#paperGrad)" stroke="#785928" stroke-width="3" />
+  <text x="170" y="52" text-anchor="middle" font-size="20" fill="#432818" class="serif-text">STAGE REPERTOIRE</text>
+
+</svg>

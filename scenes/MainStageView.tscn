@@ -1,9 +1,21 @@
-[gd_scene load_steps=11 format=3 uid="uid://b5d8g2hq9x8a"]
+[gd_scene load_steps=23 format=3 uid="uid://b5d8g2hq9x8a"]
 
 [ext_resource type="Script" path="res://src/UI/MainStageController.gd" id="1_controller"]
 [ext_resource type="Shader" path="res://src/Shaders/piano_keybed.gdshader" id="2_keybed_shader"]
 [ext_resource type="Shader" path="res://src/Shaders/waterfall_visualizer.gdshader" id="3_waterfall_shader"]
 [ext_resource type="Shader" path="res://src/Shaders/tactical_panel.gdshader" id="4_tactical_shader"]
+[ext_resource type="Texture2D" path="res://assets/ui_sprites/png/hud_cadence_heart_pulse.png" id="5_cadence_heart"]
+[ext_resource type="Texture2D" path="res://assets/ui_sprites/png/icon_gris_celestial_star.png" id="6_gris_star"]
+[ext_resource type="Texture2D" path="res://assets/ui_sprites/png/frame_moonlighter_stitched_tab.png" id="7_moonlighter_tab"]
+[ext_resource type="Texture2D" path="res://assets/ui_sprites/png/tape_lis_washi_strip.png" id="8_lis_tape"]
+[ext_resource type="Texture2D" path="res://assets/ui_sprites/png/widget_minimetro_transit_map.png" id="9_minimetro_map"]
+[ext_resource type="Texture2D" path="res://assets/ui_sprites/png/ornament_nostalgia_gilded_corner.png" id="10_nostalgia_corner"]
+[ext_resource type="Texture2D" path="res://assets/ui_sprites/png/badge_djmax_judgement_max.png" id="11_djmax_badge"]
+[ext_resource type="Texture2D" path="res://assets/ui_sprites/png/hud_djmax_fever_gauge.png" id="12_djmax_fever"]
+[ext_resource type="Texture2D" path="res://assets/ui_sprites/png/badge_hifi_comic_burst.png" id="13_hifi_burst"]
+[ext_resource type="Texture2D" path="res://assets/ui_sprites/png/icon_taiko_don_ka_pair.png" id="14_taiko_pair"]
+[ext_resource type="Texture2D" path="res://assets/ui_sprites/png/sticker_snipperclips_pastel_note.png" id="15_snipperclips_note"]
+[ext_resource type="Texture2D" path="res://assets/ui_sprites/png/overlay_gris_zen_vignette.png" id="16_gris_vignette"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_keybed"]
 shader = ExtResource("2_keybed_shader")
@@ -116,6 +128,19 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.039, 0.045, 0.058, 1)
 
+[node name="ZenVignetteOverlay" type="TextureRect" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("16_gris_vignette")
+expand_mode = 1
+stretch_mode = 6
+
 [node name="HUD" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -144,6 +169,14 @@ theme_override_font_sizes/font_size = 13
 text = "// SYS_STATUS: OPERATIONAL [ANANTANADA V1.0]"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="ZenModeBtn" type="Button" parent="HUD/TopBar"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+icon = ExtResource("6_gris_star")
+icon_alignment = 1
+expand_icon = true
+tooltip_text = "GRIS Zen Mode: Minimalist Focus Stage View"
 
 [node name="DevicePill" type="PanelContainer" parent="HUD/TopBar"]
 custom_minimum_size = Vector2(260, 0)
@@ -181,6 +214,14 @@ vertical_alignment = 1
 [node name="Spacer" type="Control" parent="HUD/TopBar"]
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="CadenceHeartRect" type="TextureRect" parent="HUD/TopBar"]
+custom_minimum_size = Vector2(170, 44)
+layout_mode = 2
+texture = ExtResource("5_cadence_heart")
+expand_mode = 1
+stretch_mode = 5
+tooltip_text = "Cadence of Hyrule: 16-Bit Dynamic Heart Beat Pulse Bar"
 
 [node name="BpmPill" type="PanelContainer" parent="HUD/TopBar"]
 custom_minimum_size = Vector2(280, 0)
@@ -229,6 +270,27 @@ offset_top = 10.0
 offset_right = -14.0
 offset_bottom = -10.0
 theme_override_constants/separation = 8
+
+[node name="HeaderDecorRow" type="HBoxContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="MoonlighterTab" type="TextureRect" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/HeaderDecorRow"]
+custom_minimum_size = Vector2(170, 36)
+layout_mode = 2
+texture = ExtResource("7_moonlighter_tab")
+expand_mode = 1
+stretch_mode = 5
+tooltip_text = "Moonlighter: Stitched Leather Repertoire Ledger"
+
+[node name="WashiTape" type="TextureRect" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/HeaderDecorRow"]
+custom_minimum_size = Vector2(110, 32)
+layout_mode = 2
+texture = ExtResource("8_lis_tape")
+expand_mode = 1
+stretch_mode = 5
+tooltip_text = "Life is Strange: Washi Tape Binding"
 
 [node name="HeaderLabel" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
 layout_mode = 2
@@ -390,6 +452,14 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
+[node name="MiniMetroTransitMap" type="TextureRect" parent="HUD/CenterSplit/CenterCascade"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+texture = ExtResource("9_minimetro_map")
+expand_mode = 1
+stretch_mode = 5
+tooltip_text = "Mini Metro: Song Section Transit Progression Map"
+
 [node name="CascadeHeader" type="HBoxContainer" parent="HUD/CenterSplit/CenterCascade"]
 layout_mode = 2
 
@@ -413,13 +483,41 @@ material = SubResource("ShaderMaterial_waterfall")
 layout_mode = 2
 size_flags_vertical = 3
 
+[node name="NostalgiaCornerLeft" type="TextureRect" parent="HUD/CenterSplit/CenterCascade/WaterfallRect"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 0
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 70.0
+offset_bottom = 70.0
+texture = ExtResource("10_nostalgia_corner")
+expand_mode = 1
+stretch_mode = 5
+tooltip_text = "NOSTALGIA Op. 2: Classical Gilded Baroque Filigree"
+
+[node name="NostalgiaCornerRight" type="TextureRect" parent="HUD/CenterSplit/CenterCascade/WaterfallRect"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -70.0
+offset_top = 6.0
+offset_right = -6.0
+offset_bottom = 70.0
+grow_horizontal = 0
+texture = ExtResource("10_nostalgia_corner")
+expand_mode = 1
+stretch_mode = 5
+flip_h = true
+
 [node name="CoachDeck" type="HBoxContainer" parent="HUD/CenterSplit/CenterCascade"]
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 14
 
 [node name="TimingVerdict" type="Label" parent="HUD/CenterSplit/CenterCascade/CoachDeck"]
-custom_minimum_size = Vector2(230, 0)
+custom_minimum_size = Vector2(190, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0.96, 0.83, 1)
 theme_override_font_sizes/font_size = 14
@@ -427,12 +525,36 @@ text = "ACCURACY: [ PERFECT! ]"
 vertical_alignment = 1
 
 [node name="AccuracyValue" type="Label" parent="HUD/CenterSplit/CenterCascade/CoachDeck"]
-custom_minimum_size = Vector2(170, 0)
+custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.72, 0.01, 1)
 theme_override_font_sizes/font_size = 14
-text = "SCORE ACC: 98.4%"
+text = "ACC: 98.4%"
 vertical_alignment = 1
+
+[node name="DJMaxJudgementBadge" type="TextureRect" parent="HUD/CenterSplit/CenterCascade/CoachDeck"]
+custom_minimum_size = Vector2(120, 38)
+layout_mode = 2
+texture = ExtResource("11_djmax_badge")
+expand_mode = 1
+stretch_mode = 5
+tooltip_text = "DJMAX RESPECT V: 100% MAX BEAT Precision Judgement"
+
+[node name="DJMaxFeverGauge" type="TextureRect" parent="HUD/CenterSplit/CenterCascade/CoachDeck"]
+custom_minimum_size = Vector2(160, 38)
+layout_mode = 2
+texture = ExtResource("12_djmax_fever")
+expand_mode = 1
+stretch_mode = 5
+tooltip_text = "DJMAX RESPECT V: Dynamic x5 FEVER Gauge"
+
+[node name="HiFiBurstBadge" type="TextureRect" parent="HUD/CenterSplit/CenterCascade/CoachDeck"]
+custom_minimum_size = Vector2(44, 44)
+layout_mode = 2
+texture = ExtResource("13_hifi_burst")
+expand_mode = 1
+stretch_mode = 5
+tooltip_text = "Hi-Fi Rush: Pop-Art Comic Beat Starburst"
 
 [node name="StrikeGauge" type="Label" parent="HUD/CenterSplit/CenterCascade/CoachDeck"]
 layout_mode = 2
@@ -496,6 +618,25 @@ theme_override_font_sizes/font_size = 12
 text = "TRANSPOSE: [ +0 SEMITONES ]"
 horizontal_alignment = 1
 
+[node name="TaikoRow" type="HBoxContainer" parent="HUD/CenterSplit/ChordHud"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="TaikoDonKa" type="TextureRect" parent="HUD/CenterSplit/ChordHud/TaikoRow"]
+custom_minimum_size = Vector2(130, 38)
+layout_mode = 2
+texture = ExtResource("14_taiko_pair")
+expand_mode = 1
+stretch_mode = 5
+tooltip_text = "Taiko no Tatsujin: Don (Left Bass) / Ka (Right Treble) Drum Indicator"
+
+[node name="TaikoLabel" type="Label" parent="HUD/CenterSplit/ChordHud/TaikoRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0, 0.96, 0.83, 0.8)
+text = "[L: DON // R: KA]"
+
 [node name="TransitionHeader" type="Label" parent="HUD/CenterSplit/ChordHud"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0.96, 0.83, 1)
@@ -550,6 +691,14 @@ melangkah di tanah tua\""
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
+
+[node name="SnipperclipsSticky" type="TextureRect" parent="HUD/CenterSplit/ChordHud/LyricBox/VBox"]
+custom_minimum_size = Vector2(120, 52)
+layout_mode = 2
+texture = ExtResource("15_snipperclips_note")
+expand_mode = 1
+stretch_mode = 5
+tooltip_text = "Snipperclips: Pastel Papercraft Stage Cue Reminder"
 
 [node name="BottomKeybed" type="VBoxContainer" parent="HUD"]
 layout_mode = 2

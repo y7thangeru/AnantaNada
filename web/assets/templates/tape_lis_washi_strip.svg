@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  ANANTANADA UI SPRITE TEMPLATE
+  Editable in Inkscape, Figma, Illustrator, or any vector editor.
+  License: CC0 Public Domain
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 52" width="210" height="52">
+  <defs>
+    <style>
+      .bold-text { font-family: 'Arial Black', Impact, sans-serif; font-weight: bold; }
+      .serif-text { font-family: 'Georgia', 'Times New Roman', serif; }
+      .mono-text { font-family: 'Courier New', monospace; font-weight: bold; }
+      .hand-text { font-family: 'Comic Sans MS', 'Chalkboard', cursive; font-weight: bold; }
+    </style>
+  </defs>
+
+  <defs>
+    <linearGradient id="tapeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffe494" stop-opacity="0.85" />
+      <stop offset="50%" stop-color="#fff1c5" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#ffe494" stop-opacity="0.85" />
+    </linearGradient>
+  </defs>
+  <!-- Torn Ends -->
+  <polygon points="5,8 15,2 190,4 200,9 196,44 188,48 10,46 4,40" fill="url(#tapeGrad)" stroke="#e0b852" stroke-width="1.2" />
+  <line x1="8" y1="12" x2="8" y2="38" stroke="#cca138" stroke-width="1" stroke-dasharray="2,2" />
+  <line x1="192" y1="12" x2="192" y2="38" stroke="#cca138" stroke-width="1" stroke-dasharray="2,2" />
+
+</svg>

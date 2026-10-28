@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  ANANTANADA UI SPRITE TEMPLATE
+  Editable in Inkscape, Figma, Illustrator, or any vector editor.
+  License: CC0 Public Domain
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 75" width="250" height="75">
+  <defs>
+    <style>
+      .bold-text { font-family: 'Arial Black', Impact, sans-serif; font-weight: bold; }
+      .serif-text { font-family: 'Georgia', 'Times New Roman', serif; }
+      .mono-text { font-family: 'Courier New', monospace; font-weight: bold; }
+      .hand-text { font-family: 'Comic Sans MS', 'Chalkboard', cursive; font-weight: bold; }
+    </style>
+  </defs>
+
+  <defs>
+    <linearGradient id="leatherGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#8d5b4c" />
+      <stop offset="50%" stop-color="#6a382c" />
+      <stop offset="100%" stop-color="#4a2218" />
+    </linearGradient>
+  </defs>
+  <!-- Leather Body -->
+  <path d="M 0,0 L 220,0 C 235,0 240,15 240,30 L 240,45 C 240,60 230,70 215,70 L 0,70 Z" fill="url(#leatherGrad)" stroke="#2b110a" stroke-width="3" />
+  <!-- Stitched Edges -->
+  <path d="M 6,6 L 214,6 C 226,6 234,14 234,26 L 234,44 C 234,56 226,64 214,64 L 6,64" fill="none" stroke="#f4a261" stroke-width="2" stroke-dasharray="5,4" />
+  <!-- Brass Rivet -->
+  <circle cx="28" cy="35" r="9" fill="#e9c46a" stroke="#8d5b4c" stroke-width="2" />
+  <circle cx="28" cy="35" r="3" fill="#2b110a" />
+  <!-- Label Text -->
+  <text x="130" y="43" text-anchor="middle" font-size="18" fill="#f4e8c1" class="serif-text" letter-spacing="1">SETLIST LEDGER</text>
+
+</svg>

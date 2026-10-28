@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  ANANTANADA UI SPRITE TEMPLATE
+  Editable in Inkscape, Figma, Illustrator, or any vector editor.
+  License: CC0 Public Domain
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <style>
+      .bold-text { font-family: 'Arial Black', Impact, sans-serif; font-weight: bold; }
+      .serif-text { font-family: 'Georgia', 'Times New Roman', serif; }
+      .mono-text { font-family: 'Courier New', monospace; font-weight: bold; }
+      .hand-text { font-family: 'Comic Sans MS', 'Chalkboard', cursive; font-weight: bold; }
+    </style>
+  </defs>
+
+  <defs>
+    <linearGradient id="grisSilver" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="50%" stop-color="#cfd8dc" />
+      <stop offset="100%" stop-color="#78909c" />
+    </linearGradient>
+  </defs>
+  <!-- Concentric Fine Geometry -->
+  <circle cx="64" cy="64" r="54" fill="none" stroke="#cfd8dc" stroke-width="1.2" stroke-dasharray="2,3" />
+  <circle cx="64" cy="64" r="42" fill="none" stroke="#eceff1" stroke-width="1.5" />
+  <circle cx="64" cy="64" r="28" fill="none" stroke="#90a4ae" stroke-width="0.8" />
+  <!-- 8-Point Diamond Star -->
+  <polygon points="64,12 68,52 108,56 72,64 80,104 64,72 48,104 56,64 20,56 60,52" fill="url(#grisSilver)" />
+  <circle cx="64" cy="64" r="4" fill="#ffffff" />
+
+</svg>

@@ -337,6 +337,7 @@ body.cockpit-body {
 }
 
 .lyric-box {
+  position: relative;
   background: #14171f;
   border: 1px solid var(--border-tech);
   padding: 14px;
@@ -363,3 +364,115 @@ body.cockpit-body {
 .zone-a { color: var(--neon-amber); }
 .split-divider { color: #f43f5e; }
 .zone-b { color: var(--neon-cyan); }
+
+/* --- 12-Master Game UI Sprites & Widgets --- */
+.cadence-beat-widget {
+  display: flex;
+  align-items: center;
+  height: 32px;
+}
+.beat-pulse-img {
+  height: 28px;
+  object-fit: contain;
+  transition: transform 0.08s ease, filter 0.08s ease;
+}
+.beat-pulse-img.pulse {
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 10px #ff0055);
+}
+
+.setlist-badge-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.moonlighter-tab {
+  height: 24px;
+  object-fit: contain;
+}
+.washi-tape {
+  height: 20px;
+  object-fit: contain;
+}
+
+.minimetro-transit-container {
+  width: 100%;
+  margin-bottom: 8px;
+  background: #11141c;
+  padding: 4px;
+  border-radius: 4px;
+}
+.transit-map-img {
+  width: 100%;
+  height: 34px;
+  object-fit: contain;
+}
+
+.arcade-badges-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.djmax-badge {
+  height: 26px;
+  object-fit: contain;
+}
+.fever-gauge {
+  height: 26px;
+  object-fit: contain;
+}
+.hifi-burst {
+  height: 32px;
+  object-fit: contain;
+  transition: transform 0.1s ease;
+}
+.hifi-burst.hit {
+  transform: scale(1.25) rotate(-6deg);
+}
+
+.nostalgia-ornament-wrap {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  pointer-events: none;
+}
+.nostalgia-corner {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  opacity: 0.85;
+}
+
+.taiko-drum-widget {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 6px 0;
+  padding: 4px;
+  background: #131722;
+  border-radius: 4px;
+}
+.taiko-img {
+  height: 24px;
+  object-fit: contain;
+}
+.taiko-label {
+  font-size: 11px;
+  color: var(--neon-cyan);
+  font-weight: 700;
+}
+
+.snipperclips-sticker {
+  position: absolute;
+  top: -8px;
+  right: -6px;
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  transform: rotate(8deg);
+  pointer-events: none;
+}

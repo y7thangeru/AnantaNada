@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  ANANTANADA UI SPRITE TEMPLATE
+  Editable in Inkscape, Figma, Illustrator, or any vector editor.
+  License: CC0 Public Domain
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" width="300" height="200">
+  <defs>
+    <style>
+      .bold-text { font-family: 'Arial Black', Impact, sans-serif; font-weight: bold; }
+      .serif-text { font-family: 'Georgia', 'Times New Roman', serif; }
+      .mono-text { font-family: 'Courier New', monospace; font-weight: bold; }
+      .hand-text { font-family: 'Comic Sans MS', 'Chalkboard', cursive; font-weight: bold; }
+    </style>
+  </defs>
+
+  <defs>
+    <linearGradient id="rankGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff0055" />
+      <stop offset="50%" stop-color="#ff5400" />
+      <stop offset="100%" stop-color="#ffbd00" />
+    </linearGradient>
+  </defs>
+  <!-- Slanted Background -->
+  <polygon points="10,60 270,10 290,140 30,190" fill="#111116" stroke="#00f5d4" stroke-width="6" />
+  <polygon points="16,66 264,18 282,134 34,182" fill="url(#rankGrad)" />
+  <!-- Halftone Accent Lines -->
+  <line x1="30" y1="75" x2="120" y2="60" stroke="#ffffff" stroke-width="4" stroke-linecap="round" />
+  <line x1="25" y1="90" x2="90" y2="80" stroke="#ffffff" stroke-width="3" stroke-linecap="round" />
+  <!-- Rank Typography -->
+  <text x="150" y="125" text-anchor="middle" font-size="64" fill="#111116" class="bold-text" transform="rotate(-10 150 120)">RANK SSS</text>
+  <text x="148" y="122" text-anchor="middle" font-size="64" fill="#ffffff" class="bold-text" transform="rotate(-10 150 120)">RANK SSS</text>
+  <!-- Speed Lines -->
+  <polygon points="210,35 255,27 250,42" fill="#ffffff" />
+
+</svg>

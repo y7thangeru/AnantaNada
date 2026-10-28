@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  ANANTANADA UI SPRITE TEMPLATE
+  Editable in Inkscape, Figma, Illustrator, or any vector editor.
+  License: CC0 Public Domain
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="180" height="180">
+  <defs>
+    <style>
+      .bold-text { font-family: 'Arial Black', Impact, sans-serif; font-weight: bold; }
+      .serif-text { font-family: 'Georgia', 'Times New Roman', serif; }
+      .mono-text { font-family: 'Courier New', monospace; font-weight: bold; }
+      .hand-text { font-family: 'Comic Sans MS', 'Chalkboard', cursive; font-weight: bold; }
+    </style>
+  </defs>
+
+  <defs>
+    <filter id="stickyDrop">
+      <feDropShadow dx="3" dy="4" stdDeviation="2" flood-color="#000" flood-opacity="0.2" />
+    </filter>
+  </defs>
+  <!-- Curled Sticky Note Body -->
+  <polygon points="10,10 170,10 170,140 140,170 10,170" fill="#ffefa6" stroke="#e0c75c" stroke-width="1.5" filter="url(#stickyDrop)" />
+  <polygon points="140,140 170,140 140,170" fill="#e0c75c" />
+  <text x="90" y="60" text-anchor="middle" font-size="15" fill="#4a421b" class="hand-text">Don't forget:</text>
+  <text x="90" y="90" text-anchor="middle" font-size="18" fill="#d90429" class="hand-text">CHORUS SOLO</text>
+  <text x="90" y="120" text-anchor="middle" font-size="13" fill="#4a421b" class="hand-text">(Bar 032 - 048)</text>
+
+</svg>

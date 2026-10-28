@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  ANANTANADA UI SPRITE TEMPLATE
+  Editable in Inkscape, Figma, Illustrator, or any vector editor.
+  License: CC0 Public Domain
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 90" width="90" height="90">
+  <defs>
+    <style>
+      .bold-text { font-family: 'Arial Black', Impact, sans-serif; font-weight: bold; }
+      .serif-text { font-family: 'Georgia', 'Times New Roman', serif; }
+      .mono-text { font-family: 'Courier New', monospace; font-weight: bold; }
+      .hand-text { font-family: 'Comic Sans MS', 'Chalkboard', cursive; font-weight: bold; }
+    </style>
+  </defs>
+
+  <circle cx="45" cy="50" r="36" fill="#e76f51" stroke="#264653" stroke-width="3" />
+  <circle cx="45" cy="50" r="30" fill="#f4a261" />
+  <polygon points="45,14 36,26 54,26" fill="#e76f51" stroke="#264653" stroke-width="2" />
+  <!-- Coin Stack -->
+  <circle cx="45" cy="48" r="16" fill="#e9c46a" stroke="#8d5b4c" stroke-width="2" />
+  <text x="45" y="55" text-anchor="middle" font-size="20" fill="#78350f" class="bold-text">G</text>
+
+</svg>

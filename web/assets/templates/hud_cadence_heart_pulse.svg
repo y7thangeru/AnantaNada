@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  ANANTANADA UI SPRITE TEMPLATE
+  Editable in Inkscape, Figma, Illustrator, or any vector editor.
+  License: CC0 Public Domain
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 72" width="320" height="72">
+  <defs>
+    <style>
+      .bold-text { font-family: 'Arial Black', Impact, sans-serif; font-weight: bold; }
+      .serif-text { font-family: 'Georgia', 'Times New Roman', serif; }
+      .mono-text { font-family: 'Courier New', monospace; font-weight: bold; }
+      .hand-text { font-family: 'Comic Sans MS', 'Chalkboard', cursive; font-weight: bold; }
+    </style>
+  </defs>
+
+  <defs>
+    <filter id="pixelDrop">
+      <feDropShadow dx="2" dy="2" stdDeviation="0" flood-color="#000" />
+    </filter>
+  </defs>
+  <rect x="5" y="15" width="310" height="42" fill="#1a1423" stroke="#ffd166" stroke-width="3" filter="url(#pixelDrop)" />
+  <!-- Converging Beat Chevrons -->
+  <path d="M 40,24 L 60,36 L 40,48 M 80,24 L 100,36 L 80,48 M 120,24 L 140,36 L 120,48" fill="none" stroke="#00f5d4" stroke-width="4" stroke-linecap="square" />
+  <path d="M 280,24 L 260,36 L 280,48 M 240,24 L 220,36 L 240,48 M 200,24 L 180,36 L 200,48" fill="none" stroke="#00f5d4" stroke-width="4" stroke-linecap="square" />
+  <!-- Center 16-Bit Heart -->
+  <polygon points="160,24 168,18 174,24 174,32 160,46 146,32 146,24 152,18" fill="#e63946" stroke="#ffffff" stroke-width="2" />
+
+</svg>

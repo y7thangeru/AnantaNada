@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  ANANTANADA UI SPRITE TEMPLATE
+  Editable in Inkscape, Figma, Illustrator, or any vector editor.
+  License: CC0 Public Domain
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 90" width="240" height="90">
+  <defs>
+    <style>
+      .bold-text { font-family: 'Arial Black', Impact, sans-serif; font-weight: bold; }
+      .serif-text { font-family: 'Georgia', 'Times New Roman', serif; }
+      .mono-text { font-family: 'Courier New', monospace; font-weight: bold; }
+      .hand-text { font-family: 'Comic Sans MS', 'Chalkboard', cursive; font-weight: bold; }
+    </style>
+  </defs>
+
+  <defs>
+    <filter id="paperShadow">
+      <feDropShadow dx="2" dy="3" stdDeviation="1" flood-color="#000" flood-opacity="0.25" />
+    </filter>
+  </defs>
+  <rect x="10" y="10" width="220" height="70" rx="6" fill="#ffffff" stroke="#fb8500" stroke-width="3" filter="url(#paperShadow)" />
+  <!-- Scissor Cut Dashed Line -->
+  <line x1="20" y1="20" x2="220" y2="20" stroke="#023047" stroke-width="2" stroke-dasharray="6,4" />
+  <!-- Hole punch -->
+  <circle cx="35" cy="45" r="7" fill="#e2e8f0" stroke="#023047" stroke-width="2" />
+  <text x="130" y="52" text-anchor="middle" font-size="16" fill="#023047" class="bold-text">SNIP &amp; CLIP NOTE</text>
+
+</svg>

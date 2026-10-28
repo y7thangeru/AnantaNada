@@ -14,7 +14,11 @@ const HIGHEST_NOTE: int = 96 # C7
 @onready var lbl_ip_address: Label = $HUD/TopBar/NetworkPill/IpLabel
 @onready var lbl_bpm_beat: Label = $HUD/TopBar/BpmPill/BpmLabel
 @onready var btn_panic: Button = $HUD/TopBar/PanicButtonContainer/PanicButton
+@onready var cadence_heart_rect: TextureRect = $HUD/TopBar/CadenceHeartRect
+@onready var btn_zen_mode: Button = $HUD/TopBar/ZenModeBtn
+@onready var zen_vignette: TextureRect = $ZenVignetteOverlay
 
+@onready var setlist_deck: PanelContainer = $HUD/CenterSplit/SetlistDeck
 @onready var search_box: LineEdit = $HUD/CenterSplit/SetlistDeck/MissionContainer/SearchBox
 @onready var btn_filter_all: Button = $HUD/CenterSplit/SetlistDeck/MissionContainer/FilterRow/BtnFilterAll
 @onready var btn_filter_indo: Button = $HUD/CenterSplit/SetlistDeck/MissionContainer/FilterRow/BtnFilterIndo
@@ -39,16 +43,27 @@ const HIGHEST_NOTE: int = 96 # C7
 @onready var btn_next_page: Button = $HUD/CenterSplit/SetlistDeck/MissionContainer/PaginationRow/BtnNextPage
 @onready var lbl_page_indicator: Label = $HUD/CenterSplit/SetlistDeck/MissionContainer/PaginationRow/PageIndicator
 
+@onready var minimetro_map: TextureRect = $HUD/CenterSplit/CenterCascade/MiniMetroTransitMap
 @onready var waterfall_rect: ColorRect = $HUD/CenterSplit/CenterCascade/WaterfallRect
+@onready var nostalgia_left: TextureRect = $HUD/CenterSplit/CenterCascade/WaterfallRect/NostalgiaCornerLeft
+@onready var nostalgia_right: TextureRect = $HUD/CenterSplit/CenterCascade/WaterfallRect/NostalgiaCornerRight
+
+@onready var coach_deck: HBoxContainer = $HUD/CenterSplit/CenterCascade/CoachDeck
 @onready var lbl_rhythm_accuracy: Label = $HUD/CenterSplit/CenterCascade/CoachDeck/AccuracyValue
 @onready var lbl_timing_verdict: Label = $HUD/CenterSplit/CenterCascade/CoachDeck/TimingVerdict
+@onready var djmax_badge: TextureRect = $HUD/CenterSplit/CenterCascade/CoachDeck/DJMaxJudgementBadge
+@onready var djmax_fever: TextureRect = $HUD/CenterSplit/CenterCascade/CoachDeck/DJMaxFeverGauge
+@onready var hifi_burst: TextureRect = $HUD/CenterSplit/CenterCascade/CoachDeck/HiFiBurstBadge
 @onready var lbl_strike_gauge: Label = $HUD/CenterSplit/CenterCascade/CoachDeck/StrikeGauge
 @onready var lbl_velocity_rank: Label = $HUD/CenterSplit/CenterCascade/CoachDeck/RankBadge
 @onready var btn_never_lost: Button = $HUD/CenterSplit/CenterCascade/CoachDeck/RetroBufferBtn
 
+@onready var chord_hud: VBoxContainer = $HUD/CenterSplit/ChordHud
 @onready var current_chord_box: PanelContainer = $HUD/CenterSplit/ChordHud/CurrentChordBox
 @onready var lbl_current_chord: Label = $HUD/CenterSplit/ChordHud/CurrentChordBox/VBox/ChordLabel
 @onready var lbl_transpose: Label = $HUD/CenterSplit/ChordHud/CurrentChordBox/VBox/TransposePill
+@onready var taiko_don_ka: TextureRect = $HUD/CenterSplit/ChordHud/TaikoRow/TaikoDonKa
+@onready var taiko_label: Label = $HUD/CenterSplit/ChordHud/TaikoRow/TaikoLabel
 @onready var next_chord_box: PanelContainer = $HUD/CenterSplit/ChordHud/NextChordBox
 @onready var lbl_next_chord: Label = $HUD/CenterSplit/ChordHud/NextChordBox/NextLabel
 @onready var lbl_lyric_teleprompter: Label = $HUD/CenterSplit/ChordHud/LyricBox/VBox/LyricText
@@ -88,6 +103,13 @@ var key_state_image: Image
 var key_state_texture: ImageTexture
 var key_velocities: PackedFloat32Array = PackedFloat32Array()
 var key_impacts: PackedFloat32Array = PackedFloat32Array()
+
+# 12-Master Game UI States
+var is_zen_mode: bool = false
+var fever_energy: float = 0.0
+var burst_scale: float = 1.0
+var don_ka_flash: float = 0.0
+var active_station: int = 1
 
 # Note Stream Runway for Waterfall Visualizer
 var waterfall_image: Image
@@ -132,6 +154,8 @@ func _ready() -> void:
 	# 2. Wire UI Buttons
 	btn_panic.pressed.connect(_on_panic_pressed)
 	btn_never_lost.pressed.connect(_on_never_lost_pressed)
+	if btn_zen_mode:
+		btn_zen_mode.pressed.connect(_toggle_zen_mode)
 	search_box.text_changed.connect(_on_search_changed)
 	btn_filter_all.pressed.connect(func(): _set_category("ALL"))
 	btn_filter_indo.pressed.connect(func(): _set_category("Indo_Band"))
@@ -395,6 +419,62 @@ func _process(delta: float) -> void:
 		waterfall_material.set_shader_parameter("beat_pulse", beat_pulse)
 		waterfall_material.set_shader_parameter("hit_beam_intensity", hit_beam_flash)
 
+	# 4. 12-Master Game Visualizer Updates
+	# Cadence of Hyrule: 16-Bit Heart Beat Pulse Bar
+	if cadence_heart_rect:
+		cadence_heart_rect.scale = Vector2.ONE * (1.0 + beat_pulse * 0.16)
+		cadence_heart_rect.modulate = Color(1.0 + beat_pulse * 0.5, 1.0 - beat_pulse * 0.1, 1.0 - beat_pulse * 0.1, 0.85 + beat_pulse * 0.15)
+
+	# Mini Metro: Song Section Transit Schematic Progression
+	var target_station = 1
+	if current_bar >= 37:
+		target_station = 5 # OUTRO
+	elif current_bar >= 29:
+		target_station = 4 # SOLO
+	elif current_bar >= 17:
+		target_station = 3 # CHORUS
+	elif current_bar >= 5:
+		target_station = 2 # VERSE
+	else:
+		target_station = 1 # INTRO
+
+	if target_station != active_station:
+		active_station = target_station
+		if minimetro_map:
+			minimetro_map.modulate = Color(1.4, 1.3, 0.8)
+	elif minimetro_map and minimetro_map.modulate != Color.WHITE:
+		minimetro_map.modulate = minimetro_map.modulate.lerp(Color.WHITE, delta * 3.0)
+
+	# DJMAX Respect V: Dynamic FEVER Gauge & Judgement Decay
+	fever_energy = max(0.0, fever_energy - delta * 0.04)
+	if djmax_fever:
+		var fever_tint = Color(0.3 + fever_energy * 0.7, 0.8, 1.0) if fever_energy < 1.0 else Color(1.6 + beat_pulse * 0.4, 0.3, 1.4)
+		djmax_fever.modulate = fever_tint
+
+	if djmax_badge and djmax_badge.modulate != Color.WHITE:
+		djmax_badge.modulate = djmax_badge.modulate.lerp(Color.WHITE, delta * 3.0)
+
+	# Hi-Fi Rush: Comic Pop-Art Burst Decay
+	if hifi_burst:
+		if burst_scale > 1.0:
+			burst_scale = max(1.0, burst_scale - delta * 3.0)
+			hifi_burst.scale = Vector2.ONE * burst_scale
+		else:
+			hifi_burst.modulate = hifi_burst.modulate.lerp(Color(1.0, 1.0, 1.0, 0.4 + beat_pulse * 0.6), delta * 4.0)
+
+	# NOSTALGIA Op. 2: Baroque Gilded Shimmer
+	if nostalgia_left and nostalgia_left.modulate != Color.WHITE:
+		nostalgia_left.modulate = nostalgia_left.modulate.lerp(Color.WHITE, delta * 2.5)
+	if nostalgia_right and nostalgia_right.modulate != Color.WHITE:
+		nostalgia_right.modulate = nostalgia_right.modulate.lerp(Color.WHITE, delta * 2.5)
+
+	# Taiko: Don / Ka Drum Marker Glow Decay
+	if taiko_don_ka and don_ka_flash > 0.0:
+		don_ka_flash = max(0.0, don_ka_flash - delta * 4.0)
+		taiko_don_ka.modulate = Color(1.0 + don_ka_flash * 0.5, 1.0 + don_ka_flash * 0.5, 1.0)
+	elif taiko_don_ka and taiko_don_ka.modulate != Color.WHITE:
+		taiko_don_ka.modulate = Color.WHITE
+
 	_push_key_texture()
 	_update_waterfall_stream(delta)
 
@@ -531,11 +611,35 @@ func _handle_note_on(note: int, velocity: int) -> void:
 		key_impacts[idx] = 1.0
 		hit_beam_flash = max(hit_beam_flash, v_norm)
 
-		# Strike rank evaluation
+		# 12-Master Game Interactive Hooks
+		fever_energy = min(1.2, fever_energy + 0.07 * v_norm)
+		don_ka_flash = 1.0
+
+		var split_pt = 60
+		if all_songs.size() > current_song_index:
+			split_pt = int(all_songs[current_song_index].get("splitPoint", 60))
+
+		# Taiko: Don / Ka Drum Feedback
+		if taiko_label:
+			if note < split_pt:
+				taiko_label.text = "[★ DON! BASS HIT ★]"
+				taiko_label.modulate = Color(1.0, 0.25, 0.35)
+			else:
+				taiko_label.text = "[★ KA! LEAD HIT ★]"
+				taiko_label.modulate = Color(0.0, 0.96, 0.83)
+
+		# Strike rank evaluation & Hi-Fi / DJMAX triggers
 		if velocity >= 110:
 			lbl_velocity_rank.text = "RANK [S]"
 			lbl_velocity_rank.modulate = Color(1.0, 0.85, 0.2)
 			screen_shake = 6.0
+			burst_scale = 1.35
+			if djmax_badge:
+				djmax_badge.modulate = Color(2.0, 1.8, 0.4)
+			if nostalgia_left:
+				nostalgia_left.modulate = Color(1.6, 1.4, 0.6)
+			if nostalgia_right:
+				nostalgia_right.modulate = Color(1.6, 1.4, 0.6)
 		elif velocity >= 90:
 			lbl_velocity_rank.text = "RANK [A]"
 			lbl_velocity_rank.modulate = Color(0.0, 0.96, 0.83)
@@ -547,6 +651,19 @@ func _handle_note_on(note: int, velocity: int) -> void:
 		var bar_str = ""
 		for b in range(bars): bar_str += "|"
 		lbl_strike_gauge.text = "[ %-16s ] %d" % [bar_str, velocity]
+
+func _toggle_zen_mode() -> void:
+	is_zen_mode = not is_zen_mode
+	if setlist_deck: setlist_deck.visible = not is_zen_mode
+	if chord_hud: chord_hud.visible = not is_zen_mode
+	if coach_deck: coach_deck.visible = not is_zen_mode
+	if zen_vignette: zen_vignette.visible = is_zen_mode
+	if is_zen_mode:
+		lbl_timing_verdict.text = ">> GRIS ZEN MODE: ACTIVE (MINIMALIST CONCERT FOCUS)"
+		lbl_timing_verdict.modulate = Color(0.8, 0.9, 1.0)
+	else:
+		lbl_timing_verdict.text = "ACCURACY: [ PERFECT! ]"
+		lbl_timing_verdict.modulate = Color(0.0, 0.96, 0.83)
 
 func _handle_note_off(note: int) -> void:
 	var idx = note - LOWEST_NOTE

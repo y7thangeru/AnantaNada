@@ -15,6 +15,9 @@
         <span class="sys-title">// SYS_STATUS: OPERATIONAL</span>
       </div>
       <div class="link-badge" id="deviceTag">> LINK: ROLAND GO:KEYS 3 [ONLINE]</div>
+      <div class="cadence-beat-widget">
+        <img src="assets/ui_sprites/png/hud_cadence_heart_pulse.png" alt="Cadence Beat Pulse" id="cadenceHeart" class="beat-pulse-img" />
+      </div>
       <div class="bpm-badge" id="bpmTag">[BPM: 128 /// 4/4] [BEAT: 03/16]</div>
       <button class="hazard-purge-btn" id="panicBtn">! EMERGENCY PURGE / PANIC !</button>
     </header>
@@ -23,7 +26,11 @@
     <main class="cockpit-grid">
       <!-- Left: Setlist Deck -->
       <section class="panel setlist-deck">
-        <div class="panel-header">[SETLIST DECK] /// SLANTED CARDS</div>
+        <div class="setlist-badge-banner">
+          <img src="assets/ui_sprites/png/frame_moonlighter_stitched_tab.png" class="moonlighter-tab" alt="Moonlighter Ledger" />
+          <img src="assets/ui_sprites/png/tape_lis_washi_strip.png" class="washi-tape" alt="LiS Tape" />
+        </div>
+        <div class="panel-header">[SETLIST DECK] /// 100-SONG REPERTOIRE</div>
         <div class="mission-tag active-tag">// ACTIVE MISSION</div>
         <div class="mission-card active-card" id="activeCard">
           <span class="mission-num">> 01</span>
@@ -53,8 +60,17 @@
 
       <!-- Center: Rhythm Coach & Strike Gauge -->
       <section class="panel coach-panel">
+        <div class="minimetro-transit-container">
+          <img src="assets/ui_sprites/png/widget_minimetro_transit_map.png" class="transit-map-img" alt="Mini Metro Song Transit" />
+        </div>
         <div class="panel-header">[PERFORMANCE COMBO / TIMING COACH]</div>
         
+        <div class="arcade-badges-row">
+          <img src="assets/ui_sprites/png/badge_djmax_judgement_max.png" class="djmax-badge" alt="DJMAX Judgement" id="djmaxBadge" />
+          <img src="assets/ui_sprites/png/hud_djmax_fever_gauge.png" class="fever-gauge" alt="DJMAX Fever" id="djmaxFever" />
+          <img src="assets/ui_sprites/png/badge_hifi_comic_burst.png" class="hifi-burst" alt="Hi-Fi Burst" id="hifiBurst" />
+        </div>
+
         <div class="accuracy-banner">
           <span class="verdict-tag" id="timingVerdict">ACCURACY: [ PERFECT! ]</span>
           <span class="score-tag" id="scoreAcc">SCORE ACC: 98.4%</span>
@@ -80,6 +96,9 @@
 
       <!-- Right: Chord Tactical HUD & Lyric Teleprompter -->
       <section class="panel chord-tactical-hud">
+        <div class="nostalgia-ornament-wrap">
+          <img src="assets/ui_sprites/png/ornament_nostalgia_gilded_corner.png" class="nostalgia-corner" alt="NOSTALGIA Gold Corner" />
+        </div>
         <div class="panel-header">[CHORD TACTICAL HUD]</div>
         <div class="mission-tag active-tag">// CURRENT HARMONY</div>
         <div class="chord-hero-box">
@@ -87,12 +106,18 @@
           <div class="transpose-tag" id="transposeTag">TRANSPOSE: [ +0 SEMITONES ]</div>
         </div>
 
+        <div class="taiko-drum-widget">
+          <img src="assets/ui_sprites/png/icon_taiko_don_ka_pair.png" class="taiko-img" alt="Taiko Don Ka" id="taikoImg" />
+          <span class="taiko-label" id="taikoLabel">[L: DON (Bass) // R: KA (Lead)]</span>
+        </div>
+
         <div class="mission-tag next-tag">// INCOMING TRANSITION</div>
         <div class="next-chord-pill" id="nextChord">NEXT CHORD -> C#m7</div>
 
         <div class="mission-tag lyric-tag">// LYRIC TELEPROMPTER</div>
         <div class="lyric-box" id="lyricBox">
-          "Kala fajar tiba, melangkah di tanah tua"
+          <img src="assets/ui_sprites/png/sticker_snipperclips_pastel_note.png" class="snipperclips-sticker" alt="Snipperclips Note" />
+          <span id="lyricText">"Kala fajar tiba, melangkah di tanah tua"</span>
         </div>
       </section>
     </main>

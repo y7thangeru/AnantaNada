@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  ANANTANADA UI SPRITE TEMPLATE
+  Editable in Inkscape, Figma, Illustrator, or any vector editor.
+  License: CC0 Public Domain
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <style>
+      .bold-text { font-family: 'Arial Black', Impact, sans-serif; font-weight: bold; }
+      .serif-text { font-family: 'Georgia', 'Times New Roman', serif; }
+      .mono-text { font-family: 'Courier New', monospace; font-weight: bold; }
+      .hand-text { font-family: 'Comic Sans MS', 'Chalkboard', cursive; font-weight: bold; }
+    </style>
+  </defs>
+
+  <defs>
+    <linearGradient id="oakWood" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#b07d4f" />
+      <stop offset="40%" stop-color="#804e27" />
+      <stop offset="80%" stop-color="#542e12" />
+      <stop offset="100%" stop-color="#361a07" />
+    </linearGradient>
+  </defs>
+  <!-- Wood Plank Frame -->
+  <rect x="0" y="0" width="120" height="30" fill="url(#oakWood)" stroke="#221105" stroke-width="3" />
+  <rect x="0" y="0" width="30" height="120" fill="url(#oakWood)" stroke="#221105" stroke-width="3" />
+  <!-- Cast Iron Corner Bracket -->
+  <polygon points="0,0 50,0 50,20 20,20 20,50 0,50" fill="#444951" stroke="#1f2226" stroke-width="2" />
+  <!-- Brass Screws -->
+  <circle cx="10" cy="10" r="3.5" fill="#d4af37" stroke="#1f2226" stroke-width="1" />
+  <circle cx="35" cy="10" r="3.5" fill="#d4af37" stroke="#1f2226" stroke-width="1" />
+  <circle cx="10" cy="35" r="3.5" fill="#d4af37" stroke="#1f2226" stroke-width="1" />
+
+</svg>

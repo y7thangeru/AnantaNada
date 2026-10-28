@@ -14,6 +14,11 @@ const timingVerdict = document.getElementById("timingVerdict");
 const scoreAcc = document.getElementById("scoreAcc");
 const strikeGauge = document.getElementById("strikeGauge");
 const rankBadge = document.getElementById("rankBadge");
+const cadenceHeart = document.getElementById("cadenceHeart");
+const hifiBurst = document.getElementById("hifiBurst");
+const djmaxBadge = document.getElementById("djmaxBadge");
+const djmaxFever = document.getElementById("djmaxFever");
+const taikoLabel = document.getElementById("taikoLabel");
 const beatSteps = [
   document.getElementById("beat1"),
   document.getElementById("beat2"),
@@ -71,8 +76,17 @@ function handlePlaybackTick(data) {
   }
   if (data.activePatch) activePatchName.textContent = data.activePatch;
 
-  // Beat stepper animation
+  // Beat stepper animation & 12-Game Kinetic Pulse
   if (data.beat !== undefined) {
+    if (cadenceHeart) {
+      cadenceHeart.classList.add("pulse");
+      setTimeout(() => cadenceHeart.classList.remove("pulse"), 130);
+    }
+    if (hifiBurst && data.beat === 1) {
+      hifiBurst.classList.add("hit");
+      setTimeout(() => hifiBurst.classList.remove("hit"), 150);
+    }
+
     beatSteps.forEach((step, idx) => {
       if (idx + 1 === data.beat) {
         step.classList.add("active");

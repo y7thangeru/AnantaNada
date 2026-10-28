@@ -26,15 +26,15 @@
 
 ### 1.1. Apa Itu AnantaNada?
 **ANANTANADA** adalah sistem workstation panggung diegetik hybrid yang dirancang khusus untuk musisi, keyboardis, dan band panggung yang menggunakan synthesizer/arranger **Roland Go:Keys 3** (atau Go:Keys 5). Sistem ini menggabungkan:
-1. **Engine MIDI C# Zero-Allocation** yang beroperasi langsung di atas driver multimedia Windows (`winmm.dll`).
-2. **Konsol Visual Panggung 1080p Berbasis Godot 4.3** dengan estetika visual game (*Persona 5*, *Arknights*, *Hi-Fi Rush*), waterfall notes interaktif, dan keybed 61-tuts procedural shader yang responsif terhadap velocity sentuhan tuts.
-3. **Retroactive 5-Minute RAM Scratchpad ("Never-Lost Melody")**: Perekam latar belakang terus-menerus tanpa henti. Jika Anda menemukan riff atau melodi bagus saat bermain tanpa menyalakan tombol rekam di DAW, cukup tekan 1 tombol dan 5 menit permainan Anda langsung diekspor menjadi file `.mid` (Standard MIDI File Type 0).
+1. **Engine MIDI C# Zero-Allocation** yang beroperasi langsung di atas driver multimedia Windows (`winmm.dll`) dan Windows Runtime Bluetooth LE MIDI (`Windows.Devices.Midi`).
+2. **Konsol Visual Panggung 1080p Berbasis Godot 4.3** dengan tata letak 3-Kolom bergaya game modern (*Persona 5*, *Arknights*, *Hi-Fi Rush*, *Armored Core*), waterfall notes 3D interaktif, dan keybed 61-tuts procedural shader yang responsif terhadap velocity sentuhan tuts.
+3. **Retroactive 5-Minute RAM Scratchpad ("Never-Lost Melody")**: Perekam latar belakang terus-menerus tanpa henti ke dalam ring buffer 262,144 slot (~4 MB RAM). Jika Anda menemukan riff atau melodi bagus saat bermain tanpa menyalakan tombol rekam di DAW, cukup tekan 1 tombol dan 5 menit permainan Anda langsung diekspor menjadi file `.mid` (Standard MIDI File Type 0).
 4. **StageHub Mini-Server & Teleprompter Mobile**: Server HTTP dan WebSocket lokal yang tertanam langsung di dalam aplikasi. Anggota band atau vokalis dapat membuka browser di HP/tablet mereka untuk melihat chord chart real-time, ketukan metronom, mengganti lagu/sound keyboard dari jauh, serta memicu tombol *Panic* darurat.
 
 ### 1.2. Garansi Keselamatan Hardware Roland Go:Keys 3
 Keyboard modern portabel seperti Roland Go:Keys 3 memiliki memori flash/EEPROM internal dengan siklus tulis terbatas. Kebanyakan perangkat lunak DAW mengirimkan perintah SysEx secara serampangan yang dapat memicu penyimpanan memori non-volatil.
 **AnantaNada menjamin 3 pilar proteksi fisik:**
-- **Zero Flash Writes**: Pergantian sound dilakukan 100% di RAM volatil menggunakan pesan standar: Bank Select MSB (`CC 00`), Bank Select LSB (`CC 32`), dan Program Change (`PC`). Memori flash keyboard tidak pernah disentuh.
+- **Zero Flash Writes**: Pergantian sound dilakukan 100% di RAM volatil menggunakan pesan standar di Channel 4: Bank Select MSB (`CC 00`), Bank Select LSB (`CC 32`), dan Program Change (`PC`). Memori flash keyboard tidak pernah disentuh.
 - **Throttled SysEx FIFO Queue**: Antrean SysEx diproteksi dengan jeda minimal 20 ms antar-paket untuk mencegah overflow pada prosesor internal Go:Keys 3.
 - **Hardware-Safe Global Panic Circuit**: Mengirimkan broadcast simultan `CC 120` (All Sound Off), `CC 123` (All Notes Off), `CC 64` (Sustain Off = 0), dan Note-Off ke seluruh 16 channel MIDI jika terjadi kabel tercabut atau lag koneksi.
 
@@ -62,7 +62,7 @@ Keyboard modern portabel seperti Roland Go:Keys 3 memiliki memori flash/EEPROM i
 
 ```text
 [Roland Go:Keys 3] 
-       │ (Kabel USB-B ke USB-A / USB-C)
+       │ (Kabel USB-B ke USB-A / USB-C atau Bluetooth LE MIDI)
        ▼
 [Laptop / PC Windows Host] ── (Jaringan Wi-Fi / Hotspot Lokal) ──▶ [Smartphone / Tablet]
 (Godot 4.3 + AnantaNada)                                          (Browser: http://<IP>:8080)
@@ -78,7 +78,7 @@ Keyboard modern portabel seperti Roland Go:Keys 3 memiliki memori flash/EEPROM i
 Untuk performa optimal panggung bersama AnantaNada:
 1. Tekan tombol **[MENU]** di panel Roland Go:Keys 3.
 2. Navigasikan ke submenu **MIDI**:
-   - **MIDI Rx Channel (Receive):** Set ke **Channel 1** (atau Mode Omni jika ingin multi-layer).
+   - **MIDI Rx Channel (Receive):** Set ke **Channel 1** atau **Channel 4** (Jalur C AnantaNada menargetkan Channel 4 / wire index 3).
    - **MIDI Tx Channel (Transmit):** Set ke **Channel 1**.
    - **Program Change Tx/Rx:** Set ke **ON** (memungkinkan AnantaNada mengubah sound instrumen secara otomatis).
    - **Bank Select Tx/Rx:** Set ke **ON**.
@@ -91,14 +91,14 @@ Jika Anda menggunakan fitur Bluetooth nirkabel Roland Go:Keys 3:
 1. Aktifkan Bluetooth di Roland Go:Keys 3 melalui menu `Bluetooth -> MIDI On`.
 2. Buka menu Windows: *Settings -> Bluetooth & devices -> Add device -> Bluetooth*.
 3. Pilih **GO:KEYS 3 MIDI** untuk menghubungkan.
-4. AnantaNada akan secara otomatis mendeteksi MIDI port virtual Bluetooth tersebut.
+4. AnantaNada menggunakan API WinRT modern (`Windows.Devices.Midi`) yang secara otomatis mendeteksi port BLE MIDI `GO:KEYS 3 MIDI (Bluetooth MIDI IN/OUT)`.
 
 ---
 
 ## 4. CARA MENJALANKAN & MENGUJI PROYEK
 
 ### 4.1. Uji Mandiri CLI (Verification Harness)
-Sebelum membuka antarmuka grafis, Anda dapat memverifikasi integritas seluruh subsistem audio, memori ring buffer, dan sirkuit panic:
+Sebelum membuka antarmuka grafis, Anda dapat memverifikasi integritas seluruh subsistem audio, memori ring buffer, katalog tone Jalur C, dan repertoar 100 lagu:
 
 ```powershell
 cd D:\AntiGravity_Project\AnantaNada_RolandGoKeys3
@@ -107,7 +107,6 @@ dotnet run
 
 Output verifikasi akan muncul:
 ```text
-[ANANTANADA HYBRID WORKSTATION] Host Process Initializing...
 =================================================
   ANANTANADA ENGINE VERIFICATION & QUALITY AUDIT  
 =================================================
@@ -116,8 +115,10 @@ Output verifikasi akan muncul:
 [TEST 3] Hardware-Safe Volatile Tone Dispatch... PASS (Volatile MSB/LSB/PC dispatched with zero flash writes)
 [TEST 4] Hardware Panic Circuit (CC120, 123, 64 on 16 Ch)... PASS (Broadcasted CC 120/123/64 + All Notes Off to all 16 channels)
 [TEST 5] Embedded StageHub Server & WS Telemetry Loop... SKIP (Port binding restricted in environment)
+[TEST 6] Jalur C Tone Catalog & Channel 4 Volatile Dispatch... PASS (26 tones loaded across 7 categories; Ch 4 dispatch + RPN verified)
+[TEST 7] 100-Song Tactical Repertoire & Random Sampling Dispatch... PASS (100 songs verified [50 Indo / 50 West]; 10 random dispatches on Ch 4 OK)
 =================================================
-  AUDIT RESULT: 4 PASSED, 0 FAILED
+  AUDIT RESULT: 6 PASSED, 0 FAILED
 =================================================
 ```
 
@@ -136,41 +137,91 @@ Output verifikasi akan muncul:
 ![Godot Stage HUD](captures/screenshot_godot_stage.png)
 
 ### 5.1. Top Navigation Bar (Status Bar Panggung)
-- **Brand Indicator:** Tulisan `ANANTANADA // GO:KEYS 3` memastikan status runtime aktif.
-- **Device Status Pill:**
-  - `CONNECTED: Roland Go:Keys 3` (Berwarna Cyan terang): Driver MIDI Windows berhasil terhubung secara fisik ke keyboard.
-  - `SCANNING HARDWARE...` atau `DISCONNECTED`: Keyboard belum tercolok atau belum dinyalakan. Colokkan kabel dan AnantaNada akan mendeteksi otomatis.
-- **StageHub Network Pill:**
-  - Menampilkan alamat IP lokal host, misalnya: `HUB: http://192.168.1.15:8080`.
-  - Gunakan alamat ini untuk membuka antarmuka remote di smartphone atau tablet stand mikrofon Anda.
+- **System Status Indicator:** Teks `// SYS_STATUS: OPERATIONAL [ANANTANADA V1.0]` memastikan runtime host berjalan stabil.
+- **Device Status & Link:**
+  - `> LINK: ROLAND GO:KEYS 3 [ONLINE]` (Cyan terang): Menandakan hardware terhubung fisik via USB / Bluetooth LE MIDI.
+  - `> MEMORY: IN-RAM SAFE`: Mengonfirmasi proteksi nol tulis flash aktif.
 - **BPM & Metronome Pill:**
-  - Menampilkan tempo lagu aktif (misal `128 BPM`) dengan indikator ketukan visual berkedip mengikuti birama.
-- **Panic Button (Merah Crimson Terang):**
-  - Tombol failsafe fisik di layar. Sekali klik, langsung membisukan semua tuts yang macet di ke-16 channel MIDI instrumen.
+  - Menampilkan tempo lagu aktif (misal `[BPM: 128 /// 4/4] [BEAT: 03/16]`) dengan indikator denyut birama yang sinkron.
+- **Emergency Button (Merah Crimson Terang):**
+  - Tombol **`[ ! EMERGENCY PURGE / PANIC ! ]`** bergaya sakelar militer taktis. Sekali klik langsung memicu pembersihan nada macet di seluruh 16 channel MIDI instrumen.
 
-### 5.2. Center Panel (Teleprompter & Waterfall Visualizer)
-- **Teleprompter Lagu Aktif (Sebelah Kiri):**
-  - **Judul Lagu:** Menampilkan nomor urut dan judul lagu setlist panggung (misal `01. Neo Shibuya Dawn`).
-  - **Patch Badge:** Nama suara Roland yang sedang aktif (misal `Vintage EP 1`).
-  - **Current Chord (Akord Sekarang):** Ditampilkan dalam ukuran font **72pt** super tebal (misal `G#m7`) sehingga terbaca jelas dari jarak 2 meter saat Anda berdiri di panggung.
-  - **Next Chord (Akord Berikutnya):** Ditampilkan dalam font **32pt** Cyan (misal `C#m7`) untuk antisipasi perpindahan jari pemain sebelum ketukan tiba.
-  - **Bar / Beat Tracker:** Menampilkan hitungan birama real-time (`BAR 12 // BEAT 3`).
-- **Kinetic Waterfall Note Stream (Sebelah Kanan):**
-  - Menampilkan jalur not jatuh vertikal 61-kolom yang sinkron dengan tuts yang Anda tekan.
-  - Dilengkapi garis penanda birama horizontal dan pancaran cahaya (*bloom spread*) pada garis target benturan (*strike line*).
+---
 
-### 5.3. Bottom Bar (Keybed 61-Tuts & Scratchpad Exporter)
+### 5.2. Kolom 1: Tactical Setlist Deck (Repertoar 100 Lagu)
+
+![Setlist Deck](captures/ui_setlist_deck.png)
+
+- **Filter Kategori Sekali Sentuh:**
+  - `[ ALL (100) ]`: Menampilkan seluruh 100 repertoar lagu panggung.
+  - `[ INDO (50) ]`: Menyaring khusus 50 lagu Pop/Rock Indonesia (Sheila on 7, Dewa 19, Nidji, The Adams, Diskoria, Hindia, .Feast, Glenn Fredly, dsb.).
+  - `[ WEST (50) ]`: Menyaring khusus 50 lagu Pop/Rock Barat (Oasis, Coldplay, Maroon 5, Bon Jovi, Radiohead, Green Day, Blink-182, Bruno Mars, dsb.).
+- **Kotak Pencarian Cepat (Search Box):** Ketik sebagian judul lagu atau nama artis untuk menyaring instan tanpa latensi.
+- **Kartu Misi Miring (Slanted Mission Cards):**
+  - Setiap kartu menampilkan: Nomor urut, Judul lagu, Nama Artis, Nada Dasar / Akord Awal, dan Patch Suara Roland Go:Keys 3 yang direkomendasikan.
+  - **Aksi Klik Kartu**: Memilih kartu akan seketika mengirimkan perintah MIDI Channel 4 Bank Select MSB/LSB dan Program Change, mengatur transpose RPN, menyinkronkan tempo metronom, dan memancarkan data lagu ke HP mobile remote.
+- **Paginasi Taktis:** Tombol `[ < PREV ]` dan `[ NEXT > ]` untuk berpindah halaman lagu dengan mulus saat berada di panggung.
+
+---
+
+### 5.3. Kolom 2: Cyber-Cascade Waterfall & Performance Coach
+
+![Waterfall & Coach](captures/ui_waterfall_coach.png)
+
+- **18° 3D Trapezoidal Waterfall Runway (`waterfall_visualizer.gdshader`):**
+  - Jalur tuts jatuh vertikal dengan sudut perspektif tiga dimensi berkecepatan tinggi yang mengalir tepat ke tuts keyboard Anda.
+  - 61 garis kolom pemisah dan penanda birama horizontal kuning amber yang bergerak mengikuti tempo lagu.
+- **Hit Beam Target Line:**
+  - Garis benturan neon Cyan dengan pancaran cahaya lembut (*bloom spread*) di titik kontak saat tuts mencapai bawah.
+- **Rhythm Accuracy Coach (*Hi-Fi Rush Style*):**
+  - Mengevaluasi presisi ketukan jari pemain terhadap beat metronom secara real-time:
+    - `[ PERFECT! ]` (Warna Cyan Terang): Deviasi ritmis $< 25\text{ ms}$.
+    - `[ GREAT! ]` (Warna Hijau): Deviasi ritmis $25 \text{--} 50\text{ ms}$.
+    - `[ RUSHING! ]` (Warna Kuning): Jari menekan tuts terlalu cepat mendahului ketukan.
+    - `[ DRAGGING! ]` (Warna Merah): Jari menekan tuts terlambat dari ketukan.
+- **Dynamic Strike Gauge (*Armored Core Style*):**
+  - Mengukur kekuatan velocity sentuhan jari secara dinamis dengan bar meter visual dan indikator Rank:
+    - `RANK [S]`: Velocity 110–127 (*fortississimo* `fff`). Memicu efek guncangan layar (*screen shake*) halus.
+    - `RANK [A]`: Velocity 85–109 (*forte* `f`).
+    - `RANK [B]`: Velocity 50–84 (*mezzo-forte* `mf`).
+    - `RANK [C]`: Velocity 1–49 (*piano* `p`).
+- **Status Retroactive Buffer:**
+  - Label `>> RETRO-BUFFER: [ 5m CAPTURE ARMED ]` memastikan sistem perekam latar belakang 5 menit aktif merekam.
+
+---
+
+### 5.4. Kolom 3: Tactical Chord HUD & Lyric Prompter
+
+![Tactical Chord HUD](captures/ui_chord_hud.png)
+
+- **Current Harmony Panel (Panel Akord Aktif):**
+  - Menggunakan frame poligon Arknights dengan sudut terpotong (*chamfered*).
+  - Menampilkan akord yang sedang dimainkan dalam font raksasa **72pt** tebal (misal `G#m7`), terbaca sangat jelas dari jarak 2 meter saat Anda berdiri di panggung.
+- **Transpose Status:**
+  - Menampilkan status transpose hardware keyboard (misal `TRANSPOSE: [ +0 ]` atau `[ +2 ]`).
+- **Incoming Transition (Akord Berikutnya):**
+  - Menampilkan akord berikutnya (misal `NEXT CHORD -> C#m7`) dalam font 32pt berdenyut lembut menjelang pergantian birama, sehingga jari Anda dapat bersiap sebelum ketukan tiba.
+- **Lyric Teleprompter Sinkron Birama:**
+  - Menampilkan baris lirik lagu yang bergulir secara otomatis mengikuti birama dan ketukan lagu, memastikan vokalis dan keyboardis selalu berada di bait yang tepat.
+
+---
+
+### 5.5. Bottom Bar: Synth-Runner 61-Key Keybed & Never-Lost Melody
+
+![61-Key Keybed](captures/ui_keybed_61.png)
+
 - **Interactive 61-Key Virtual Keybed (`piano_keybed.gdshader`):**
-  - Merender 36 tuts putih gading dan 25 tuts hitam secara prosedural.
-  - **Pemisahan Tangan Otomatis (Hand Split):**
-    - Tuts tangan kiri (Bass / Chord, tuts 1–24): Menyala dengan warna **Electric Amber** (`#ffb703`).
-    - Tuts tangan kanan (Melodi / Lead, tuts 25–61): Menyala dengan warna **Cyber Cyan** (`#00f5d4`).
-  - **Velocity Reactive Glow:** Semakin kuat tuts ditekan (velocity 1–127), semakin terang pancaran cahaya neon GPU.
-  - **Attack Impact Flash:** Efek kilatan transient seketika saat tuts menyentuh titik kontak.
+  - Merender secara akurat 36 tuts putih gading dan 25 tuts hitam yang terangkat secara tiga dimensi dengan bayangan jatuh realistis (*ambient occlusion dropshadows*).
+  - **Split Point C4 Divider (Garis Pemisah Merah):**
+    - Memisahkan secara visual tuts oktaf rendah ($C_2 \text{--} B_3$) dan tuts oktaf tinggi ($C_4 \text{--} C_7$).
+  - **Pemisahan Zona Warna Tangan (Dual Neon Hand Split):**
+    - **Zone A: Sub-Bass / Akord (Tuts 1–24):** Menyala dengan pendaran **Amber Pulse** (`#ffb703`).
+    - **Zone B: Neo-Solo Lead (Tuts 25–61):** Menyala dengan pendaran **Cyan Overdrive** (`#00f5d4`).
+  - **Attack Impact Transient Flash:** Menghasilkan kilatan cahaya putih instan di ujung tuts saat disentuh.
 - **Tombol "⚡ AMBIL IDE TADI (5-MIN RETROACTIVE)":**
-  - Jika Anda baru saja memainkan melodi atau akord yang indah saat jamming santai, segera klik tombol ini.
-  - AnantaNada akan mengekstrak data 5 menit terakhir dari circular RAM buffer dan menyimpannya ke folder `captures/jam_YYYYMMDD_HHmmss.mid`.
-  - File `.mid` ini dapat langsung Anda drag-and-drop ke Ableton Live, FL Studio, Logic Pro, Cubase, atau Reaper!
+  - Klik tombol ini kapan saja saat Anda menemukan melodi atau arpeggio menarik saat bermain santai.
+  - Data permainan 5 menit terakhir langsung diserialisasi ke format Standard MIDI File Type 0 di folder `captures/jam_YYYYMMDD_HHmmss.mid`.
+  - Muncul notifikasi toast emas selama 3 detik di layar mengonfirmasi jumlah event dan birama yang tersimpan!
 
 ---
 
@@ -209,33 +260,27 @@ Output verifikasi akan muncul:
 
 Anda dapat menambahkan daftar lagu sendiri dan memetakan sound Roland Go:Keys 3 sesuai repertoar band Anda.
 
-### 7.1. Mengedit Setlist di `MainStageController.cs`
-Buka file [src/UI/MainStageController.cs](file:///d:/AntiGravity_Project/AnantaNada_RolandGoKeys3/src/UI/MainStageController.cs), cari baris deklarasi `_setlist`:
+### 7.1. Mengedit Setlist di `setlists/master_100_repertoire.json`
+Buka file `setlists/master_100_repertoire.json`, Anda akan melihat struktur data JSON:
 
-```csharp
-private record SongItem(string Title, string CurrentChord, string NextChord, string PatchName, byte BankMsb, byte BankLsb, byte Pc, int Bpm);
-
-private readonly List<SongItem> _setlist = new()
+```json
 {
-    // Format: (Judul Lagu, Akord Awal, Akord Antisipasi, Nama Patch, Bank MSB, Bank LSB, Program Change, BPM)
-    new SongItem("01. Neo Shibuya Dawn", "G#m7", "C#m7", "Vintage EP 1", 87, 64, 14, 128),
-    new SongItem("02. Cybernetic Groove", "F#maj7", "B7", "Fat Saw Lead", 87, 65, 4, 134),
-    new SongItem("03. Midnight Reverie", "Emaj9", "A#dim7", "Warm Stage Grand", 87, 64, 1, 92),
-    new SongItem("04. Overdrive Anthem", "D#m7", "G#7", "Brass Punch Sect", 87, 66, 22, 140)
-};
+  "id": "indo_001",
+  "title": "Dan",
+  "artist": "Sheila on 7",
+  "category": "Indo Pop/Rock",
+  "bpm": 115,
+  "keySignature": "E Major",
+  "transpose": 0,
+  "patchName": "Concert Grand",
+  "bankMsb": 71,
+  "bankLsb": 96,
+  "programChange": 1,
+  "tags": ["nostalgia", "singalong", "ballad"]
+}
 ```
 
-### 7.2. Mengetahui Nilai Bank Select MSB, LSB, dan PC Roland Go:Keys 3
-Pada synthesizer mesin Roland ZEN-Core / Go:Keys 3:
-- **Bank Select MSB (CC 00):** Biasanya bernilai `87` (atau `86` untuk sound expansion).
-- **Bank Select LSB (CC 32):** Menentukan kategori instrumen:
-  - `64`: Kategori Keyboard / Acoustic Piano / Electric Piano.
-  - `65`: Kategori Lead / Synth / Pad.
-  - `66`: Kategori Brass / Strings / Wind.
-  - `67`: Kategori Bass / Plucked.
-- **Program Change (PC 0–127):** Menentukan nomor sound preset di dalam kategori tersebut.
-
-Cukup sesuaikan nilai angka tersebut pada array `_setlist`, lalu jalankan ulang proyek.
+Cukup tambahkan entri lagu baru dengan format yang sama, dan lagu tersebut akan otomatis muncul pada pencarian dan filter di konsol panggung!
 
 ---
 
@@ -246,12 +291,12 @@ Cukup sesuaikan nilai angka tersebut pada array `_setlist`, lalu jalankan ulang 
 - **Solusi:**
   1. Pastikan lampu layar Roland Go:Keys 3 menyala.
   2. Cabut kabel USB, tunggu 3 detik, lalu colokkan kembali ke port USB laptop.
-  3. AnantaNada memiliki mekanisme polling otomatis; jika nama perangkat belum terupdate, tekan tombol navigasi atau restart aplikasi.
+  3. Tekan hotkey `R` pada jendela konsol host C# untuk memicu pemindaian ulang instrumen secara instan.
 
 ### 8.2. Masalah: Nada Macet / Bunyi Terus-Menerus (Stuck Notes)
 - **Penyebab:** Kabel USB MIDI tersenggol atau pedal sustain melepaskan sinyal yang terputus di tengah jalan.
 - **Solusi:**
-  1. Tekan tombol **PANIC** merah di konsol desktop atau tombol **PANIC** di HP mobile remote.
+  1. Tekan tombol **`[ ! EMERGENCY PURGE / PANIC ! ]`** di konsol desktop atau tombol **PANIC** di HP mobile remote.
   2. Sirkuit Panic AnantaNada seketika mengirimkan sinyal `CC 120 (All Sound Off)`, `CC 123 (All Notes Off)`, dan mereset sustain pedal `CC 64 = 0` ke seluruh 16 channel MIDI secara merata.
 
 ### 8.3. Masalah: Smartphone Tidak Bisa Membuka `http://<HOST_IP>:8080`
@@ -259,12 +304,6 @@ Cukup sesuaikan nilai angka tersebut pada array `_setlist`, lalu jalankan ulang 
 - **Solusi:**
   1. Pastikan smartphone tersambung ke jaringan Wi-Fi yang sama dengan laptop. Cara paling andal di panggung festival: **Nyalakan fitur Mobile Hotspot di Laptop**, lalu sambungkan smartphone ke hotspot laptop tersebut.
   2. Buka pengaturan Windows Defender Firewall -> Berikan izin (Allow) pada Godot Engine atau port TCP 8080.
-
-### 8.4. Masalah: File MIDI Hasil Ekspor Kosong
-- **Penyebab:** Tombol *"Ambil Ide Tadi"* ditekan sebelum tuts keyboard dimainkan.
-- **Solusi:**
-  1. Mainkan tuts keyboard terlebih dahulu.
-  2. Buffer circular RAM AnantaNada merekam hingga 262,144 event (sekitar 5 menit permainan kontinu). Tekan tombol ekspor setelah Anda selesai jamming. File akan tersimpan di folder `captures/`.
 
 ---
 

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  ANANTANADA UI SPRITE TEMPLATE
+  Editable in Inkscape, Figma, Illustrator, or any vector editor.
+  License: CC0 Public Domain
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 110" width="240" height="110">
+  <defs>
+    <style>
+      .bold-text { font-family: 'Arial Black', Impact, sans-serif; font-weight: bold; }
+      .serif-text { font-family: 'Georgia', 'Times New Roman', serif; }
+      .mono-text { font-family: 'Courier New', monospace; font-weight: bold; }
+      .hand-text { font-family: 'Comic Sans MS', 'Chalkboard', cursive; font-weight: bold; }
+    </style>
+  </defs>
+
+  <!-- Don Drum (Red - Center Hit) -->
+  <g transform="translate(10, 10)">
+    <circle cx="50" cy="50" r="46" fill="#ff2a42" stroke="#ffffff" stroke-width="4" />
+    <circle cx="50" cy="50" r="36" fill="#ffccd2" />
+    <circle cx="38" cy="45" r="4" fill="#111116" />
+    <circle cx="62" cy="45" r="4" fill="#111116" />
+    <ellipse cx="50" cy="58" rx="8" ry="5" fill="#ff2a42" />
+    <text x="50" y="82" text-anchor="middle" font-size="14" fill="#111116" class="bold-text">DON (C)</text>
+  </g>
+  <!-- Ka Drum (Blue - Rim Hit) -->
+  <g transform="translate(130, 10)">
+    <circle cx="50" cy="50" r="46" fill="#00b4d8" stroke="#ffffff" stroke-width="4" />
+    <circle cx="50" cy="50" r="36" fill="#caf0f8" />
+    <circle cx="38" cy="45" r="4" fill="#111116" />
+    <circle cx="62" cy="45" r="4" fill="#111116" />
+    <ellipse cx="50" cy="58" rx="8" ry="5" fill="#00b4d8" />
+    <text x="50" y="82" text-anchor="middle" font-size="14" fill="#111116" class="bold-text">KA (K)</text>
+  </g>
+
+</svg>
