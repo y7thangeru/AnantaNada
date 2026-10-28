@@ -64,6 +64,7 @@
 
 ## 6. Multi-Tiered Documentation Architecture
 - [x] Root `README.md` with system overview, architecture diagrams, and quickstart
+- [x] Comprehensive Operational User Guide (`USER_GUIDE.md`) covering physical hardware setup, desktop stage HUD, mobile remote, retroactive scratchpad export, and troubleshooting
 - [x] Core MIDI package documentation (`src/Core/Midi/README.md`)
 - [x] StageHub Network package documentation (`src/Network/README.md`)
 - [x] GPU Visualizer Shaders documentation (`src/Shaders/README.md`)

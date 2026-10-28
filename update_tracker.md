@@ -307,3 +307,19 @@ This file logs all file creations, modifications, deletions, refactorings, and f
 ### [2026-10-28 18:52:00 +07:00] - [MODIFY] `src/Shaders/piano_keybed.gdshader` & `src/UI/MainStageController.gd`
 - **Action**: Added `split_point_white_key` uniform to `piano_keybed.gdshader` and dynamically computed white key offsets in `MainStageController.gd`.
 - **Reason**: Ensures the red split marker line slides dynamically to match the exact split point defined in any song mission (e.g. C3, C4, C5).
+
+### [2026-10-28 21:14:02 +07:00] - [NEW] `USER_GUIDE.md`
+- **Action**: Created comprehensive operational user guide and stage SOP document.
+- **Reason**: Provides step-by-step instructions for hardware connection (USB/Bluetooth), Roland Go:Keys 3 MIDI menu configurations, desktop stage console operations, mobile remote teleprompter setup, Never-Lost Melody 1-click MIDI exports, setlist customization, and live gig troubleshooting.
+
+### [2026-10-28 21:14:36 +07:00] - [MODIFY] `README.md`
+- **Action**: Added prominent User Guide badge, Quick Operational Guide section, and updated multi-tiered directory structure.
+- **Reason**: Enable immediate operational understanding directly from the repository front page.
+
+### [2026-10-28 21:14:55 +07:00] - [MODIFY] `Feature-ToBe-Implemented.md`
+- **Action**: Synchronized feature lifecycle tracker with `USER_GUIDE.md` completion.
+- **Reason**: Maintain single source of truth for project features.
+
+### [2026-10-28 21:15:30 +07:00] - [MODIFY] `Report-To-GeminiProject.md`
+- **Action**: Updated consolidated master report with unabridged compilation of `USER_GUIDE.md` in Part II and updated quickstart section in Part I.
+- **Reason**: Ensure consolidated report remains exhaustive and 100% synchronized with repository contents.

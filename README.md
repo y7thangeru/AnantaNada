@@ -5,11 +5,13 @@
 [![Target: Roland Go:Keys 3](https://img.shields.io/badge/Target-Roland_Go%3AKeys_3-ffb703?logo=roland&logoColor=black)](https://www.roland.com/global/products/gokeys_3/)
 [![Architecture: Hardware--Safe](https://img.shields.io/badge/Architecture-Hardware--Safe_(Zero_Flash_Writes)-00f5d4)](#-hardware-safety-principles)
 [![StageHub: Embedded HTTP/WS](https://img.shields.io/badge/StageHub-Embedded_HTTP_%26_WebSocket-ef233c)](#-embedded-stagehub-telemetry-server)
+[![User Guide: Complete](https://img.shields.io/badge/User_Guide-Complete_SOP-success)](USER_GUIDE.md)
 
 > **Design Paradigm:** Game-Grade Diegetic Stage Console (*Persona 5* / *Arknights* / *Hi-Fi Rush*)  
 > **Host Runtime:** Godot Engine 4.3 (.NET 8 / C# 12)  
 > **Companion Client:** Embedded Local HTTP & WebSocket Server + HTML5 / Canvas2D Remote  
-> **Remote Repository:** [https://github.com/y7thangeru/AnantaNada](https://github.com/y7thangeru/AnantaNada)
+> **Remote Repository:** [https://github.com/y7thangeru/AnantaNada](https://github.com/y7thangeru/AnantaNada)  
+> **Buku Panduan Operasional Lengkap:** [USER_GUIDE.md](USER_GUIDE.md)
 
 ---
 
@@ -103,7 +105,7 @@ flowchart TD
 
 - Continuously buffers all incoming MIDI events in a lock-free circular ring buffer (262,144 event slots, consuming ~4 MB of RAM).
 - Stores up to 5 minutes of continuous playing history with microsecond-accurate hardware timestamps.
-- **1-Click Export**: Tapping *"Ambil Ide Tadi"* immediately serializes the buffer into a valid Standard MIDI File (`.mid`, SMF Type 0) with automatic resolution of hanging notes and variable-length quantity (VLQ) delta times.
+- **1-Click Export**: Tapping *"⚡ AMBIL IDE TADI"* immediately serializes the buffer into a valid Standard MIDI File (`.mid`, SMF Type 0) with automatic resolution of hanging notes and variable-length quantity (VLQ) delta times.
 
 ---
 
@@ -112,6 +114,47 @@ flowchart TD
 - Built-in zero-dependency HTTP and WebSocket server running inside the Godot .NET host on port `8080`.
 - Connect any stand-mounted smartphone or tablet over local Wi-Fi or mobile hotspot.
 - Displays auto-scrolling chord charts, metronome pulses, current/next chord lookahead, giant touch setlist slots, and an emergency panic button.
+
+---
+
+## 📖 Cara Menggunakan Project & Aplikasi (Quick Operational Guide)
+
+> Untuk panduan langkah-demi-langkah mendalam dan SOP panggung, buka [USER_GUIDE.md](USER_GUIDE.md).
+
+### 1. Persiapan Koneksi Hardware
+1. Hubungkan port **USB Computer** di bagian belakang Roland Go:Keys 3 ke port USB laptop Anda menggunakan kabel USB Type-B ke USB-A / USB-C.
+2. Nyalakan Roland Go:Keys 3. Driver Windows (`winmm.dll`) akan mendeteksinya secara otomatis.
+3. Di menu keyboard: pastikan `MIDI Rx/Tx Channel` aktif di Channel 1, dan `Program Change Tx/Rx` di-set **ON**.
+
+### 2. Menjalankan Workstation di Komputer
+- **Mode A: Verifikasi C# Subsystem (CLI)**:
+  ```powershell
+  dotnet run
+  ```
+  Menjalankan tes otomatis untuk buffer RAM, eksportir SMF Type 0, dan sirkuit Panic.
+- **Mode B: Menjalankan Konsol Panggung (Godot Engine)**:
+  1. Buka **Godot Engine 4.3+ (.NET edition)**.
+  2. Klik **Import** -> Pilih `project.godot`.
+  3. Tekan **F5** (atau klik Run). Layar HUD panggung 1080p akan langsung menyala!
+
+### 3. Menggunakan Konsol Utama (Desktop Stage Console)
+- **Status Koneksi**: Indikator *Device Pill* di bar atas akan otomatis menampilkan nama perangkat Roland yang tersambung.
+- **Visual Keybed 61-Tuts**: Tuts yang ditekan akan memancarkan cahaya neon GPU secara instan:
+  - Tangan Kiri (Bass / Akord, tuts 1–24): **Electric Amber** (`#ffb703`).
+  - Tangan Kanan (Melodi / Lead, tuts 25–61): **Cyber Cyan** (`#00f5d4`).
+- **Ekspor Melodi Instan**: Klik tombol **"⚡ AMBIL IDE TADI (5-MIN RETROACTIVE)"** di bar bawah kapan saja untuk menyimpan 5 menit permainan terakhir Anda ke file MIDI `captures/jam_YYYYMMDD_HHmmss.mid`.
+- **Tombol Darurat (Panic)**: Klik tombol merah **PANIC** jika terjadi nada macet karena kabel tersenggol.
+
+### 4. Menghubungkan HP / Tablet ke StageHub Mobile Remote
+1. Sambungkan HP atau tablet ke jaringan Wi-Fi yang sama dengan laptop (atau nyalakan **Mobile Hotspot** di laptop Anda).
+2. Buka browser (Chrome / Safari) di HP/tablet, lalu ketik alamat yang tertera di layar panggung, misalnya:
+   ```text
+   http://192.168.1.15:8080
+   ```
+3. Layar teleprompter hitam OLED akan terbuka seketika:
+   - **Akord Raksasa**: Menampilkan akord saat ini (72pt) dan akord antisipasi berikutnya (32pt) dari jarak 2 meter.
+   - **Setlist Sentuh**: Tap nama lagu di HP untuk langsung mengganti sound Roland Go:Keys 3 dan tempo metronom di laptop.
+   - **Panic HP**: Tombol merah di bagian bawah HP untuk membisukan instrumen dari stand mikrofon.
 
 ---
 
@@ -159,6 +202,7 @@ AnantaNada_RolandGoKeys3/
 ├── project.godot                       # Godot 4.3 project configuration
 ├── AnantaNada.csproj                   # .NET 8 / C# 12 project file with GodotSharp integration
 ├── ANANTANADA_SPEC.md                  # Comprehensive architectural specification
+├── USER_GUIDE.md                       # Buku panduan penggunaan lengkap & SOP panggung
 ├── Feature-ToBe-Implemented.md         # Single source of truth for feature tracking
 ├── update_tracker.md                   # Audit log of all file changes and rationale
 └── Report-To-GeminiProject.md          # Consolidated master report for Gemini project threads
@@ -166,27 +210,15 @@ AnantaNada_RolandGoKeys3/
 
 ---
 
-## 🚀 Quickstart & Verification
+## 🚀 Quickstart & Verification Commands
 
-### 1. Verify C# Engine & Hardware Protection Subsystems
 ```powershell
+# 1. Kompilasi & Uji Mandiri Engine C#
 dotnet run
+
+# 2. Tangkap Screenshot Headless Konsol Panggung
+godot --headless -s scripts/capture_stage_screenshot.gd
+
+# 3. Jalankan Remote Companion di Browser
+python scripts/capture_web_remote.py
 ```
-Executes the automated `VerificationHarness` validating:
-- Retroactive circular RAM buffer write/read integrity (1,000 events)
-- SMF Type 0 binary chunk header (`MThd`) and track chunk (`MTrk`) compliance
-- Hardware-safe volatile tone switching (zero flash writes)
-- 16-channel Panic Circuit broadcast
-
-### 2. Launch with Godot 4 Engine
-1. Open **Godot Engine 4.3+ (.NET edition)**.
-2. Click **Import** and select `project.godot`.
-3. Press **F5** (or Run `res://scenes/MainStageView.tscn`).
-
-### 3. Connect Stand-Mounted Mobile Device
-1. Connect smartphone or tablet to the same Wi-Fi or laptop hotspot.
-2. Open browser and navigate to:
-   ```text
-   http://<HOST_IP>:8080
-   ```
-3. Live chord teleprompter, touch setlist switcher, and emergency panic button are instantly synchronized.
