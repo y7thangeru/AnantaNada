@@ -71,3 +71,39 @@ This file logs all file creations, modifications, deletions, refactorings, and f
 ### [2026-10-28 12:43:24 +07:00] - [NEW] `README.md`
 - **Action**: Created root technical documentation and quickstart guide.
 - **Reason**: Provides overview of project guarantees, directory layout, and verification commands.
+
+### [2026-10-28 12:55:37 +07:00] - [NEW] `src/Core/Midi/README.md`
+- **Action**: Created package-level documentation for Core MIDI subsystem.
+- **Reason**: Explains circular buffer mathematics ($2^{18}$ indexing with bitmask `0x3FFFF`), SMF Type 0 VLQ delta-time algorithm, Roland Go:Keys 3 hardware safety guarantees (volatile patch switching, 20ms SysEx debounce, 16-channel panic circuit), and complete API reference.
+
+### [2026-10-28 12:55:57 +07:00] - [NEW] `src/Network/README.md`
+- **Action**: Created package-level documentation for StageHub Network subsystem.
+- **Reason**: Details zero-install HTTP/WebSocket server architecture, JSON telemetry data contracts (`PLAYBACK_TICK`, `TRIGGER_SETLIST_ITEM`, `TRIGGER_PANIC`), and concurrency model.
+
+### [2026-10-28 12:56:24 +07:00] - [NEW] `src/Shaders/README.md`
+- **Action**: Created package-level documentation for GPU Visualizer Shaders.
+- **Reason**: Explains mathematical modeling of the 61-key procedural keybed (36 white keys, 25 black keys), dynamic hand-split neon gradient rendering, transient attack impact decay, and falling waterfall stream mechanics.
+
+### [2026-10-28 12:56:41 +07:00] - [NEW] `src/UI/README.md`
+- **Action**: Created package-level documentation for UI orchestration subsystem.
+- **Reason**: Details `MainStageController` lifecycle hooks, 64x1 dynamic state texture generation without heap allocations, and event marshaling to Godot's main thread.
+
+### [2026-10-28 12:56:55 +07:00] - [NEW] `scenes/README.md`
+- **Action**: Created scene-level documentation for Godot 4 scene hierarchy.
+- **Reason**: Explains node graph composition, styling palette (Persona 5 / Arknights), and responsive Full HD viewport scaling.
+
+### [2026-10-28 12:57:09 +07:00] - [NEW] `web/README.md`
+- **Action**: Created package-level documentation for Mobile Remote Client.
+- **Reason**: Documents OLED high-contrast design, zero thermal throttling profile, self-healing WebSocket reconnect backoff, and touch setlist controller.
+
+### [2026-10-28 12:57:30 +07:00] - [MODIFY] `README.md`
+- **Action**: Upgraded root technical documentation with badges, complete system architecture flowchart, hardware safety breakdown, and multi-tiered directory links.
+- **Reason**: Multi-tiered documentation requirement under Antigravity Global Rules.
+
+### [2026-10-28 12:57:50 +07:00] - [MODIFY] `Feature-ToBe-Implemented.md`
+- **Action**: Synchronized feature lifecycle tracking with newly implemented multi-tiered documentation suites.
+- **Reason**: Keep checklist and completion metrics updated in real-time.
+
+### [2026-10-28 12:58:30 +07:00] - [MODIFY] `Report-To-GeminiProject.md`
+- **Action**: Updated consolidated master report with complete unabridged compilation of all 10 markdown documentation files across the project.
+- **Reason**: Comply with Antigravity Rule 2.5 (Consolidated Master Report).
