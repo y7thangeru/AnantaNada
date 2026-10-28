@@ -4,8 +4,8 @@
 
 > **Dokumen:** Panduan Pengguna & SOP Operasional Panggung  
 > **Instrumen Target:** Roland Go:Keys 3 / Go:Keys 5  
-> **Host Runtime:** Godot Engine 4.3+ (.NET 8 / C# 12)  
-> **Companion Hub:** Embedded Local HTTP & WebSocket Server (`:8080`) + Web Remote (HTML5/Canvas)  
+> **Host Runtime:** Godot Engine 4.3+ (.NET 8 / C# 12 / GDScript)  
+> **Companion Hub:** Embedded Local HTTP & WebSocket Server (`:8080`) + Tri-Platform Remote (Desktop, Web & Android)  
 > **Repositori:** [https://github.com/y7thangeru/AnantaNada](https://github.com/y7thangeru/AnantaNada)
 
 ---
@@ -15,8 +15,8 @@
 2. [Kebutuhan Sistem & Persiapan Perangkat](#2-kebutuhan-sistem--persiapan-perangkat)
 3. [Langkah Pemasangan & Koneksi Hardware (Roland Go:Keys 3)](#3-langkah-pemasangan--koneksi-hardware-roland-gokeys-3)
 4. [Cara Menjalankan & Menguji Proyek](#4-cara-menjalankan--menguji-proyek)
-5. [Panduan Operasional Konsol Utama (Desktop Stage Console)](#5-panduan-operasional-konsol-utama-desktop-stage-console)
-6. [Panduan Operasional Mobile Remote (Tablet & Smartphone)](#6-panduan-operasional-mobile-remote-tablet--smartphone)
+5. [Panduan Operasional Konsol Utama (Desktop Stage Atelier)](#5-panduan-operasional-konsol-utama-desktop-stage-atelier)
+6. [Panduan Operasional Mobile Remote (Tablet Web & Android Smartphone)](#6-panduan-operasional-mobile-remote-tablet-web--android-smartphone)
 7. [Panduan Kustomisasi Setlist & Sound ZEN-Core](#7-panduan-kustomisasi-setlist--sound-zen-core)
 8. [Panduan Troubleshooting & Failsafe Panggung](#8-panduan-troubleshooting--failsafe-panggung)
 
@@ -27,9 +27,9 @@
 ### 1.1. Apa Itu AnantaNada?
 **ANANTANADA** adalah sistem workstation panggung diegetik hybrid yang dirancang khusus untuk musisi, keyboardis, dan band panggung yang menggunakan synthesizer/arranger **Roland Go:Keys 3** (atau Go:Keys 5). Sistem ini menggabungkan:
 1. **Engine MIDI C# Zero-Allocation** yang beroperasi langsung di atas driver multimedia Windows (`winmm.dll`) dan Windows Runtime Bluetooth LE MIDI (`Windows.Devices.Midi`).
-2. **Konsol Visual Panggung 1080p Berbasis Godot 4.3** dengan tata letak 3-Kolom bergaya game modern (*Persona 5*, *Arknights*, *Hi-Fi Rush*, *Armored Core*), waterfall notes 3D interaktif, dan keybed 61-tuts procedural shader yang responsif terhadap velocity sentuhan tuts.
+2. **Konsol Visual Panggung 1080p Berbasis Godot 4.3** dengan tata letak 3-Kolom bergaya RPG diegetik hangat (*Animal Crossing*, *Stardew Valley*, *Atelier RPG*, *Hi-Fi Rush*, *DJMAX Respect V*), waterfall notes 3D interaktif, dan keybed 61-tuts procedural shader yang responsif terhadap velocity sentuhan tuts.
 3. **Retroactive 5-Minute RAM Scratchpad ("Never-Lost Melody")**: Perekam latar belakang terus-menerus tanpa henti ke dalam ring buffer 262,144 slot (~4 MB RAM). Jika Anda menemukan riff atau melodi bagus saat bermain tanpa menyalakan tombol rekam di DAW, cukup tekan 1 tombol dan 5 menit permainan Anda langsung diekspor menjadi file `.mid` (Standard MIDI File Type 0).
-4. **StageHub Mini-Server & Teleprompter Mobile**: Server HTTP dan WebSocket lokal yang tertanam langsung di dalam aplikasi. Anggota band atau vokalis dapat membuka browser di HP/tablet mereka untuk melihat chord chart real-time, ketukan metronom, mengganti lagu/sound keyboard dari jauh, serta memicu tombol *Panic* darurat.
+4. **StageHub Mini-Server & Tri-Platform Remote**: Server HTTP dan WebSocket lokal yang tertanam langsung di dalam aplikasi. Anggota band atau vokalis dapat membuka browser di HP/tablet mereka (Landscape Tablet atau Portrait Smartphone) untuk melihat chord chart real-time, ketukan metronom, mengganti lagu/sound keyboard dari jauh, serta memicu tombol *Panic* darurat.
 
 ### 1.2. Garansi Keselamatan Hardware Roland Go:Keys 3
 Keyboard modern portabel seperti Roland Go:Keys 3 memiliki memori flash/EEPROM internal dengan siklus tulis terbatas. Kebanyakan perangkat lunak DAW mengirimkan perintah SysEx secara serampangan yang dapat memicu penyimpanan memori non-volatil.
@@ -132,35 +132,38 @@ Output verifikasi akan muncul:
 
 ---
 
-## 5. PANDUAN OPERASIONAL KONSOL UTAMA (DESKTOP STAGE CONSOLE)
+## 5. PANDUAN OPERASIONAL KONSOL UTAMA (DESKTOP STAGE ATELIER)
 
 ![Godot Stage HUD](captures/screenshot_godot_stage.png)
 
-### 5.1. Top Navigation Bar (Status Bar Panggung)
-- **System Status Indicator:** Teks `// SYS_STATUS: OPERATIONAL [ANANTANADA V1.0]` memastikan runtime host berjalan stabil.
-- **Device Status & Link:**
+### 5.1. Top Navigation Bar (Header Panggung Kayu Mahoni)
+- **Meja Kayu Oak Hangat**: Background panggung dilapisi tekstur kayu alami yang nyaman di mata musisi panggung.
+- **Brand Indicator & Star Pin**: Lencana bintang emas Mario/Stardew menandai aplikasi aktif.
+- **Device Status & Link**:
   - `> LINK: ROLAND GO:KEYS 3 [ONLINE]` (Cyan terang): Menandakan hardware terhubung fisik via USB / Bluetooth LE MIDI.
   - `> MEMORY: IN-RAM SAFE`: Mengonfirmasi proteksi nol tulis flash aktif.
-- **BPM & Metronome Pill:**
+- **BPM & Metronome Pill**:
   - Menampilkan tempo lagu aktif (misal `[BPM: 128 /// 4/4] [BEAT: 03/16]`) dengan indikator denyut birama yang sinkron.
-- **Emergency Button (Merah Crimson Terang):**
-  - Tombol **`[ ! EMERGENCY PURGE / PANIC ! ]`** bergaya sakelar militer taktis. Sekali klik langsung memicu pembersihan nada macet di seluruh 16 channel MIDI instrumen.
+- **Koin Emas Moonlighter**: Indikator status ekonomi stage repertoire siap pakai.
+- **Emergency Panic Button (Merah Crimson Terang)**:
+  - Tombol **`[ ! PANIC PURGE ! ]`** bergaya sakelar militer taktis. Sekali klik langsung memicu pembersihan nada macet di seluruh 16 channel MIDI instrumen.
 
 ---
 
-### 5.2. Kolom 1: Tactical Setlist Deck (Repertoar 100 Lagu)
+### 5.2. Kolom 1: Setlist Codex Deck (Buku Catatan Spiral & Kartu Resep DIY)
 
 ![Setlist Deck](captures/ui_setlist_deck.png)
 
-- **Filter Kategori Sekali Sentuh:**
+- **Spiral Leather Notebook**: Halaman perkamen bergaris dengan kawat spiral perak di sebelah kanan.
+- **Tab Bookmark Pastel**:
   - `[ ALL (100) ]`: Menampilkan seluruh 100 repertoar lagu panggung.
   - `[ INDO (50) ]`: Menyaring khusus 50 lagu Pop/Rock Indonesia (Sheila on 7, Dewa 19, Nidji, The Adams, Diskoria, Hindia, .Feast, Glenn Fredly, dsb.).
   - `[ WEST (50) ]`: Menyaring khusus 50 lagu Pop/Rock Barat (Oasis, Coldplay, Maroon 5, Bon Jovi, Radiohead, Green Day, Blink-182, Bruno Mars, dsb.).
-- **Kotak Pencarian Cepat (Search Box):** Ketik sebagian judul lagu atau nama artis untuk menyaring instan tanpa latensi.
-- **Kartu Misi Miring (Slanted Mission Cards):**
-  - Setiap kartu menampilkan: Nomor urut, Judul lagu, Nama Artis, Nada Dasar / Akord Awal, dan Patch Suara Roland Go:Keys 3 yang direkomendasikan.
+- **Kotak Pencarian Cepat (Search Box)**: Ketik sebagian judul lagu atau nama artis untuk menyaring instan tanpa latensi.
+- **Kartu Resep DIY Animal Crossing (Recipe Cards)**:
+  - Setiap kartu menampilkan: Badge nomor urut bulat, Judul lagu kapital tegas, dan Baris metadata (Artis • Kunci Nada • BPM).
   - **Aksi Klik Kartu**: Memilih kartu akan seketika mengirimkan perintah MIDI Channel 4 Bank Select MSB/LSB dan Program Change, mengatur transpose RPN, menyinkronkan tempo metronom, dan memancarkan data lagu ke HP mobile remote.
-- **Paginasi Taktis:** Tombol `[ < PREV ]` dan `[ NEXT > ]` untuk berpindah halaman lagu dengan mulus saat berada di panggung.
+- **Paginasi Taktis**: Tombol `[ < PREV ]` dan `[ NEXT > ]` untuk berpindah halaman lagu dengan mulus saat berada di panggung.
 
 ---
 
@@ -168,41 +171,31 @@ Output verifikasi akan muncul:
 
 ![Waterfall & Coach](captures/ui_waterfall_coach.png)
 
-- **18° 3D Trapezoidal Waterfall Runway (`waterfall_visualizer.gdshader`):**
+- **Scalloped Cloud Canopy**: Hiasan awan pastel Animal Crossing di atas panggung memberikan nuansa ramah dan menyenangkan.
+- **Mini Metro Transit Map**: Peta rute transit seksi lagu (`Intro ➔ Verse ➔ Chorus ➔ Solo ➔ Outro`) yang menandai posisi birama lagu secara visual.
+- **18° 3D Trapezoidal Waterfall Runway (`waterfall_visualizer.gdshader`)**:
   - Jalur tuts jatuh vertikal dengan sudut perspektif tiga dimensi berkecepatan tinggi yang mengalir tepat ke tuts keyboard Anda.
   - 61 garis kolom pemisah dan penanda birama horizontal kuning amber yang bergerak mengikuti tempo lagu.
-- **Hit Beam Target Line:**
-  - Garis benturan neon Cyan dengan pancaran cahaya lembut (*bloom spread*) di titik kontak saat tuts mencapai bawah.
-- **Rhythm Accuracy Coach (*Hi-Fi Rush Style*):**
-  - Mengevaluasi presisi ketukan jari pemain terhadap beat metronom secara real-time:
-    - `[ PERFECT! ]` (Warna Cyan Terang): Deviasi ritmis $< 25\text{ ms}$.
-    - `[ GREAT! ]` (Warna Hijau): Deviasi ritmis $25 \text{--} 50\text{ ms}$.
-    - `[ RUSHING! ]` (Warna Kuning): Jari menekan tuts terlalu cepat mendahului ketukan.
-    - `[ DRAGGING! ]` (Warna Merah): Jari menekan tuts terlambat dari ketukan.
-- **Dynamic Strike Gauge (*Armored Core Style*):**
-  - Mengukur kekuatan velocity sentuhan jari secara dinamis dengan bar meter visual dan indikator Rank:
-    - `RANK [S]`: Velocity 110–127 (*fortississimo* `fff`). Memicu efek guncangan layar (*screen shake*) halus.
-    - `RANK [A]`: Velocity 85–109 (*forte* `f`).
-    - `RANK [B]`: Velocity 50–84 (*mezzo-forte* `mf`).
-    - `RANK [C]`: Velocity 1–49 (*piano* `p`).
-- **Status Retroactive Buffer:**
-  - Label `>> RETRO-BUFFER: [ 5m CAPTURE ARMED ]` memastikan sistem perekam latar belakang 5 menit aktif merekam.
+- **Hit Beam Target Line**: Garis benturan neon Cyan dengan pancaran cahaya lembut (*bloom spread*) di titik kontak saat tuts mencapai bawah.
+- **Crystal Mana Gauge & Emotikon Reaksi**:
+  - Reservoar mana bergradien biru kristal bertambah saat akurasi ketukan metronom Anda tepat.
+  - Stempel reaksi emotikon dinamis (`HAPPY`, `CHEER`, `SWEAT`) memberikan umpan balik instan saat bermain di panggung.
 
 ---
 
-### 5.4. Kolom 3: Tactical Chord HUD & Lyric Prompter
+### 5.4. Kolom 3: Runic Harmony HUD & Codex Lyric Scroll
 
 ![Tactical Chord HUD](captures/ui_chord_hud.png)
 
-- **Current Harmony Panel (Panel Akord Aktif):**
-  - Menggunakan frame poligon Arknights dengan sudut terpotong (*chamfered*).
-  - Menampilkan akord yang sedang dimainkan dalam font raksasa **72pt** tebal (misal `G#m7`), terbaca sangat jelas dari jarak 2 meter saat Anda berdiri di panggung.
-- **Transpose Status:**
-  - Menampilkan status transpose hardware keyboard (misal `TRANSPOSE: [ +0 ]` atau `[ +2 ]`).
-- **Incoming Transition (Akord Berikutnya):**
-  - Menampilkan akord berikutnya (misal `NEXT CHORD -> C#m7`) dalam font 32pt berdenyut lembut menjelang pergantian birama, sehingga jari Anda dapat bersiap sebelum ketukan tiba.
-- **Lyric Teleprompter Sinkron Birama:**
-  - Menampilkan baris lirik lagu yang bergulir secara otomatis mengikuti birama dan ketukan lagu, memastikan vokalis dan keyboardis selalu berada di bait yang tepat.
+- **Gothic Rune Spell Card (Tricky Towers Style)**:
+  - Bingkai batu runik dengan ukiran sudut emas menaungi akord aktif berukuran besar (**48pt** `[ G#m7 ]`).
+  - Dilengkapi label status transpose hardware (misal `TRANSPOSE: [ +0 SEMITONES ]`).
+- **Taiko Don/Ka Drum Pair Indicator**:
+  - Indikator drum visual: Don (Merah) mewakili ketukan Bass tangan kiri, Ka (Biru) mewakili ketukan Treble melodi tangan kanan.
+- **Animal Crossing Recipe Next Chord**:
+  - Kartu resep krem menampilkan akord antisipasi berikutnya (misal `NEXT CHORD -> C#m7`) untuk persiapan posisi jari sebelum ketukan tiba.
+- **Codex Parchment Scroll (Assassin's Creed Mirage Style)**:
+  - Gulungan naskah kuno memuat lirik lagu yang bergulir otomatis per birama lagu, memastikan vokalis dan pemain keyboard selalu berada di bait yang tepat.
 
 ---
 
@@ -225,9 +218,11 @@ Output verifikasi akan muncul:
 
 ---
 
-## 6. PANDUAN OPERASIONAL MOBILE REMOTE (TABLET & SMARTPHONE)
+## 6. PANDUAN OPERASIONAL MOBILE REMOTE (TABLET WEB & ANDROID SMARTPHONE)
 
-<img src="captures/screenshot_web_remote.png" width="360" alt="Mobile Remote HUD" />
+| Tablet Landscape Web Remote (1280x820) | Portrait Android Smartphone Remote (430x932) |
+| :---: | :---: |
+| <img src="captures/screenshot_web_remote.png" width="460" alt="Tablet Web Remote" /> | <img src="captures/screenshot_android_companion.png" width="280" alt="Android Companion" /> |
 
 ### 6.1. Menghubungkan Tablet / Smartphone
 1. Pastikan smartphone atau tablet terhubung ke **jaringan Wi-Fi yang sama** dengan laptop host, atau hubungkan ke **Mobile Hotspot** laptop host.
@@ -236,21 +231,20 @@ Output verifikasi akan muncul:
    ```text
    http://192.168.1.15:8080
    ```
-4. Layar teleprompter panggung mobile akan langsung muncul seketika tanpa perlu login atau instalasi apapun!
+4. Layar teleprompter panggung mobile RPG akan langsung terbuka seketika tanpa perlu login atau instalasi apapun!
 
 ### 6.2. Fitur Antarmuka Mobile Remote
-1. **Header & Metronome Dots:**
-   - Indikator `LINKED // STAGE HUB` (Titik hijau berdenyut) menandakan koneksi WebSocket stabil.
-   - 4 titik metronom berdenyut bergantian mengikuti ketukan birama 1-2-3-4.
-2. **Display Akord Raksasa:**
+1. **Header Kayu & Koin Emas**:
+   - Indikator koneksi WebSocket hijau aktif dengan titik metronom berkedip bergantian.
+2. **Display Akord Kartu Mantra Runik Raksasa**:
    - Menampilkan akord aktif saat ini dalam ukuran besar dengan latar belakang hitam murni OLED `#0b0d10` (menghemat baterai perangkat dan tidak menyilaukan panggung gelap).
-3. **Selector Setlist Sentuh (Giant Touch-Slots):**
-   - Menampilkan daftar lagu setlist (misal: `01. Neo Shibuya Dawn`, `02. Cybernetic Groove`, dll).
+3. **Selector Setlist Kartu Resep DIY**:
+   - Menampilkan daftar lagu setlist dalam format kartu resep yang ramah sentuhan jempol.
    - Tapping pada salah satu lagu akan:
-     - Mengubah sound keyboard Roland Go:Keys 3 secara instan.
+     - Mengubah sound keyboard Roland Go:Keys 3 secara instan di Channel 4.
      - Mengubah tempo metronom host.
      - Mengubah lead sheet dan akord yang ditampilkan di layar monitor pemain.
-4. **Tombol Failsafe Darurat (Panic Button):**
+4. **Tombol Failsafe Darurat (Panic Button)**:
    - Terletak di bagian paling bawah layar dengan warna merah menyala.
    - Tekan kapanpun jika terjadi nada macet untuk memulihkan keheningan panggung dalam 1 milidetik.
 
@@ -296,7 +290,7 @@ Cukup tambahkan entri lagu baru dengan format yang sama, dan lagu tersebut akan 
 ### 8.2. Masalah: Nada Macet / Bunyi Terus-Menerus (Stuck Notes)
 - **Penyebab:** Kabel USB MIDI tersenggol atau pedal sustain melepaskan sinyal yang terputus di tengah jalan.
 - **Solusi:**
-  1. Tekan tombol **`[ ! EMERGENCY PURGE / PANIC ! ]`** di konsol desktop atau tombol **PANIC** di HP mobile remote.
+  1. Tekan tombol **`[ ! PANIC PURGE ! ]`** di konsol desktop atau tombol **PANIC** di HP mobile remote.
   2. Sirkuit Panic AnantaNada seketika mengirimkan sinyal `CC 120 (All Sound Off)`, `CC 123 (All Notes Off)`, dan mereset sustain pedal `CC 64 = 0` ke seluruh 16 channel MIDI secara merata.
 
 ### 8.3. Masalah: Smartphone Tidak Bisa Membuka `http://<HOST_IP>:8080`

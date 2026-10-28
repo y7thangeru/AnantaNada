@@ -7,9 +7,9 @@
 [![StageHub: Embedded HTTP/WS](https://img.shields.io/badge/StageHub-Embedded_HTTP_%26_WebSocket-ef233c)](#-embedded-stagehub-telemetry-server)
 [![User Guide: Complete](https://img.shields.io/badge/User_Guide-Complete_SOP-success)](USER_GUIDE.md)
 
-> **Design Paradigm:** Game-Grade Diegetic Stage Console (*Persona 5* / *Arknights* / *Hi-Fi Rush* / *Armored Core*)  
-> **Host Runtime:** Godot Engine 4.3 (.NET 8 / C# 12)  
-> **Companion Client:** Embedded Local HTTP & WebSocket Server + HTML5 / Canvas2D Remote  
+> **Design Paradigm:** Sweet & Charming Diegetic Stage Console (*Animal Crossing* / *Stardew Valley* / *Atelier RPG* / *Hi-Fi Rush* / *DJMAX* / *12 Game Archetypes*)  
+> **Host Runtime:** Godot Engine 4.3 (.NET 8 / C# 12 / GDScript)  
+> **Companion Client:** Embedded Local HTTP & WebSocket Server + Tri-Platform Remote (Desktop, Web & Android)  
 > **Remote Repository:** [https://github.com/y7thangeru/AnantaNada](https://github.com/y7thangeru/AnantaNada)  
 > **Buku Panduan Operasional Lengkap:** [USER_GUIDE.md](USER_GUIDE.md)
 
@@ -19,21 +19,21 @@
 
 ### 1. Tri-Platform Sweet RPG Stage Console Implementation
 
-| Desktop Godot 4 Forward+ Stage Console (1080p Vulkan) | Web / Tablet StageHub Remote (1280x820 Stand-Mounted) | Android Mobile Touch Companion (430x932 Mic-Stand) |
+| Desktop Godot 4 Forward+ Stage Atelier (1080p Vulkan) | Web / Tablet StageHub Remote (1280x820 Stand-Mounted) | Android Mobile Touch Companion (430x932 Mic-Stand) |
 | :---: | :---: | :---: |
 | [![Godot Desktop Stage](captures/screenshot_godot_stage.png)](captures/screenshot_godot_stage.png) | [![Web Tablet Remote](captures/screenshot_web_remote.png)](captures/screenshot_web_remote.png) | [![Android Companion](captures/screenshot_android_companion.png)](captures/screenshot_android_companion.png) |
-| **Desktop RPG Console**: Meja kayu oak hangat, jurnal setlist bersampul kulit & kawat spiral, tab bookmark warna-warni, kartu resep DIY Animal Crossing, kanopi awan bergelombang, reservoar mana kristal, stempel emosi Moonlighter, kartu mantra runik gothic, dan teleprompter gulungan perkamen AC Mirage. | **Web/Tablet Remote**: Dashboard panggung taktil kaya tekstur RPG dengan header kayu mahoni, koin emas pedagang, dan respons instan untuk browser tablet/iPad panggung. | **Android Companion**: Tata letak vertikal responsif dengan kartu resep DIY ramah sentuhan jempol, akord berukuran besar, dan tombol Panic hazard panggung. |
+| **Desktop RPG Atelier**: Meja kayu oak hangat, jurnal setlist bersampul kulit & kawat spiral, tab bookmark warna-warni, kartu resep DIY Animal Crossing, kanopi awan bergelombang, reservoar mana kristal, stempel emosi Moonlighter, kartu mantra runik gothic, dan teleprompter gulungan perkamen AC Mirage. | **Web/Tablet Remote**: Dashboard panggung taktil kaya tekstur RPG dengan header kayu mahoni, koin emas pedagang, dan respons instan untuk browser tablet/iPad panggung. | **Android Companion**: Tata letak vertikal responsif dengan kartu resep DIY ramah sentuhan jempol, akord berukuran besar, dan tombol Panic hazard panggung. |
 
 ---
 
 ### 2. Detailed UI/UX Module Breakdown
 
-| Modul Konsol | Tampilan Visual (UI/UX Capture) | Penjelasan Fitur Panggung |
+| Modul Konsol | Tampilan Visual (UI/UX Capture) | Penjelasan Fitur Panggung RPG Diegetik |
 | :--- | :---: | :--- |
-| **Tactical Setlist Deck (100 Songs)**<br>*Arknights & Persona 5 Inspired* | ![Setlist Deck](captures/ui_setlist_deck.png) | • **100 Canonical Anthems**: 50 lagu Pop/Rock Indonesia & 50 lagu Pop/Rock Barat siap pentas.<br>• **Filter Kategori**: `[ ALL (100) ]`, `[ INDO (50) ]`, `[ WEST (50) ]`.<br>• **Pencarian Real-Time**: Pencarian instan judul/artis.<br>• **One-Touch Patch Dispatch**: Klik kartu misi langsung mengubah sound Roland Go:Keys 3 di Channel 4 tanpa menyentuh EEPROM. |
-| **Cyber-Cascade Waterfall & Timing Coach**<br>*Hi-Fi Rush & Rhythm Action Inspired* | ![Waterfall & Coach](captures/ui_waterfall_coach.png) | • **18° 3D Trapezoidal Runway**: Jalur not jatuh 61-kolom dengan aksen grid futuristik.<br>• **Focused Hit Beam Bloom**: Sinar benturan bercahaya lembut di garis kontak.<br>• **Rhythm Timing Coach**: Evaluasi ketukan real-time (`PERFECT!`, `GREAT!`, `RUSHING`, `DRAGGING`) & Dynamic Strike Gauge Rank S/A/B. |
-| **Tactical Chord HUD & Lyric Prompter**<br>*High-Contrast Stage Teleprompter* | ![Tactical Chord HUD](captures/ui_chord_hud.png) | • **Current Harmony (72pt)**: Akord aktif super besar, terbaca jelas dari jarak 2 meter.<br>• **Next Chord Transition (32pt)**: Indikator Cyan untuk antisipasi perpindahan jari.<br>• **Transpose Indicator**: Tampilan status transpose hardware via RPN.<br>• **Bar-Synced Lyric Prompter**: Lirik lagu bergerak sinkron dengan ketukan birama lagu. |
-| **Synth-Runner 61-Key Keybed**<br>*Procedural Shader with Split Point C4* | ![61-Key Keybed](captures/ui_keybed_61.png) | • **36 Tuts Putih Gading & 25 Tuts Hitam 3D**: Rendered secara prosedural di GPU.<br>• **Split Point C4 Divider**: Garis merah tajam memisahkan zona tangan kiri dan kanan.<br>• **Dual Neon Glow**: Zone A (Amber `#ffb703`) untuk Bass/Chord; Zone B (Cyan `#00f5d4`) untuk Lead/Solo.<br>• **Tombol "⚡ AMBIL IDE TADI"**: Ekspor 5 menit rekaman circular RAM ke file `.mid`. |
+| **Setlist Codex Deck (100 Songs)**<br>*Animal Crossing & Stardew Valley* | ![Setlist Deck](captures/ui_setlist_deck.png) | • **Spiral Leather Notebook**: Halaman perkamen bergaris dengan kawat spiral perak dan tab bookmark pastel.<br>• **100 DIY Recipe Cards**: Kartu resep kerajinan berisi 50 lagu Pop/Rock Indonesia & 50 Barat.<br>• **Filter Tab Cepat**: `[ ALL (100) ]`, `[ INDO (50) ]`, `[ WEST (50) ]`.<br>• **One-Touch Patch Dispatch**: Klik kartu resep langsung mengubah sound Roland Go:Keys 3 di Channel 4 tanpa menyentuh EEPROM. |
+| **Cyber-Cascade Waterfall & Mana Coach**<br>*Hi-Fi Rush, DJMAX & Mini Metro* | ![Waterfall & Coach](captures/ui_waterfall_coach.png) | • **Scalloped Cloud Canopy**: Hiasan awan pastel Animal Crossing di atas panggung.<br>• **Mini Metro Transit Map**: Peta rute transit seksi lagu (`Intro ➔ Verse ➔ Chorus ➔ Solo ➔ Outro`).<br>• **Crystal Mana Gauge & Emojis**: Reservoar mana bergradien biru-cyan dan reaksi emotikon dinamis (`HAPPY`, `CHEER`, `SWEAT`) mengikuti akurasi ketukan metronom. |
+| **Runic Harmony HUD & Codex Scroll**<br>*Tricky Towers, Taiko & AC Mirage* | ![Tactical Chord HUD](captures/ui_chord_hud.png) | • **Gothic Rune Spell Card**: Bingkai batu runik dengan ukiran sudut emas menaungi akord aktif berukuran besar (**48pt**).<br>• **Taiko Don/Ka Drum Pair**: Indikator visual drum Don (Merah Bass) dan Ka (Biru Treble).<br>• **Animal Crossing Recipe Next Chord**: Kartu resep krem untuk antisipasi perpindahan jari.<br>• **Codex Parchment Scroll**: Gulungan naskah kuno menyajikan lirik lagu sinkron birama. |
+| **Synth-Runner 61-Key Keybed**<br>*Procedural Shader with Split Point C4* | ![61-Key Keybed](captures/ui_keybed_61.png) | • **36 Tuts Putih Gading & 25 Tuts Hitam 3D**: Rendered secara prosedural di GPU dengan bayangan oklusi realistis.<br>• **Split Point C4 Divider**: Garis merah tajam memisahkan zona tangan kiri dan kanan.<br>• **Dual Neon Glow**: Zone A (Amber `#ffb703`) untuk Bass/Chord; Zone B (Cyan `#00f5d4`) untuk Lead/Solo.<br>• **Tombol "⚡ AMBIL IDE TADI"**: Ekspor 5 menit rekaman circular RAM ke file `.mid`. |
 
 ---
 
@@ -48,7 +48,7 @@ flowchart TD
         Flash["Non-Volatile Flash / EEPROM (PROTECTED)"]
     end
 
-    subgraph DesktopHost["AnantaNada Workstation (Godot 4.3 .NET 8 / C# 12)"]
+    subgraph DesktopHost["AnantaNada Workstation (Godot 4.3 .NET 8 / C# 12 / GDScript)"]
         subgraph MidiLayer["Hardware-Safe Low-Level MIDI Layer"]
             WinMM["Native WinMM Driver Interop (winmm.dll)"]
             WinRT["Modern Windows Bluetooth LE MIDI (Windows.Devices.Midi)"]
@@ -62,11 +62,12 @@ flowchart TD
             SMF["SMF Type 0 Binary Exporter (.mid)"]
         end
 
-        subgraph VisualLayer["Diegetic Visualizer Engine"]
+        subgraph VisualLayer["Charming RPG Visualizer Engine"]
             KeyShader["61-Key Procedural Keybed Shader (Amber/Cyan Glow)"]
             WaterfallShader["Kinetic Waterfall Note Stream Shader"]
             TacticalShader["Tactical Chamfered Panel Shader"]
-            StageHUD["3-Column Cockpit Konsol Panggung"]
+            RpgSprites["12-Game Archetype RPG Sprite Suite"]
+            StageHUD["3-Column Stage Atelier Cockpit"]
         end
 
         subgraph ServerLayer["Embedded StageHub Mini-Server"]
@@ -75,10 +76,9 @@ flowchart TD
         end
     end
 
-    subgraph MobileCompanion["Stand-Mounted Mobile Remote (Tablet / Phone)"]
-        Teleprompter["High-Contrast Canvas2D Teleprompter"]
-        Setlist["Giant Touch-Slot Setlist Selector"]
-        PanicMobile["Always-Visible Stage Panic Button"]
+    subgraph MobileCompanion["Tri-Platform Remote Clients"]
+        WebRemote["Landscape Tablet Web Remote (1280x820)"]
+        AndroidRemote["Portrait Android Mobile Remote (430x932)"]
     end
 
     Keybed -->|USB-MIDI / BLE MIDI| WinMM
@@ -93,7 +93,7 @@ flowchart TD
     SysExFIFO -.->|BLOCKS FLASH WRITES| Flash
 
     WsServer <-->|PLAYBACK_TICK / TRIGGER_SETLIST| MobileCompanion
-    PanicMobile -->|TRIGGER_PANIC| PanicCircuit --> WinMM --> ZenCore
+    MobileCompanion -->|TRIGGER_PANIC| PanicCircuit --> WinMM --> ZenCore
 ```
 
 ---
@@ -172,9 +172,9 @@ flowchart TD
    ```text
    http://192.168.1.15:8080
    ```
-3. Layar teleprompter hitam OLED akan terbuka seketika:
-   - **Akord Raksasa**: Menampilkan akord saat ini (72pt) dan akord antisipasi berikutnya (32pt) dari jarak 2 meter.
-   - **Setlist Sentuh**: Tap nama lagu di HP untuk langsung mengganti sound Roland Go:Keys 3 dan tempo metronom di laptop.
+3. Layar teleprompter RPG OLED akan terbuka seketika:
+   - **Akord Raksasa**: Menampilkan akord saat ini (48pt/72pt) dan akord antisipasi berikutnya dari jarak 2 meter.
+   - **Setlist Sentuh**: Tap kartu resep DIY di HP untuk langsung mengganti sound Roland Go:Keys 3 dan tempo metronom di laptop.
    - **Panic HP**: Tombol merah di bagian bawah HP untuk membisukan instrumen dari stand mikrofon.
 
 ---
@@ -185,6 +185,11 @@ flowchart TD
 AnantaNada_RolandGoKeys3/
 ├── addons/
 │   └── godot_mcp/                      # Godlink WebSocket Editor Bridge (Port 6505)
+├── assets/
+│   ├── rpg_ui/                         # Sweet & Charming RPG UI Asset Suite
+│   │   ├── sprites/                    # High-res sprites (parchment, recipe cards, coins, emojis)
+│   │   └── generate_rpg_ui_suite.py    # Automated Pillow procedural sprite generator
+│   └── ui_sprites/                     # 12-Game Archetype vector SVG & PNG suite
 ├── scenes/
 │   ├── MainStageView.tscn              # Godot 4 main stage scene & stylized node hierarchy
 │   └── README.md                       # Documentation for scene hierarchy and HUD layout
@@ -227,21 +232,24 @@ AnantaNada_RolandGoKeys3/
 │   │   └── VerificationHarness.cs      # Self-auditing unit verification suite (7/7 tests passing)
 │   └── Program.cs                      # Host bootstrap entry point & interactive stage CLI
 ├── web/
+│   ├── assets/                         # Web remote RPG sprites & assets
 │   ├── index.html                      # Mobile teleprompter & setlist HUD
 │   ├── style.css                       # Stylized high-contrast dark theme
 │   ├── app.js                          # WebSocket client & teleprompter canvas renderer
 │   └── README.md                       # Documentation for mobile remote client
 ├── captures/                           # Output directory for retroactive .mid exports and screenshots
 │   ├── screenshot_godot_stage.png      # 1080p visual capture of native stage console
-│   ├── screenshot_web_remote.png       # Visual capture of mobile stage teleprompter HUD
-│   ├── ui_setlist_deck.png             # Tactical Setlist Deck (100 Songs) component capture
-│   ├── ui_waterfall_coach.png          # Cyber-Cascade Waterfall & Timing Coach capture
-│   ├── ui_chord_hud.png                # Tactical Chord HUD & Lyric Prompter capture
+│   ├── screenshot_web_remote.png       # Visual capture of landscape tablet web remote HUD
+│   ├── screenshot_android_companion.png # Visual capture of portrait mobile phone touch companion
+│   ├── ui_setlist_deck.png             # Spiral Notebook & Recipe Cards component capture
+│   ├── ui_waterfall_coach.png          # Waterfall, MiniMetro & Mana Coach capture
+│   ├── ui_chord_hud.png                # Spell Card Chord HUD & Codex Lyric Scroll capture
 │   └── ui_keybed_61.png                # Synth-Runner 61-Key Keybed component capture
 ├── project.godot                       # Godot 4.3 project configuration
 ├── AnantaNada.csproj                   # .NET 8 / C# 12 project file with GodotSharp integration
 ├── ANANTANADA_SPEC.md                  # Comprehensive architectural specification
 ├── USER_GUIDE.md                       # Buku panduan penggunaan lengkap & SOP panggung
+├── UI_UX_DESIGN_GUIDE.md               # Panduan sistem desain UI/UX & arketipe 12 game
 ├── Feature-ToBe-Implemented.md         # Single source of truth for feature tracking
 ├── update_tracker.md                   # Audit log of all file changes and rationale
 └── Report-To-GeminiProject.md          # Consolidated master report for Gemini project threads
