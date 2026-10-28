@@ -322,6 +322,60 @@ public sealed class StageHubServer : IDisposable
         }
     }
 
+    public async Task BroadcastNoteOnAsync(byte channel, byte note, byte velocity)
+    {
+        string json = $"{{\"type\":\"NOTE_ON\",\"channel\":{channel},\"note\":{note},\"velocity\":{velocity}}}";
+        await BroadcastRawJsonAsync(json);
+    }
+
+    public async Task BroadcastNoteOffAsync(byte channel, byte note)
+    {
+        string json = $"{{\"type\":\"NOTE_OFF\",\"channel\":{channel},\"note\":{note}}}";
+        await BroadcastRawJsonAsync(json);
+    }
+
+    public async Task BroadcastPanicAsync()
+    {
+        string json = "{\"type\":\"PANIC\"}";
+        await BroadcastRawJsonAsync(json);
+    }
+
+    public async Task BroadcastRawJsonAsync(string json)
+    {
+        if (_clients.IsEmpty) return;
+
+        byte[] bytes = Encoding.UTF8.GetBytes(json);
+        var segment = new ArraySegment<byte>(bytes);
+        var deadClients = new List<Guid>();
+
+        foreach (var pair in _clients)
+        {
+            if (pair.Value.State == WebSocketState.Open)
+            {
+                try
+                {
+                    await pair.Value.SendAsync(segment, WebSocketMessageType.Text, true, CancellationToken.None);
+                }
+                catch
+                {
+                    deadClients.Add(pair.Key);
+                }
+            }
+            else
+            {
+                deadClients.Add(pair.Key);
+            }
+        }
+
+        foreach (var id in deadClients)
+        {
+            if (_clients.TryRemove(id, out var deadSocket))
+            {
+                deadSocket.Dispose();
+            }
+        }
+    }
+
     private async Task ProcessHttpRequestAsync(HttpListenerContext context)
     {
         try

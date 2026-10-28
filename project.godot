@@ -1,6 +1,10 @@
 ; Engine configuration file.
 ; It's best edited using the editor UI and not directly,
-; but it can be loaded directly as a text file.
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
 
 config_version=5
 
@@ -10,15 +14,13 @@ config/name="AnantaNada Hybrid Workstation"
 config/description="Stylized Diegetic Hybrid Workstation & Stage Console for Roland Go:Keys 3"
 config/version="1.0.0"
 run/main_scene="res://scenes/MainStageView.tscn"
-config/features=PackedStringArray("4.3", "C#", "Forward Plus")
+config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
 
 [display]
 
 window/size/viewport_width=1920
 window/size/viewport_height=1080
-window/size/mode=0
-window/size/resizable=true
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
@@ -28,7 +30,6 @@ enabled=PackedStringArray("res://addons/godot_mcp/plugin.cfg")
 
 [rendering]
 
-renderer/rendering_method="forward_plus"
+textures/vram_compression/import_etc2_astc=true
 anti_aliasing/quality/msaa_2d=2
 anti_aliasing/quality/msaa_3d=2
-textures/vram_compression/import_etc2_astc=true

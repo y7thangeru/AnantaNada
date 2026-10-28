@@ -239,3 +239,15 @@ This file logs all file creations, modifications, deletions, refactorings, and f
 ### [2026-10-28 15:31:30 +07:00] - [MODIFY] `src/Tests/VerificationHarness.cs`
 - **Action**: Added `[TEST 7] 100-Song Tactical Repertoire & Random Sampling Dispatch`, verifying exact 100-song deserialization (50 Indo / 50 West) and successful Channel 4 dispatch of 10 sampled songs.
 - **Reason**: Guarantees data integrity and hardware-level safety across the entire 100-song database.
+
+### [2026-10-28 17:42:47 +07:00] - [NEW] `src/UI/MainStageController.gd`
+- **Action**: Created native Godot 4.x GDScript controller connecting to the backend via WebSocket (`ws://127.0.0.1:8080/ws`), populating the 100-song repertoire cards, updating the 64x1 keybed texture shader, and handling user input.
+- **Reason**: Enables seamless zero-error execution in standard Godot 4.5 builds while communicating with the C# Bluetooth/USB MIDI backend.
+
+### [2026-10-28 17:44:00 +07:00] - [MODIFY] `src/Program.cs`
+- **Action**: Upgraded host entrypoint to launch an interactive live stage console with automatic Bluetooth/USB MIDI port hooking, live telemetry logging, and console hotkeys (`P` for Panic, `M` for MIDI export, `R` for rescan).
+- **Reason**: Provides dedicated background MIDI services for the desktop workstation and mobile remotes.
+
+### [2026-10-28 17:45:25 +07:00] - [NEW] `launch_anantanada.bat` & `scripts/create_desktop_shortcut.ps1`
+- **Action**: Created launcher script and automated Windows Desktop shortcut creation utility.
+- **Reason**: Delivers one-click launch experience on the user's desktop (`C:\Users\y7tha\Desktop\AnantaNada - Roland GoKeys 3.lnk`).

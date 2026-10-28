@@ -1,6 +1,6 @@
 [gd_scene load_steps=11 format=3 uid="uid://b5d8g2hq9x8a"]
 
-[ext_resource type="Script" path="res://src/UI/MainStageController.cs" id="1_controller"]
+[ext_resource type="Script" path="res://src/UI/MainStageController.gd" id="1_controller"]
 [ext_resource type="Shader" path="res://src/Shaders/piano_keybed.gdshader" id="2_keybed_shader"]
 [ext_resource type="Shader" path="res://src/Shaders/waterfall_visualizer.gdshader" id="3_waterfall_shader"]
 [ext_resource type="Shader" path="res://src/Shaders/tactical_panel.gdshader" id="4_tactical_shader"]
