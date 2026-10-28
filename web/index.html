@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AnantaNada // StageHub Remote</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="hud-container">
+    <!-- Top Telemetry Header -->
+    <header class="top-header">
+      <div class="status-indicator">
+        <span class="pulse-dot" id="connectionDot"></span>
+        <span id="connectionText">CONNECTING TO GODOT...</span>
+      </div>
+      <div class="song-meta" id="songMeta">SONG --</div>
+      <button class="panic-button" id="panicBtn" ontouchstart="">EMERGENCY PANIC</button>
+    </header>
+
+    <!-- Main Teleprompter Display -->
+    <main class="teleprompter">
+      <div class="beat-tracker">
+        <span class="bar-tag" id="barDisplay">BAR 001</span>
+        <div class="beat-dots">
+          <span class="dot" id="beat1"></span>
+          <span class="dot" id="beat2"></span>
+          <span class="dot" id="beat3"></span>
+          <span class="dot" id="beat4"></span>
+        </div>
+        <span class="bpm-tag" id="bpmDisplay">128 BPM</span>
+      </div>
+
+      <div class="chord-hero">
+        <div class="chord-label">CURRENT CHORD</div>
+        <div class="chord-main" id="currentChord">--</div>
+      </div>
+
+      <div class="next-chord-box">
+        <span class="next-label">UPCOMING:</span>
+        <span class="next-chord" id="nextChord">--</span>
+      </div>
+
+      <div class="patch-info" id="patchDisplay">PATCH: --</div>
+    </main>
+
+    <!-- Setlist Selector Drawer (Touch Slots) -->
+    <footer class="setlist-tray">
+      <div class="tray-title">/// QUICK SETLIST SWITCH (ONE-TOUCH BANK SELECT)</div>
+      <div class="setlist-grid" id="setlistGrid">
+        <button class="song-card active" data-index="0" data-msb="87" data-lsb="64" data-pc="14">
+          <span class="song-num">01</span>
+          <span class="song-name">Neo Shibuya Dawn</span>
+          <span class="song-patch">Vintage EP 1</span>
+        </button>
+        <button class="song-card" data-index="1" data-msb="87" data-lsb="65" data-pc="4">
+          <span class="song-num">02</span>
+          <span class="song-name">Cybernetic Groove</span>
+          <span class="song-patch">Fat Saw Lead</span>
+        </button>
+        <button class="song-card" data-index="2" data-msb="87" data-lsb="64" data-pc="1">
+          <span class="song-num">03</span>
+          <span class="song-name">Midnight Reverie</span>
+          <span class="song-patch">Warm Stage Grand</span>
+        </button>
+        <button class="song-card" data-index="3" data-msb="87" data-lsb="66" data-pc="22">
+          <span class="song-num">04</span>
+          <span class="song-name">Overdrive Anthem</span>
+          <span class="song-patch">Brass Punch Sect</span>
+        </button>
+      </div>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

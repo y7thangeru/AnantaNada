@@ -1,0 +1,249 @@
+[gd_scene load_steps=6 format=3 uid="uid://b5d8g2hq9x8a"]
+
+[ext_resource type="Script" path="res://src/UI/MainStageController.cs" id="1_controller"]
+[ext_resource type="Shader" path="res://src/Shaders/piano_keybed.gdshader" id="2_keybed_shader"]
+[ext_resource type="Shader" path="res://src/Shaders/waterfall_visualizer.gdshader" id="3_waterfall_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_keybed"]
+shader = ExtResource("2_keybed_shader")
+shader_parameter/color_white_key = Color(0.90, 0.92, 0.95, 1)
+shader_parameter/color_black_key = Color(0.07, 0.08, 0.11, 1)
+shader_parameter/color_neon_cyan = Color(0, 0.96, 0.83, 1)
+shader_parameter/color_neon_amber = Color(1, 0.72, 0.01, 1)
+shader_parameter/color_border = Color(0.04, 0.05, 0.06, 1)
+shader_parameter/black_key_height_ratio = 0.62
+shader_parameter/black_key_width_ratio = 0.58
+shader_parameter/border_thickness = 0.006
+shader_parameter/glow_intensity = 2.4
+shader_parameter/chromatic_offset = 0.003
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_waterfall"]
+shader = ExtResource("3_waterfall_shader")
+shader_parameter/background_color = Color(0.043, 0.051, 0.063, 0.95)
+shader_parameter/grid_line_color = Color(0.12, 0.15, 0.20, 0.4)
+shader_parameter/strike_line_color = Color(0, 0.96, 0.83, 1)
+shader_parameter/beat_marker_color = Color(1, 0.72, 0.01, 0.35)
+shader_parameter/scroll_speed = 1.2
+shader_parameter/beat_frequency = 2.0
+shader_parameter/strike_line_y = 0.96
+shader_parameter/bloom_spread = 0.08
+
+[node name="MainStageView" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_controller")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0431373, 0.0509804, 0.0627451, 1)
+
+[node name="HUD" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 20.0
+offset_right = -24.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="TopBar" type="HBoxContainer" parent="HUD"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="BrandPill" type="PanelContainer" parent="HUD/TopBar"]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+
+[node name="BrandLabel" type="Label" parent="HUD/TopBar/BrandPill"]
+layout_mode = 2
+text = "ANANTANADA // GO:KEYS 3"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DevicePill" type="PanelContainer" parent="HUD/TopBar"]
+custom_minimum_size = Vector2(240, 0)
+layout_mode = 2
+
+[node name="StatusLabel" type="Label" parent="HUD/TopBar/DevicePill"]
+layout_mode = 2
+text = "SCANNING HARDWARE..."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NetworkPill" type="PanelContainer" parent="HUD/TopBar"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
+[node name="IpLabel" type="Label" parent="HUD/TopBar/NetworkPill"]
+layout_mode = 2
+text = "HUB: http://127.0.0.1:8080"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Spacer" type="Control" parent="HUD/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BpmPill" type="PanelContainer" parent="HUD/TopBar"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+
+[node name="BpmLabel" type="Label" parent="HUD/TopBar/BpmPill"]
+layout_mode = 2
+text = "128 BPM"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PanicButton" type="Button" parent="HUD/TopBar"]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+text = "EMERGENCY PANIC"
+
+[node name="CenterPanel" type="HSplitContainer" parent="HUD"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SetlistDrawer" type="PanelContainer" parent="HUD/CenterPanel"]
+custom_minimum_size = Vector2(340, 0)
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="HUD/CenterPanel/SetlistDrawer"]
+layout_mode = 2
+offset_left = 12.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = -12.0
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="HUD/CenterPanel/SetlistDrawer/VBox"]
+layout_mode = 2
+text = "/// LIVE SETLIST ROSTER"
+
+[node name="SongList" type="ItemList" parent="HUD/CenterPanel/SetlistDrawer/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+item_count = 4
+item_0/text = "01. Neo Shibuya Dawn [128 BPM]"
+item_1/text = "02. Cybernetic Groove [134 BPM]"
+item_2/text = "03. Midnight Reverie [92 BPM]"
+item_3/text = "04. Overdrive Anthem [140 BPM]"
+
+[node name="Teleprompter" type="VBoxContainer" parent="HUD/CenterPanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="SongTitle" type="Label" parent="HUD/CenterPanel/Teleprompter"]
+layout_mode = 2
+text = "01. Neo Shibuya Dawn"
+horizontal_alignment = 1
+
+[node name="CurrentChord" type="Label" parent="HUD/CenterPanel/Teleprompter"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 96
+text = "G#m7"
+horizontal_alignment = 1
+
+[node name="NextChord" type="Label" parent="HUD/CenterPanel/Teleprompter"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "NEXT: C#m7"
+horizontal_alignment = 1
+
+[node name="BarBeatLabel" type="Label" parent="HUD/CenterPanel/Teleprompter"]
+layout_mode = 2
+text = "BAR 012 . BEAT 3"
+horizontal_alignment = 1
+
+[node name="ActivePatch" type="Label" parent="HUD/CenterPanel/Teleprompter"]
+layout_mode = 2
+text = "PATCH: Vintage EP 1 (MSB:87 LSB:64 PC:14)"
+horizontal_alignment = 1
+
+[node name="WaterfallContainer" type="Control" parent="HUD"]
+custom_minimum_size = Vector2(0, 160)
+layout_mode = 2
+
+[node name="WaterfallRect" type="ColorRect" parent="HUD/WaterfallContainer"]
+material = SubResource("ShaderMaterial_waterfall")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BottomBar" type="VBoxContainer" parent="HUD"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="KeybedContainer" type="Control" parent="HUD/BottomBar"]
+custom_minimum_size = Vector2(0, 130)
+layout_mode = 2
+
+[node name="KeybedRect" type="ColorRect" parent="HUD/BottomBar/KeybedContainer"]
+material = SubResource("ShaderMaterial_keybed")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ControlRow" type="HBoxContainer" parent="HUD/BottomBar"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="NeverLostMelodyBtn" type="Button" parent="HUD/BottomBar/ControlRow"]
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+text = "AMBIL IDE TADI (LAST 5 MINS .MID)"
+
+[node name="SplitMonitorPill" type="PanelContainer" parent="HUD/BottomBar/ControlRow"]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+
+[node name="SplitLabel" type="Label" parent="HUD/BottomBar/ControlRow/SplitMonitorPill"]
+layout_mode = 2
+text = "SPLIT: C2-B3 (BASS) / C4-C7 (LEAD)"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CueSplitPill" type="PanelContainer" parent="HUD/BottomBar/ControlRow"]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+
+[node name="CueLabel" type="Label" parent="HUD/BottomBar/ControlRow/CueSplitPill"]
+layout_mode = 2
+text = "OUTPUT: MAIN (PA) + CUE (IEM)"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Spacer" type="Control" parent="HUD/BottomBar/ControlRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TransposePill" type="PanelContainer" parent="HUD/BottomBar/ControlRow"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="TransposeLabel" type="Label" parent="HUD/BottomBar/ControlRow/TransposePill"]
+layout_mode = 2
+text = "TRANSPOSE: +0 SEMITONES"
+horizontal_alignment = 1
+vertical_alignment = 1
