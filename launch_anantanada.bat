@@ -8,14 +8,14 @@ echo   Starting C# MIDI Engine + Godot Stage Console GUI...
 echo =========================================================================
 
 :: 1. Ensure latest C# Engine binary exists
-if not exist "bin\Debug\net8.0\AnantaNada.exe" (
-    echo Compiling C# Host Engine...
+if not exist "bin\Debug\net8.0-windows10.0.19041.0\AnantaNada.exe" (
+    echo Compiling C# Host Engine with Windows BLE MIDI Support...
     dotnet build -c Debug
 )
 
 :: 2. Start C# MIDI Host Engine (handles Bluetooth & USB MIDI + WebSocket Server)
 echo [1/2] Starting C# Bluetooth/USB MIDI Host Engine...
-start "AnantaNada Engine Host" cmd /k "bin\Debug\net8.0\AnantaNada.exe"
+start "AnantaNada Engine Host" cmd /k "bin\Debug\net8.0-windows10.0.19041.0\AnantaNada.exe"
 
 :: Brief 2-second delay to ensure WebSocket listener is armed
 timeout /t 2 /nobreak > nul

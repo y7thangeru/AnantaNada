@@ -83,6 +83,7 @@ public sealed class StageHubServer : IDisposable
             {
                 _listener.Prefixes.Clear();
                 _listener.Prefixes.Add($"http://localhost:{_port}/");
+                _listener.Prefixes.Add($"http://127.0.0.1:{_port}/");
                 _listener.Start();
 
                 _isRunning = true;
@@ -93,7 +94,7 @@ public sealed class StageHubServer : IDisposable
                 };
                 _serverThread.Start();
 
-                OnLog?.Invoke($"[StageHub Server] Online on localhost:{_port} (Fallback mode). WebRoot: {_webRootDirectory}");
+                OnLog?.Invoke($"[StageHub Server] Online on localhost & 127.0.0.1:{_port} (Loopback mode). WebRoot: {_webRootDirectory}");
                 return true;
             }
             catch (Exception ex)
@@ -337,6 +338,12 @@ public sealed class StageHubServer : IDisposable
     public async Task BroadcastPanicAsync()
     {
         string json = "{\"type\":\"PANIC\"}";
+        await BroadcastRawJsonAsync(json);
+    }
+
+    public async Task BroadcastDeviceStatusAsync(string deviceName, bool isConnected)
+    {
+        string json = $"{{\"type\":\"DEVICE_STATUS\",\"deviceName\":\"{deviceName}\",\"connected\":{(isConnected ? "true" : "false")}}}";
         await BroadcastRawJsonAsync(json);
     }
 

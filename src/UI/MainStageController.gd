@@ -382,6 +382,15 @@ func _handle_ws_packet(json_text: String) -> void:
 			lbl_next_chord.text = "NEXT CHORD -> %s" % str(data.get("nextChord", "G"))
 		elif type == "PANIC":
 			_on_panic_pressed()
+		elif type == "DEVICE_STATUS":
+			var d_name = str(parsed.get("deviceName", "ROLAND GO:KEYS 3"))
+			var conn = bool(parsed.get("connected", false))
+			if conn:
+				lbl_device_status.text = "> LINK: %s" % d_name.to_upper()
+				lbl_device_status.modulate = Color(0.0, 0.96, 0.83)
+			else:
+				lbl_device_status.text = "> LINK: OFFLINE"
+				lbl_device_status.modulate = Color(0.93, 0.14, 0.23)
 
 func _handle_note_on(note: int, velocity: int) -> void:
 	var idx = note - LOWEST_NOTE

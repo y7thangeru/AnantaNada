@@ -16,6 +16,17 @@ public static class Program
             return await VerificationHarness.RunAll();
         }
 
+        if (args.Length > 0 && args[0] == "--scan")
+        {
+            Console.WriteLine("[ANANTANADA] Scanning All Windows MIDI Devices (WinRT BLE + WinMM)...");
+            using var testEngine = new NativeMidiEngine();
+            testEngine.OnLog += Console.WriteLine;
+            await testEngine.ConnectAsync("Go:Keys");
+            Console.WriteLine($"\n>> Connected Device: {testEngine.ConnectedDeviceName}");
+            Console.WriteLine($">> IsInOpen: {testEngine.IsInOpen}, IsOutOpen: {testEngine.IsOutOpen}");
+            return 0;
+        }
+
         Console.Title = "ANANTANADA - Roland Go:Keys 3 Live Stage Engine";
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine(@"
@@ -49,6 +60,7 @@ public static class Program
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"\n>> [DEVICE LINKED] {name.ToUpper()} (USB/Bluetooth MIDI Ready)");
             Console.ResetColor();
+            _ = hubServer.BroadcastDeviceStatusAsync(name, true);
         };
 
         midiEngine.OnDeviceDisconnected += () =>
@@ -56,6 +68,7 @@ public static class Program
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("\n>> [DEVICE OFFLINE] Roland Go:Keys 3 Disconnected.");
             Console.ResetColor();
+            _ = hubServer.BroadcastDeviceStatusAsync("Disconnected", false);
         };
 
         // Wire MIDI ingress to buffer and WebSocket broadcast
@@ -83,6 +96,14 @@ public static class Program
             Console.ForegroundColor = ConsoleColor.DarkCyan;
             Console.WriteLine($"[HUB] {msg}");
             Console.ResetColor();
+        };
+
+        hubServer.OnClientCountChanged += count =>
+        {
+            if (count > 0 && (midiEngine.IsInOpen || midiEngine.IsOutOpen))
+            {
+                _ = hubServer.BroadcastDeviceStatusAsync(midiEngine.ConnectedDeviceName, true);
+            }
         };
 
         hubServer.OnSetlistItemTriggered += payload =>

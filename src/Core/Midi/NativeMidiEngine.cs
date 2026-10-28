@@ -1,6 +1,10 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.InteropServices;
+using Windows.Devices.Enumeration;
+using Windows.Devices.Midi;
+using Windows.Storage.Streams;
 
 namespace AnantaNada.Core.Midi;
 
@@ -141,6 +145,10 @@ public sealed class NativeMidiEngine : IDisposable
     private bool _isDisposed;
     private bool _isWindows;
 
+    // Modern Windows BLE (Bluetooth LE) MIDI Handles
+    private MidiInPort? _uwpMidiIn;
+    private IMidiOutPort? _uwpMidiOut;
+
     // SysEx Throttled FIFO queue
     private readonly BlockingCollection<byte[]> _sysExQueue = new(new ConcurrentQueue<byte[]>());
     private readonly Thread _sysExWorkerThread;
@@ -158,8 +166,8 @@ public sealed class NativeMidiEngine : IDisposable
     public event Action<string>? OnDeviceConnected;
     public event Action? OnDeviceDisconnected;
 
-    public bool IsInOpen => _hMidiIn != nint.Zero;
-    public bool IsOutOpen => _hMidiOut != nint.Zero;
+    public bool IsInOpen => _hMidiIn != nint.Zero || _uwpMidiIn != null;
+    public bool IsOutOpen => _hMidiOut != nint.Zero || _uwpMidiOut != null;
     public string ConnectedDeviceName { get; private set; } = "Disconnected";
 
     public NativeMidiEngine()
@@ -219,8 +227,14 @@ public sealed class NativeMidiEngine : IDisposable
 
     /// <summary>
     /// Connects to Roland Go:Keys 3 device by matching device name or defaulting to first detected device.
+    /// Supports both Modern Windows Runtime (Bluetooth LE MIDI) and Classic WinMM (USB Cable / Standard MIDI).
     /// </summary>
     public bool Connect(string preferredNameSubstring = "Go:Keys")
+    {
+        return ConnectAsync(preferredNameSubstring).GetAwaiter().GetResult();
+    }
+
+    public async Task<bool> ConnectAsync(string preferredNameSubstring = "Go:Keys")
     {
         if (!_isWindows)
         {
@@ -231,14 +245,88 @@ public sealed class NativeMidiEngine : IDisposable
 
         Close();
 
+        // 1. Check Modern Windows Runtime (WinRT / UWP) for Bluetooth LE (BLE) MIDI & Modern USB MIDI
+        try
+        {
+            string inSelector = MidiInPort.GetDeviceSelector();
+            var inDevices = await DeviceInformation.FindAllAsync(inSelector);
+            string outSelector = MidiOutPort.GetDeviceSelector();
+            var outDevices = await DeviceInformation.FindAllAsync(outSelector);
+
+            if (inDevices.Count > 0 || outDevices.Count > 0)
+            {
+                OnLog?.Invoke($"[MIDI Engine - WinRT BLE] Discovered {inDevices.Count} In, {outDevices.Count} Out modern MIDI device(s).");
+                foreach (var d in inDevices)
+                {
+                    OnLog?.Invoke($"  -> WinRT MIDI IN: '{d.Name}' (Id: {d.Id})");
+                }
+                foreach (var d in outDevices)
+                {
+                    OnLog?.Invoke($"  -> WinRT MIDI OUT: '{d.Name}' (Id: {d.Id})");
+                }
+
+                // Match Roland Go:Keys or preferred substring (or any BLE MIDI device)
+                var targetIn = inDevices.FirstOrDefault(d =>
+                    d.Name.Contains(preferredNameSubstring, StringComparison.OrdinalIgnoreCase) ||
+                    d.Name.Contains("Go:Keys", StringComparison.OrdinalIgnoreCase) ||
+                    d.Name.Contains("Roland", StringComparison.OrdinalIgnoreCase) ||
+                    d.Name.Contains("MIDI", StringComparison.OrdinalIgnoreCase));
+
+                var targetOut = outDevices.FirstOrDefault(d =>
+                    d.Name.Contains(preferredNameSubstring, StringComparison.OrdinalIgnoreCase) ||
+                    d.Name.Contains("Go:Keys", StringComparison.OrdinalIgnoreCase) ||
+                    d.Name.Contains("Roland", StringComparison.OrdinalIgnoreCase) ||
+                    d.Name.Contains("MIDI", StringComparison.OrdinalIgnoreCase));
+
+                if (targetIn != null)
+                {
+                    OnLog?.Invoke($"[MIDI Engine] Opening WinRT BLE MIDI IN on: [{targetIn.Name}]...");
+                    _uwpMidiIn = await MidiInPort.FromIdAsync(targetIn.Id);
+                    if (_uwpMidiIn != null)
+                    {
+                        _uwpMidiIn.MessageReceived += OnUwpMidiInMessageReceived;
+                        ConnectedDeviceName = targetIn.Name;
+                        OnLog?.Invoke($"[MIDI Engine] BLE MIDI IN linked successfully to [{targetIn.Name}]!");
+                    }
+                }
+
+                if (targetOut != null)
+                {
+                    OnLog?.Invoke($"[MIDI Engine] Opening WinRT BLE MIDI OUT on: [{targetOut.Name}]...");
+                    _uwpMidiOut = await MidiOutPort.FromIdAsync(targetOut.Id);
+                    if (_uwpMidiOut != null)
+                    {
+                        if (string.IsNullOrEmpty(ConnectedDeviceName) || ConnectedDeviceName == "Disconnected")
+                        {
+                            ConnectedDeviceName = targetOut.Name;
+                        }
+                        OnLog?.Invoke($"[MIDI Engine] BLE MIDI OUT linked successfully to [{targetOut.Name}]!");
+                    }
+                }
+
+                if (_uwpMidiIn != null || _uwpMidiOut != null)
+                {
+                    OnDeviceConnected?.Invoke(ConnectedDeviceName);
+                    return true;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            OnLog?.Invoke($"[MIDI Engine - WinRT BLE Scan] {ex.Message}");
+        }
+
+        // 2. Fallback to Classic WinMM (USB Cable / Standard WinMM MIDI driver)
         int inCount = midiInGetNumDevs();
         int outCount = midiOutGetNumDevs();
 
         if (inCount == 0 && outCount == 0)
         {
-            OnLog?.Invoke("[MIDI Engine] No MIDI hardware devices found.");
+            OnLog?.Invoke("[MIDI Engine] No MIDI hardware devices found (WinRT or WinMM).");
             return false;
         }
+
+        OnLog?.Invoke($"[MIDI Engine - WinMM] Scanning ports: {inCount} MIDI IN, {outCount} MIDI OUT available.");
 
         uint selectedIn = 0;
         bool foundIn = false;
@@ -247,6 +335,7 @@ public sealed class NativeMidiEngine : IDisposable
         {
             if (midiInGetDevCaps(i, out MIDIINCAPS caps, capsInSize) == 0)
             {
+                OnLog?.Invoke($"  -> WinMM MIDI IN [{i}]: {caps.szPname}");
                 if (caps.szPname.Contains(preferredNameSubstring, StringComparison.OrdinalIgnoreCase))
                 {
                     selectedIn = i;
@@ -264,6 +353,7 @@ public sealed class NativeMidiEngine : IDisposable
         {
             if (midiOutGetDevCaps(i, out MIDIOUTCAPS caps, capsOutSize) == 0)
             {
+                OnLog?.Invoke($"  -> WinMM MIDI OUT [{i}]: {caps.szPname}");
                 if (caps.szPname.Contains(preferredNameSubstring, StringComparison.OrdinalIgnoreCase))
                 {
                     selectedOut = i;
@@ -272,6 +362,11 @@ public sealed class NativeMidiEngine : IDisposable
                     break;
                 }
             }
+        }
+
+        if (inCount == 0)
+        {
+            OnLog?.Invoke("[MIDI Engine] Notice: No MIDI IN port active. 'GO:KEYS 3 Audio' is Bluetooth Audio (speaker sound only). To send MIDI notes, connect USB-C cable or pair Bluetooth MIDI.");
         }
 
         // Fallback to device 0 if specific match was not found but devices exist
@@ -293,11 +388,11 @@ public sealed class NativeMidiEngine : IDisposable
             if (res == 0)
             {
                 midiInStart(_hMidiIn);
-                OnLog?.Invoke($"[MIDI Engine] MIDI IN hooked on [{ConnectedDeviceName}].");
+                OnLog?.Invoke($"[MIDI Engine] WinMM MIDI IN hooked on [{ConnectedDeviceName}].");
             }
             else
             {
-                OnLog?.Invoke($"[MIDI Engine] Failed to open MIDI IN: Error {res}");
+                OnLog?.Invoke($"[MIDI Engine] Failed to open WinMM MIDI IN: Error {res}");
             }
         }
 
@@ -307,16 +402,51 @@ public sealed class NativeMidiEngine : IDisposable
             int res = midiOutOpen(out _hMidiOut, selectedOut, nint.Zero, nint.Zero, 0);
             if (res == 0)
             {
-                OnLog?.Invoke($"[MIDI Engine] MIDI OUT opened on device {selectedOut}.");
+                OnLog?.Invoke($"[MIDI Engine] WinMM MIDI OUT opened on device {selectedOut}.");
             }
             else
             {
-                OnLog?.Invoke($"[MIDI Engine] Failed to open MIDI OUT: Error {res}");
+                OnLog?.Invoke($"[MIDI Engine] Failed to open WinMM MIDI OUT: Error {res}");
             }
         }
 
         OnDeviceConnected?.Invoke(ConnectedDeviceName);
         return IsInOpen || IsOutOpen;
+    }
+
+    private void OnUwpMidiInMessageReceived(MidiInPort sender, MidiMessageReceivedEventArgs args)
+    {
+        var rawData = args.Message.RawData;
+        if (rawData == null || rawData.Length == 0) return;
+
+        using var reader = DataReader.FromBuffer(rawData);
+        byte[] bytes = new byte[rawData.Length];
+        reader.ReadBytes(bytes);
+
+        byte status = bytes[0];
+        // Filter system realtime messages (Clock 0xF8, Active Sensing 0xFE)
+        if (status >= 0xF8) return;
+
+        byte data1 = bytes.Length > 1 ? bytes[1] : (byte)0;
+        byte data2 = bytes.Length > 2 ? bytes[2] : (byte)0;
+
+        long timestampUs = _stopwatch.ElapsedTicks * 1_000_000L / Stopwatch.Frequency;
+        var msg = new MidiRawMessage(status, data1, data2, timestampUs);
+
+        OnMessageReceived?.Invoke(in msg);
+
+        if (msg.IsNoteOn)
+        {
+            OnNoteOn?.Invoke(msg.Channel, msg.Data1, msg.Data2);
+        }
+        else if (msg.IsNoteOff)
+        {
+            OnNoteOff?.Invoke(msg.Channel, msg.Data1, msg.Data2);
+        }
+        else if (msg.IsControlChange)
+        {
+            OnControlChange?.Invoke(msg.Channel, msg.Data1, msg.Data2);
+        }
     }
 
     /// <summary>
@@ -360,10 +490,18 @@ public sealed class NativeMidiEngine : IDisposable
     /// </summary>
     public void SendShortMessage(byte status, byte data1, byte data2)
     {
-        if (_hMidiOut == nint.Zero) return;
+        if (_hMidiOut != nint.Zero)
+        {
+            uint msg = (uint)(status | (data1 << 8) | (data2 << 16));
+            midiOutShortMsg(_hMidiOut, msg);
+        }
 
-        uint msg = (uint)(status | (data1 << 8) | (data2 << 16));
-        midiOutShortMsg(_hMidiOut, msg);
+        if (_uwpMidiOut != null)
+        {
+            var writer = new DataWriter();
+            writer.WriteBytes(new byte[] { status, data1, data2 });
+            _uwpMidiOut.SendBuffer(writer.DetachBuffer());
+        }
     }
 
     /// <summary>
@@ -371,10 +509,18 @@ public sealed class NativeMidiEngine : IDisposable
     /// </summary>
     public void SendShortMessage(byte status, byte data1)
     {
-        if (_hMidiOut == nint.Zero) return;
+        if (_hMidiOut != nint.Zero)
+        {
+            uint msg = (uint)(status | (data1 << 8));
+            midiOutShortMsg(_hMidiOut, msg);
+        }
 
-        uint msg = (uint)(status | (data1 << 8));
-        midiOutShortMsg(_hMidiOut, msg);
+        if (_uwpMidiOut != null)
+        {
+            var writer = new DataWriter();
+            writer.WriteBytes(new byte[] { status, data1 });
+            _uwpMidiOut.SendBuffer(writer.DetachBuffer());
+        }
     }
 
     /// <summary>
@@ -479,7 +625,7 @@ public sealed class NativeMidiEngine : IDisposable
             {
                 if (_sysExQueue.TryTake(out byte[]? packet, 50, _cts.Token))
                 {
-                    if (packet != null && _hMidiOut != nint.Zero)
+                    if (packet != null && (_hMidiOut != nint.Zero || _uwpMidiOut != null))
                     {
                         SendRawSysEx(packet);
                     }
@@ -501,6 +647,13 @@ public sealed class NativeMidiEngine : IDisposable
 
     private unsafe void SendRawSysEx(byte[] data)
     {
+        if (_uwpMidiOut != null)
+        {
+            var writer = new DataWriter();
+            writer.WriteBytes(data);
+            _uwpMidiOut.SendBuffer(writer.DetachBuffer());
+        }
+
         if (_hMidiOut == nint.Zero) return;
 
         nint dataPtr = Marshal.AllocHGlobal(data.Length);
@@ -541,7 +694,7 @@ public sealed class NativeMidiEngine : IDisposable
     {
         OnLog?.Invoke("[PANIC CIRCUIT TRIGGERED] Silencing all 16 MIDI channels immediately.");
 
-        if (_hMidiOut != nint.Zero)
+        if (_hMidiOut != nint.Zero || _uwpMidiOut != null)
         {
             for (byte ch = 0; ch < MidiConstants.TotalChannels; ch++)
             {
@@ -563,13 +716,37 @@ public sealed class NativeMidiEngine : IDisposable
                 }
             }
 
-            // Driver-level reset
-            midiOutReset(_hMidiOut);
+            // Driver-level reset for WinMM
+            if (_hMidiOut != nint.Zero)
+            {
+                midiOutReset(_hMidiOut);
+            }
         }
     }
 
     public void Close()
     {
+        if (_uwpMidiIn != null)
+        {
+            try
+            {
+                _uwpMidiIn.MessageReceived -= OnUwpMidiInMessageReceived;
+                _uwpMidiIn.Dispose();
+            }
+            catch { }
+            _uwpMidiIn = null;
+        }
+
+        if (_uwpMidiOut != null)
+        {
+            try
+            {
+                _uwpMidiOut.Dispose();
+            }
+            catch { }
+            _uwpMidiOut = null;
+        }
+
         if (_hMidiIn != nint.Zero)
         {
             midiInStop(_hMidiIn);

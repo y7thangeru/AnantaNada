@@ -251,3 +251,27 @@ This file logs all file creations, modifications, deletions, refactorings, and f
 ### [2026-10-28 17:45:25 +07:00] - [NEW] `launch_anantanada.bat` & `scripts/create_desktop_shortcut.ps1`
 - **Action**: Created launcher script and automated Windows Desktop shortcut creation utility.
 - **Reason**: Delivers one-click launch experience on the user's desktop (`C:\Users\y7tha\Desktop\AnantaNada - Roland GoKeys 3.lnk`).
+
+### [2026-10-28 18:03:00 +07:00] - [MODIFY] `AnantaNada.csproj`
+- **Action**: Upgraded target framework from standard `net8.0` to `net8.0-windows10.0.19041.0`.
+- **Reason**: Grants native access to Windows 10/11 WinRT APIs (`Windows.Devices.Midi`, `Windows.Devices.Enumeration`, `Windows.Storage.Streams`) required for Bluetooth LE (BLE) MIDI GATT communication without third-party loopback utilities.
+
+### [2026-10-28 18:03:30 +07:00] - [MODIFY] `src/Core/Midi/NativeMidiEngine.cs`
+- **Action**: Integrated modern Windows BLE MIDI stack via `MidiInPort.FromIdAsync` and `MidiOutPort.FromIdAsync`, implemented `OnUwpMidiInMessageReceived` callback, direct byte buffer streaming via `IMidiOutPort.SendBuffer()`, and dual-mode discovery prioritizing BLE MIDI with seamless fallback to classic WinMM.
+- **Reason**: Resolves "GO:KEYS 3 MIDI - Not connected" state in Windows Bluetooth by actively hooking the GATT peripheral ports (`GO:KEYS 3 MIDI (Bluetooth MIDI IN)` and `(Bluetooth MIDI OUT)`).
+
+### [2026-10-28 18:03:45 +07:00] - [MODIFY] `src/Network/StageHubServer.cs`
+- **Action**: Implemented `BroadcastDeviceStatusAsync(string deviceName, bool isConnected)` transmitting live hardware status and device names over WebSocket.
+- **Reason**: Synchronizes real-time hardware link status with the Godot stage HUD and remote mobile browser controllers.
+
+### [2026-10-28 18:04:00 +07:00] - [MODIFY] `src/Program.cs`
+- **Action**: Wired MIDI engine `OnDeviceConnected` and `OnDeviceDisconnected` events to `StageHubServer.BroadcastDeviceStatusAsync`, dispatched connection status to newly connected clients on `OnClientCountChanged`, and added `--scan` CLI utility for diagnostic enumeration.
+- **Reason**: Guarantees instant synchronization between the C# Bluetooth MIDI service and the Godot GUI upon launch.
+
+### [2026-10-28 18:04:15 +07:00] - [MODIFY] `src/UI/MainStageController.gd`
+- **Action**: Added `DEVICE_STATUS` WebSocket message parser dynamically updating `lbl_device_status` with the connected keyboard's exact hardware name and neon cyan active indicator.
+- **Reason**: Displays live diegetic connection confirmation on the cockpit HUD when paired over Bluetooth LE MIDI.
+
+### [2026-10-28 18:04:30 +07:00] - [MODIFY] `launch_anantanada.bat`
+- **Action**: Updated binary path to `bin\Debug\net8.0-windows10.0.19041.0\AnantaNada.exe`.
+- **Reason**: Ensures desktop launcher executes the latest build equipped with the Windows BLE MIDI subsystem.

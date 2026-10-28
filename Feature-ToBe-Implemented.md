@@ -27,6 +27,8 @@
 - [x] Strict Volatile Patch Changing: Bank Select MSB (`CC 00`), LSB (`CC 32`), Program Change (`PC`) with zero EEPROM/Flash writes
 - [x] Rate-limited FIFO SysEx pipeline with 20ms debounce delay
 - [x] Persistent Hardware-Safe Global Panic Circuit (CC 120, CC 123, CC 64 across all 16 channels)
+- [x] Direct Modern Windows Runtime (WinRT / UWP) Bluetooth LE (BLE) MIDI connectivity (`Windows.Devices.Midi`)
+- [x] Auto-detection and seamless dual-engine fallback between Bluetooth LE MIDI and classic WinMM USB drivers
 - [ ] Auto-reconnect worker thread for Bluetooth LE MIDI & USB unplug detection
 
 ## 2. Retroactive Capture Buffer ("Never-Lost Melody") (`RetroactiveBuffer.cs`)
