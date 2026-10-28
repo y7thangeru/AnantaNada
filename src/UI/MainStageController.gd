@@ -19,14 +19,21 @@ const HIGHEST_NOTE: int = 96 # C7
 @onready var btn_filter_all: Button = $HUD/CenterSplit/SetlistDeck/MissionContainer/FilterRow/BtnFilterAll
 @onready var btn_filter_indo: Button = $HUD/CenterSplit/SetlistDeck/MissionContainer/FilterRow/BtnFilterIndo
 @onready var btn_filter_western: Button = $HUD/CenterSplit/SetlistDeck/MissionContainer/FilterRow/BtnFilterWestern
+@onready var active_card: PanelContainer = $HUD/CenterSplit/SetlistDeck/MissionContainer/ActiveCard
 @onready var lbl_active_mission: Label = $HUD/CenterSplit/SetlistDeck/MissionContainer/ActiveCard/MissionName
 
 @onready var next_card_1: PanelContainer = $HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard1
 @onready var next_card_2: PanelContainer = $HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard2
 @onready var next_card_3: PanelContainer = $HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard3
+@onready var next_card_4: PanelContainer = $HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard4
+@onready var next_card_5: PanelContainer = $HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard5
+@onready var next_card_6: PanelContainer = $HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard6
 @onready var lbl_card_1: Label = $HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard1/Label
 @onready var lbl_card_2: Label = $HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard2/Label
 @onready var lbl_card_3: Label = $HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard3/Label
+@onready var lbl_card_4: Label = $HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard4/Label
+@onready var lbl_card_5: Label = $HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard5/Label
+@onready var lbl_card_6: Label = $HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard6/Label
 
 @onready var btn_prev_page: Button = $HUD/CenterSplit/SetlistDeck/MissionContainer/PaginationRow/BtnPrevPage
 @onready var btn_next_page: Button = $HUD/CenterSplit/SetlistDeck/MissionContainer/PaginationRow/BtnNextPage
@@ -51,6 +58,10 @@ const HIGHEST_NOTE: int = 96 # C7
 @onready var lbl_zone_a: Label = $HUD/BottomKeybed/ZoneRow/ZoneALabel
 @onready var lbl_split_line: Label = $HUD/BottomKeybed/ZoneRow/SplitLine
 @onready var lbl_zone_b: Label = $HUD/BottomKeybed/ZoneRow/ZoneBLabel
+
+const CARDS_PER_PAGE: int = 6
+var cards: Array[PanelContainer] = []
+var card_labels: Array[Label] = []
 
 # State
 var ws: WebSocketPeer = WebSocketPeer.new()
@@ -115,9 +126,22 @@ func _ready() -> void:
 	btn_prev_page.pressed.connect(_on_prev_page)
 	btn_next_page.pressed.connect(_on_next_page)
 
-	next_card_1.gui_input.connect(func(event): _on_card_click(event, 0))
-	next_card_2.gui_input.connect(func(event): _on_card_click(event, 1))
-	next_card_3.gui_input.connect(func(event): _on_card_click(event, 2))
+	active_card.gui_input.connect(func(event):
+		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+			_select_song(current_song_index)
+	)
+	active_card.mouse_entered.connect(func(): active_card.modulate = Color(1.2, 1.2, 1.1))
+	active_card.mouse_exited.connect(func(): active_card.modulate = Color.WHITE)
+
+	cards = [next_card_1, next_card_2, next_card_3, next_card_4, next_card_5, next_card_6]
+	card_labels = [lbl_card_1, lbl_card_2, lbl_card_3, lbl_card_4, lbl_card_5, lbl_card_6]
+
+	for i in range(cards.size()):
+		var slot = i
+		var card = cards[i]
+		card.gui_input.connect(func(event): _on_card_click(event, slot))
+		card.mouse_entered.connect(func(): card.modulate = Color(0.4, 1.3, 1.2))
+		card.mouse_exited.connect(func(): card.modulate = Color.WHITE)
 
 	# 3. Load 100 Repertoire JSON
 	_load_repertoire_json()
@@ -180,21 +204,20 @@ func _on_prev_page() -> void:
 		_update_cards_ui()
 
 func _on_next_page() -> void:
-	var max_page = max(0, int(ceil(displayed_songs.size() / 3.0)) - 1)
+	var max_page = max(0, int(ceil(displayed_songs.size() / float(CARDS_PER_PAGE))) - 1)
 	if current_page < max_page:
 		current_page += 1
 		_update_cards_ui()
 
 func _update_cards_ui() -> void:
 	var total = displayed_songs.size()
-	var max_page = max(1, int(ceil(total / 3.0)))
+	var max_page = max(1, int(ceil(total / float(CARDS_PER_PAGE))))
 	current_page = clamp(current_page, 0, max_page - 1)
 	lbl_page_indicator.text = "PAGE %d/%d (%d)" % [current_page + 1, max_page, total]
 
-	var start = current_page * 3
-	_set_card_slot(next_card_1, lbl_card_1, start)
-	_set_card_slot(next_card_2, lbl_card_2, start + 1)
-	_set_card_slot(next_card_3, lbl_card_3, start + 2)
+	var start = current_page * CARDS_PER_PAGE
+	for i in range(cards.size()):
+		_set_card_slot(cards[i], card_labels[i], start + i)
 
 func _set_card_slot(card: PanelContainer, label: Label, idx: int) -> void:
 	if idx < displayed_songs.size():
@@ -206,7 +229,7 @@ func _set_card_slot(card: PanelContainer, label: Label, idx: int) -> void:
 
 func _on_card_click(event: InputEvent, slot_offset: int) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		var target_idx = (current_page * 3) + slot_offset
+		var target_idx = (current_page * CARDS_PER_PAGE) + slot_offset
 		if target_idx < displayed_songs.size():
 			var song = displayed_songs[target_idx]
 			var full_idx = all_songs.find(song)
@@ -288,8 +311,11 @@ func _on_panic_pressed() -> void:
 
 func _on_never_lost_pressed() -> void:
 	btn_never_lost.modulate = Color(1.0, 0.85, 0.2)
-	lbl_timing_verdict.text = "CAPTURED: RECENT 5-MIN SESSION EXPORTED (.MID)"
-	lbl_timing_verdict.modulate = Color(0.0, 0.96, 0.83)
+	lbl_timing_verdict.text = "CAPTURING 5-MIN SESSION TO MIDI..."
+	lbl_timing_verdict.modulate = Color(1.0, 0.85, 0.2)
+	if is_ws_connected:
+		var cmd = {"command": "TRIGGER_EXPORT_MIDI"}
+		ws.send_text(JSON.stringify(cmd))
 
 func _connect_ws() -> void:
 	ws.close()
@@ -382,6 +408,13 @@ func _handle_ws_packet(json_text: String) -> void:
 			lbl_next_chord.text = "NEXT CHORD -> %s" % str(data.get("nextChord", "G"))
 		elif type == "PANIC":
 			_on_panic_pressed()
+		elif type == "CAPTURE_SAVED":
+			var fn = str(parsed.get("filename", "session.mid"))
+			var bars = int(parsed.get("bars", 0))
+			var evts = int(parsed.get("events", 0))
+			lbl_timing_verdict.text = ">> CAPTURED: %s (%d bars, %d notes)" % [fn, bars, evts]
+			lbl_timing_verdict.modulate = Color(0.0, 0.96, 0.83)
+			btn_never_lost.modulate = Color(0.0, 0.96, 0.83)
 		elif type == "DEVICE_STATUS":
 			var d_name = str(parsed.get("deviceName", "ROLAND GO:KEYS 3"))
 			var conn = bool(parsed.get("connected", false))

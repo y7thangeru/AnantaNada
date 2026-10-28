@@ -15,7 +15,7 @@ namespace AnantaNada.Network;
 /// </summary>
 public sealed class StageHubServer : IDisposable
 {
-    private readonly HttpListener _listener = new();
+    private HttpListener? _listener;
     private readonly ConcurrentDictionary<Guid, WebSocket> _clients = new();
     private readonly string _webRootDirectory;
     private readonly int _port;
@@ -28,6 +28,7 @@ public sealed class StageHubServer : IDisposable
     // Events triggered by incoming remote commands
     public event Action<TriggerSetlistItemPayload>? OnSetlistItemTriggered;
     public event Action? OnPanicTriggered;
+    public event Action? OnExportMidiTriggered;
     public event Action<string>? OnLog;
     public event Action<int>? OnClientCountChanged;
 
@@ -53,6 +54,7 @@ public sealed class StageHubServer : IDisposable
 
     /// <summary>
     /// Starts the embedded HTTP and WebSocket listener.
+    /// Safely binds to loopback (127.0.0.1 and localhost) without requiring Windows Admin URLACL elevation.
     /// </summary>
     public bool Start()
     {
@@ -60,9 +62,24 @@ public sealed class StageHubServer : IDisposable
 
         try
         {
-            // Listen on all network interfaces
-            _listener.Prefixes.Clear();
-            _listener.Prefixes.Add($"http://*:{_port}/");
+            _listener = new HttpListener();
+            _listener.Prefixes.Add($"http://127.0.0.1:{_port}/");
+            _listener.Prefixes.Add($"http://localhost:{_port}/");
+
+            // Optionally attempt binding to LAN IP for mobile browser remotes (fails safely if non-admin)
+            var ips = GetLocalIpAddresses();
+            foreach (var ip in ips)
+            {
+                if (ip != "127.0.0.1")
+                {
+                    try
+                    {
+                        _listener.Prefixes.Add($"http://{ip}:{_port}/");
+                    }
+                    catch { }
+                }
+            }
+
             _listener.Start();
 
             _isRunning = true;
@@ -73,17 +90,18 @@ public sealed class StageHubServer : IDisposable
             };
             _serverThread.Start();
 
-            OnLog?.Invoke($"[StageHub Server] Online on port {_port}. WebRoot: {_webRootDirectory}");
+            OnLog?.Invoke($"[StageHub Server] Online on port {_port} (127.0.0.1 & localhost active). WebRoot: {_webRootDirectory}");
             return true;
         }
         catch (HttpListenerException hlex)
         {
-            // On Windows, listening on '*' without admin URLACL might require localhost prefix fallback
+            // If binding with LAN IP threw access denied, bind strictly to loopback
             try
             {
-                _listener.Prefixes.Clear();
-                _listener.Prefixes.Add($"http://localhost:{_port}/");
+                try { _listener?.Close(); } catch { }
+                _listener = new HttpListener();
                 _listener.Prefixes.Add($"http://127.0.0.1:{_port}/");
+                _listener.Prefixes.Add($"http://localhost:{_port}/");
                 _listener.Start();
 
                 _isRunning = true;
@@ -94,7 +112,7 @@ public sealed class StageHubServer : IDisposable
                 };
                 _serverThread.Start();
 
-                OnLog?.Invoke($"[StageHub Server] Online on localhost & 127.0.0.1:{_port} (Loopback mode). WebRoot: {_webRootDirectory}");
+                OnLog?.Invoke($"[StageHub Server] Online on 127.0.0.1:{_port} (Loopback Safe Mode). WebRoot: {_webRootDirectory}");
                 return true;
             }
             catch (Exception ex)
@@ -148,6 +166,7 @@ public sealed class StageHubServer : IDisposable
         {
             try
             {
+                if (_listener == null || !_isRunning) break;
                 var context = await _listener.GetContextAsync();
 
                 if (context.Request.IsWebSocketRequest)
@@ -247,6 +266,11 @@ public sealed class StageHubServer : IDisposable
                         OnPanicTriggered?.Invoke();
                         break;
 
+                    case "TRIGGER_EXPORT_MIDI":
+                        OnLog?.Invoke("[StageHub Remote] Received TRIGGER_EXPORT_MIDI from stage console.");
+                        OnExportMidiTriggered?.Invoke();
+                        break;
+
                     case "TRIGGER_SETLIST_ITEM":
                         if (root.TryGetProperty("payload", out var payloadProp))
                         {
@@ -344,6 +368,12 @@ public sealed class StageHubServer : IDisposable
     public async Task BroadcastDeviceStatusAsync(string deviceName, bool isConnected)
     {
         string json = $"{{\"type\":\"DEVICE_STATUS\",\"deviceName\":\"{deviceName}\",\"connected\":{(isConnected ? "true" : "false")}}}";
+        await BroadcastRawJsonAsync(json);
+    }
+
+    public async Task BroadcastCaptureToastAsync(string filename, int eventsCount, int bars)
+    {
+        string json = $"{{\"type\":\"CAPTURE_SAVED\",\"filename\":\"{filename}\",\"events\":{eventsCount},\"bars\":{bars}}}";
         await BroadcastRawJsonAsync(json);
     }
 
@@ -458,8 +488,8 @@ public sealed class StageHubServer : IDisposable
 
         try
         {
-            _listener.Stop();
-            _listener.Close();
+            _listener?.Stop();
+            _listener?.Close();
         }
         catch { }
 

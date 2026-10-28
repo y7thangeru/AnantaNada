@@ -275,3 +275,19 @@ This file logs all file creations, modifications, deletions, refactorings, and f
 ### [2026-10-28 18:04:30 +07:00] - [MODIFY] `launch_anantanada.bat`
 - **Action**: Updated binary path to `bin\Debug\net8.0-windows10.0.19041.0\AnantaNada.exe`.
 - **Reason**: Ensures desktop launcher executes the latest build equipped with the Windows BLE MIDI subsystem.
+
+### [2026-10-28 18:18:00 +07:00] - [FIX] `src/Network/StageHubServer.cs`
+- **Action**: Fixed `HttpListener` initialization on Windows unprivileged user environments by binding directly to loopback (`http://127.0.0.1:{port}/` and `http://localhost:{port}/`), removing wildcards that trigger `Access is denied` and `Cannot access a disposed object`. Added `OnExportMidiTriggered` event and `BroadcastCaptureToastAsync`.
+- **Reason**: Guarantees WebSocket listener is always armed and reachable by Godot (`ws://127.0.0.1:8080/ws`), restoring live note streaming and setlist dispatch.
+
+### [2026-10-28 18:18:20 +07:00] - [MODIFY] `src/Program.cs`
+- **Action**: Wired `hubServer.OnExportMidiTriggered` to `buffer.ExportToMidi()` and broadcasted toast metadata back to the Godot stage HUD.
+- **Reason**: Connects the UI's `[ 5m CAPTURE ARMED ]` button directly to physical disk SMF `.mid` generation.
+
+### [2026-10-28 18:18:45 +07:00] - [REFACTOR] `scenes/MainStageView.tscn`
+- **Action**: Resolved large empty layout gap in `SetlistDeck` by expanding visible slots from 3 cards to 6 full-sized 48px cards (`NextCard1` through `NextCard6`), enabled `mouse_filter = 0` (STOP) with `mouse_default_cursor_shape = 2` (pointing hand) on cards, and set `mouse_filter = 2` (IGNORE) on inner labels.
+- **Reason**: Eliminates dead space on 1080p displays and ensures clicking anywhere on a song card triggers mission selection and hardware tone dispatch.
+
+### [2026-10-28 18:19:10 +07:00] - [MODIFY] `src/UI/MainStageController.gd`
+- **Action**: Upgraded pagination to 6 cards per page (`CARDS_PER_PAGE = 6`), added interactive hover cyan neon highlighting on all song cards and active card, hooked card click signals, added `TRIGGER_EXPORT_MIDI` WebSocket dispatch, and handled `CAPTURE_SAVED` toast updates.
+- **Reason**: Delivers tactile, game-grade feedback when navigating the setlist and selecting songs.

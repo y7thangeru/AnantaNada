@@ -266,11 +266,14 @@ theme_override_font_sizes/font_size = 12
 text = "// ACTIVE MISSION"
 
 [node name="ActiveCard" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
-custom_minimum_size = Vector2(0, 60)
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
+mouse_filter = 0
+mouse_default_cursor_shape = 2
 
 [node name="MissionName" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/ActiveCard"]
 layout_mode = 2
+mouse_filter = 2
 theme_override_font_sizes/font_size = 15
 text = "> 01. DAN - SHEILA ON 7"
 horizontal_alignment = 1
@@ -283,33 +286,81 @@ theme_override_font_sizes/font_size = 12
 text = "// NEXT QUEUED MISSIONS"
 
 [node name="NextCard1" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
-custom_minimum_size = Vector2(0, 46)
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
+mouse_filter = 0
+mouse_default_cursor_shape = 2
 
 [node name="Label" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard1"]
 layout_mode = 2
+mouse_filter = 2
 theme_override_font_sizes/font_size = 13
 text = "    02. KISAH KLASIK [A // 114 BPM]"
 vertical_alignment = 1
 
 [node name="NextCard2" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
-custom_minimum_size = Vector2(0, 46)
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
+mouse_filter = 0
+mouse_default_cursor_shape = 2
 
 [node name="Label" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard2"]
 layout_mode = 2
+mouse_filter = 2
 theme_override_font_sizes/font_size = 13
 text = "    03. MELOMPAT TINGGI [D // 136 BPM]"
 vertical_alignment = 1
 
 [node name="NextCard3" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
-custom_minimum_size = Vector2(0, 46)
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
+mouse_filter = 0
+mouse_default_cursor_shape = 2
 
 [node name="Label" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard3"]
 layout_mode = 2
+mouse_filter = 2
 theme_override_font_sizes/font_size = 13
 text = "    04. SAHABAT SEJATI [C // 120 BPM]"
+vertical_alignment = 1
+
+[node name="NextCard4" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+mouse_filter = 0
+mouse_default_cursor_shape = 2
+
+[node name="Label" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard4"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 13
+text = "    05. SHE'S THE ONE [Bb // 84 BPM]"
+vertical_alignment = 1
+
+[node name="NextCard5" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+mouse_filter = 0
+mouse_default_cursor_shape = 2
+
+[node name="Label" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard5"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 13
+text = "    06. KANGEN [D // 78 BPM]"
+vertical_alignment = 1
+
+[node name="NextCard6" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+mouse_filter = 0
+mouse_default_cursor_shape = 2
+
+[node name="Label" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard6"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 13
+text = "    07. KAMU KAMULAH SURGAKU [G // 128 BPM]"
 vertical_alignment = 1
 
 [node name="PaginationRow" type="HBoxContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]

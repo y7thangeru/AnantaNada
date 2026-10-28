@@ -134,6 +134,22 @@ public static class Program
             _ = hubServer.BroadcastPanicAsync();
         };
 
+        hubServer.OnExportMidiTriggered += () =>
+        {
+            string stamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            string outDir = Path.Combine(Directory.GetCurrentDirectory(), "captures");
+            Directory.CreateDirectory(outDir);
+            string outPath = Path.Combine(outDir, $"session_{stamp}.mid");
+            bool ok = buffer.ExportToMidi(outPath, out int count, out int bars);
+            if (ok)
+            {
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine($"\n>> [CAPTURE EXPORTED] {count} events ({bars} bars) -> {outPath}");
+                Console.ResetColor();
+                _ = hubServer.BroadcastCaptureToastAsync($"session_{stamp}.mid", count, bars);
+            }
+        };
+
         // Connect MIDI (Scan for Go:Keys or any USB/Bluetooth MIDI hardware)
         Console.WriteLine("[1/3] Scanning and connecting to MIDI Devices...");
         bool midiConnected = midiEngine.Connect("Go:Keys");
