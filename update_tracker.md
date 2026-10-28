@@ -390,3 +390,21 @@ This file logs all file creations, modifications, deletions, refactorings, and f
   5. Built `scripts/capture_web_screens.py` capturing pixel-perfect screenshots of Web Remote (1280x820) and Android Companion (430x932) via Chrome headless, and updated `scripts/screenshot_grabber.gd` to render full 1920x1080 Godot stage console (`captures/screenshot_godot_stage.png`).
   6. Updated `UI_UX_DESIGN_GUIDE.md`, `Feature-ToBe-Implemented.md`, `README.md`, and `Report-To-GeminiProject.md`.
 - **Reason**: Responds directly to user feedback requesting an interactive, sweet, and charming RPG game interface utilizing sprites optimally.
+
+### [2026-10-28 23:10:00 +07:00] - [FIX] Recipe Card Layout, Container Margins & Spell Card Alignment (Desktop, Web, Android)
+- **Action**: Resolved text overflow and container collision issues identified during visual review:
+  1. `assets/rpg_ui/generate_rpg_ui_suite.py`:
+     - Removed baked static 48x48 square rectangle from `card_ac_recipe_item.png` so the sprite serves as a clean, flexible parchment card base.
+     - Resized `card_rpg_spell_harmony.png` from 320x120 to 340x136 to provide vertical breathing space for chord labels and transpose tags.
+     - Regenerated sprites and synchronized across `assets/ui_sprites/png/` and `web/assets/ui_sprites/png/`.
+  2. `scenes/MainStageView.tscn` & `src/UI/MainStageController.gd`:
+     - Wrapped `SetlistDeck` controls inside `NotebookMargin` (`MarginContainer` with 26px left / 34px right insets) ensuring `SearchBox` and `FilterRow` stay strictly within the journal page.
+     - Expanded `CurrentChordBox` to 136px height with `ChordMargin` and 48pt font, ensuring `TransposePill` sits comfortably above the lower runic border.
+     - Restructured song cards (`ActiveCard`, `NextCard1..6`) into strict 2-column horizontal rows: left 28x28 `Badge` box (star pin or song number) and right `Col` (bold title & meta with `text_overrun_behavior = 3`).
+  3. `web/index.html` & `web/style.css`:
+     - Overhauled `.mission-card` into flex-row layout with `min-height: 52px`, `.card-badge` (34x34px rounded cream/gold badge), and `.card-details` with ellipsis overflow.
+     - Tuned `.chord-hero-box` and `.chord-giant` to 48px with pill-styled `.transpose-tag`.
+  4. Tri-Platform Screenshot Verification:
+     - Re-captured `captures/screenshot_godot_stage.png` (1920x1080), `captures/screenshot_web_remote.png` (1280x820), and `captures/screenshot_android_companion.png` (430x932).
+     - Verified zero text overlapping, perfectly aligned badge boxes, and full containment within decorative frames.
+- **Reason**: Directly addresses user visual feedback regarding text spilling out of card boxes, setlist header width mismatch, and transpose label border clipping.

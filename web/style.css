@@ -236,17 +236,21 @@ body.cockpit-body {
 
 /* Animal Crossing DIY Recipe Cards */
 .mission-card {
-  background: #fffcf5 url('assets/ui_sprites/png/card_ac_recipe_item.png') center center / 100% 100% no-repeat;
-  border: 1px solid #d4c2a5;
-  border-radius: 8px;
+  background: #fffdf5 url('assets/ui_sprites/png/card_ac_recipe_item.png') center center / 100% 100% no-repeat;
+  border: 1px solid #d8c8af;
+  border-radius: 10px;
   padding: 8px 12px;
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
   text-align: left;
   cursor: pointer;
   transition: all 0.12s ease;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .mission-card:active {
@@ -257,44 +261,62 @@ body.cockpit-body {
   background: #fff8e8 url('assets/ui_sprites/png/card_ac_recipe_item.png') center center / 100% 100% no-repeat;
   border: 2px solid var(--text-gold);
   box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
 }
 
-.card-star-badge {
+.card-badge {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  max-width: 34px;
+  border-radius: 8px;
+  background: #f4ecdc;
+  border: 1.5px solid #d4c2a5;
+  color: #b45309;
+  font-weight: 900;
+  font-size: 13px;
   display: flex;
   align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.card-badge.star-badge {
+  background: #fef3c7;
+  border-color: #f59e0b;
 }
 
 .star-pin-img {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   object-fit: contain;
 }
 
 .card-details {
   display: flex;
   flex-direction: column;
-  gap: 1px;
-}
-
-.mission-card .mission-num {
-  font-size: 11px;
-  font-weight: 900;
-  color: #b45309;
+  gap: 2px;
+  overflow: hidden;
+  flex: 1;
+  min-width: 0;
 }
 
 .mission-card .mission-title {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 900;
-  color: #1e1b18;
+  color: #3d2c1d;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.3px;
 }
 
 .mission-card .mission-patch {
   font-size: 11px;
-  color: #786450;
+  color: #7c6853;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .next-missions-list {
@@ -499,25 +521,35 @@ body.cockpit-body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   background: #181024 url('assets/ui_sprites/png/card_rpg_spell_harmony.png') center center / 100% 100% no-repeat;
   border: 2px solid #8b5cf6;
-  border-radius: 8px;
-  padding: 14px;
+  border-radius: 10px;
+  padding: 12px 14px;
+  min-height: 128px;
+  box-sizing: border-box;
   box-shadow: 0 4px 16px rgba(139, 92, 246, 0.35);
 }
 
 .chord-giant {
-  font-size: 58px;
+  font-size: 48px;
+  line-height: 1.1;
   font-weight: 900;
   color: #fffaf0;
   text-shadow: 0 0 16px rgba(245, 158, 11, 0.6), 2px 2px 4px #000;
   font-family: "Impact", sans-serif;
+  margin-bottom: 4px;
 }
 
 .transpose-tag {
   font-size: 11px;
   font-weight: 800;
   color: #fbbf24;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 2px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  letter-spacing: 0.5px;
 }
 
 .taiko-drum-widget {

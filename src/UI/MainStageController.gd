@@ -19,29 +19,24 @@ const HIGHEST_NOTE: int = 96 # C7
 @onready var zen_vignette: TextureRect = $ZenVignetteOverlay
 
 @onready var setlist_deck: PanelContainer = $HUD/CenterSplit/SetlistDeck
-@onready var search_box: LineEdit = $HUD/CenterSplit/SetlistDeck/MissionContainer/SearchBox
-@onready var btn_filter_all: Button = $HUD/CenterSplit/SetlistDeck/MissionContainer/FilterRow/BtnFilterAll
-@onready var btn_filter_indo: Button = $HUD/CenterSplit/SetlistDeck/MissionContainer/FilterRow/BtnFilterIndo
-@onready var btn_filter_western: Button = $HUD/CenterSplit/SetlistDeck/MissionContainer/FilterRow/BtnFilterWestern
-@onready var active_card: PanelContainer = $HUD/CenterSplit/SetlistDeck/MissionContainer/ActiveCard
-@onready var lbl_active_mission: Label = $HUD/CenterSplit/SetlistDeck/MissionContainer/ActiveCard/MissionName
+@onready var search_box: LineEdit = $HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/SearchBox
+@onready var btn_filter_all: Button = $HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/FilterRow/BtnFilterAll
+@onready var btn_filter_indo: Button = $HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/FilterRow/BtnFilterIndo
+@onready var btn_filter_western: Button = $HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/FilterRow/BtnFilterWestern
+@onready var active_card: PanelContainer = $HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/ActiveCard
+@onready var lbl_active_mission: Label = $HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/ActiveCard/Pad/Row/Col/MissionName
+@onready var lbl_active_meta: Label = $HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/ActiveCard/Pad/Row/Col/MissionMeta
 
-@onready var next_card_1: PanelContainer = $HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard1
-@onready var next_card_2: PanelContainer = $HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard2
-@onready var next_card_3: PanelContainer = $HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard3
-@onready var next_card_4: PanelContainer = $HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard4
-@onready var next_card_5: PanelContainer = $HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard5
-@onready var next_card_6: PanelContainer = $HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard6
-@onready var lbl_card_1: Label = $HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard1/Label
-@onready var lbl_card_2: Label = $HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard2/Label
-@onready var lbl_card_3: Label = $HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard3/Label
-@onready var lbl_card_4: Label = $HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard4/Label
-@onready var lbl_card_5: Label = $HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard5/Label
-@onready var lbl_card_6: Label = $HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard6/Label
+@onready var next_card_1: PanelContainer = $HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard1
+@onready var next_card_2: PanelContainer = $HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard2
+@onready var next_card_3: PanelContainer = $HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard3
+@onready var next_card_4: PanelContainer = $HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard4
+@onready var next_card_5: PanelContainer = $HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard5
+@onready var next_card_6: PanelContainer = $HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard6
 
-@onready var btn_prev_page: Button = $HUD/CenterSplit/SetlistDeck/MissionContainer/PaginationRow/BtnPrevPage
-@onready var btn_next_page: Button = $HUD/CenterSplit/SetlistDeck/MissionContainer/PaginationRow/BtnNextPage
-@onready var lbl_page_indicator: Label = $HUD/CenterSplit/SetlistDeck/MissionContainer/PaginationRow/PageIndicator
+@onready var btn_prev_page: Button = $HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/PaginationRow/BtnPrevPage
+@onready var btn_next_page: Button = $HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/PaginationRow/BtnNextPage
+@onready var lbl_page_indicator: Label = $HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/PaginationRow/PageIndicator
 
 @onready var minimetro_map: TextureRect = $HUD/CenterSplit/CenterCascade/MiniMetroTransitMap
 @onready var waterfall_rect: ColorRect = $HUD/CenterSplit/CenterCascade/WaterfallRect
@@ -60,8 +55,8 @@ const HIGHEST_NOTE: int = 96 # C7
 
 @onready var chord_hud: VBoxContainer = $HUD/CenterSplit/ChordHud
 @onready var current_chord_box: PanelContainer = $HUD/CenterSplit/ChordHud/CurrentChordBox
-@onready var lbl_current_chord: Label = $HUD/CenterSplit/ChordHud/CurrentChordBox/VBox/ChordLabel
-@onready var lbl_transpose: Label = $HUD/CenterSplit/ChordHud/CurrentChordBox/VBox/TransposePill
+@onready var lbl_current_chord: Label = $HUD/CenterSplit/ChordHud/CurrentChordBox/ChordMargin/VBox/ChordLabel
+@onready var lbl_transpose: Label = $HUD/CenterSplit/ChordHud/CurrentChordBox/ChordMargin/VBox/TransposePill
 @onready var taiko_don_ka: TextureRect = $HUD/CenterSplit/ChordHud/TaikoRow/TaikoDonKa
 @onready var taiko_label: Label = $HUD/CenterSplit/ChordHud/TaikoRow/TaikoLabel
 @onready var next_chord_box: PanelContainer = $HUD/CenterSplit/ChordHud/NextChordBox
@@ -171,7 +166,6 @@ func _ready() -> void:
 	active_card.mouse_exited.connect(func(): active_card.modulate = Color.WHITE)
 
 	cards = [next_card_1, next_card_2, next_card_3, next_card_4, next_card_5, next_card_6]
-	card_labels = [lbl_card_1, lbl_card_2, lbl_card_3, lbl_card_4, lbl_card_5, lbl_card_6]
 
 	for i in range(cards.size()):
 		var slot = i
@@ -254,13 +248,21 @@ func _update_cards_ui() -> void:
 
 	var start = current_page * CARDS_PER_PAGE
 	for i in range(cards.size()):
-		_set_card_slot(cards[i], card_labels[i], start + i)
+		_set_card_slot(cards[i], start + i)
 
-func _set_card_slot(card: PanelContainer, label: Label, idx: int) -> void:
+func _set_card_slot(card: PanelContainer, idx: int) -> void:
 	if idx < displayed_songs.size():
 		card.visible = true
 		var s = displayed_songs[idx]
-		label.text = "  %s. %s [%s // %d BPM]" % [str(s.get("id", idx + 1)), str(s.get("title", "")), str(s.get("keySignature", "C")), int(s.get("bpm", 120))]
+		var badge_lbl: Label = card.get_node_or_null("Pad/Row/Badge/Num")
+		var title_lbl: Label = card.get_node_or_null("Pad/Row/Col/Title")
+		var meta_lbl: Label = card.get_node_or_null("Pad/Row/Col/Meta")
+		if badge_lbl:
+			badge_lbl.text = "%02d" % (idx + 1)
+		if title_lbl:
+			title_lbl.text = str(s.get("title", "")).to_upper()
+		if meta_lbl:
+			meta_lbl.text = "%s • %s • %d BPM" % [str(s.get("artist", "")), str(s.get("keySignature", "C")), int(s.get("bpm", 120))]
 	else:
 		card.visible = false
 
@@ -284,7 +286,9 @@ func _select_song(idx: int) -> void:
 	current_bar = 1
 	current_beat = 1
 
-	lbl_active_mission.text = "> %s - %s" % [str(song.get("title", "")).to_upper(), str(song.get("artist", "")).to_upper()]
+	lbl_active_mission.text = str(song.get("title", "")).to_upper()
+	if lbl_active_meta:
+		lbl_active_meta.text = "%s • %s • %d BPM" % [str(song.get("artist", "")), str(song.get("keySignature", "C")), current_bpm]
 	lbl_bpm_beat.text = "[BPM: %d /// %s] [BEAT: 01/4]" % [current_bpm, str(song.get("timeSignature", "4/4"))]
 	var tr = int(song.get("transpose", 0))
 	lbl_transpose.text = "TRANSPOSE: [ %s%d SEMITONES ]" % ["+" if tr >= 0 else "", tr]

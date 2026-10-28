@@ -141,3 +141,8 @@
   - [x] Desktop Stage View: `captures/screenshot_godot_stage.png` (1920x1080)
   - [x] Web Remote: `captures/screenshot_web_remote.png` (1280x820)
   - [x] Android Companion: `captures/screenshot_android_companion.png` (430x932)
+- [x] Precision container alignment & text collision resolution:
+  - [x] Recipe card flexible layout without baked-in square outlines (`assets/rpg_ui/generate_rpg_ui_suite.py`)
+  - [x] Dedicated square number badge box (`01`..`06` or Star Pin) on left, text details with ellipsis on right across Desktop, Web, and Android
+  - [x] Journal notebook margin container wrapping search and filter controls strictly inside parchment margins in Godot
+  - [x] Expanded spell card dimensions (340x136) & pill-styled transpose tag eliminating gold border collision

@@ -179,11 +179,9 @@ def generate_ac_cards():
     # Warm butter cream background
     draw.rounded_rectangle([2 * s, 2 * s, w - 2 * s, h - 2 * s], radius=10 * s, fill=(255, 250, 230, 255), outline=(228, 214, 176, 255), width=2 * s)
     # Acorn / Dot watermark pattern
-    for x in range(16 * s, w - 20 * s, 30 * s):
+    for x in range(16 * s, w - 20 * s, 28 * s):
         draw.ellipse([x, 14 * s, x + 4 * s, 18 * s], fill=(240, 230, 200, 160))
-        draw.ellipse([x + 15 * s, 36 * s, x + 19 * s, 40 * s], fill=(240, 230, 200, 160))
-    # Left item icon frame
-    draw.rounded_rectangle([8 * s, 8 * s, 48 * s, 48 * s], radius=6 * s, fill=(245, 236, 210, 255), outline=(210, 195, 160, 255), width=2 * s)
+        draw.ellipse([x + 14 * s, 36 * s, x + 18 * s, 40 * s], fill=(240, 230, 200, 160))
     save(img, "card_ac_recipe_item.png", s)
 
     # Stamp Slot Card (Nook Miles Stamp Slot)
@@ -299,8 +297,8 @@ def generate_codex_parchment():
 # ---------------------------------------------------------------------------
 def generate_spell_card():
     print("Generating Gothic RPG Runic Spell Card...")
-    img, draw, s = canvas(320, 120)
-    w, h = 320 * s, 120 * s
+    img, draw, s = canvas(340, 136)
+    w, h = 340 * s, 136 * s
     # Dark arcane stone card with glowing gold trim
     draw.rounded_rectangle([4 * s, 4 * s, w - 4 * s, h - 4 * s], radius=12 * s, fill=(28, 22, 32, 255), outline=(212, 175, 55, 255), width=3 * s)
     # Inner runic border

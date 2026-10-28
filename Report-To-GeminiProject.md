@@ -358,6 +358,10 @@ Menyertakan screenshot implementasi nyata dari 3 platform (Desktop 1080p Vulkan,
 # Sweet & Charming Interactive RPG Game UI/UX Suite
 Pembaruan menyeluruh mengubah konsol dari techwear gelap menjadi antarmuka RPG diegetik yang manis, hangat, dan taktil:
 - Aset Baru: 14 sprite supersampled (desk_wood_surface, notebook_page_parchment, spiral_wire_binding, scalloped_cloud_banner, tab_mint/honey/berry/sky, card_ac_recipe_item, card_ac_stamp_slot, emoji_reactions, badge_gold_coin_rpg, badge_star_pin, gauge_rpg_mana_bar, parchment_codex_scroll, card_rpg_spell_harmony).
+- Layout & Precision Alignment Fix (Resolusi Teks Tabrakan & Overflow):
+  - Sprite `card_ac_recipe_item.png` dibersihkan dari kotak statis bawaan, memungkinkan tata letak 2 kolom fleksibel (badge box di kiri + teks judul/patch di kanan).
+  - Margin notebook leather-bound di Godot dibatasi via `NotebookMargin` sehingga kotak pencarian dan filter genre tidak melebar melewati halaman.
+  - Kartu mantra `CurrentChordBox` diperbesar menjadi 340x136px dan indikator transpose diberi latar belakang kapsul (pill) elegan sehingga tidak terpotong garis emas rune.
 - Desktop 1080p: Godot 4 Forward+ Vulkan (`captures/screenshot_godot_stage.png`).
 - Web Remote (Desktop/Tablet): 1280x820 (`captures/screenshot_web_remote.png`).
 - Android Companion: 430x932 Mobile Portrait (`captures/screenshot_android_companion.png`).

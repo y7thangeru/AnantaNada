@@ -284,7 +284,7 @@ size_flags_vertical = 3
 theme_override_constants/separation = 16
 
 [node name="SetlistDeck" type="PanelContainer" parent="HUD/CenterSplit"]
-custom_minimum_size = Vector2(340, 0)
+custom_minimum_size = Vector2(360, 0)
 layout_mode = 2
 
 [node name="NotebookBg" type="TextureRect" parent="HUD/CenterSplit/SetlistDeck"]
@@ -302,20 +302,24 @@ texture = ExtResource("19_spiral_wire")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="MissionContainer" type="VBoxContainer" parent="HUD/CenterSplit/SetlistDeck"]
+[node name="NotebookMargin" type="MarginContainer" parent="HUD/CenterSplit/SetlistDeck"]
 layout_mode = 2
-offset_left = 18.0
-offset_top = 12.0
-offset_right = -36.0
-offset_bottom = -12.0
-theme_override_constants/separation = 8
+mouse_filter = 2
+theme_override_constants/margin_left = 26
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 34
+theme_override_constants/margin_bottom = 14
 
-[node name="HeaderDecorRow" type="HBoxContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
+[node name="MissionContainer" type="VBoxContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="HeaderDecorRow" type="HBoxContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer"]
 layout_mode = 2
 theme_override_constants/separation = 8
 alignment = 1
 
-[node name="MoonlighterTab" type="TextureRect" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/HeaderDecorRow"]
+[node name="MoonlighterTab" type="TextureRect" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/HeaderDecorRow"]
 custom_minimum_size = Vector2(170, 36)
 layout_mode = 2
 texture = ExtResource("7_moonlighter_tab")
@@ -323,7 +327,7 @@ expand_mode = 1
 stretch_mode = 5
 tooltip_text = "Moonlighter: Stitched Leather Repertoire Ledger"
 
-[node name="WashiTape" type="TextureRect" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/HeaderDecorRow"]
+[node name="WashiTape" type="TextureRect" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/HeaderDecorRow"]
 custom_minimum_size = Vector2(110, 32)
 layout_mode = 2
 texture = ExtResource("8_lis_tape")
@@ -331,233 +335,538 @@ expand_mode = 1
 stretch_mode = 5
 tooltip_text = "Life is Strange: Washi Tape Binding"
 
-[node name="TabsBookmarkRow" type="HBoxContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
+[node name="TabsBookmarkRow" type="HBoxContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer"]
 layout_mode = 2
 theme_override_constants/separation = 8
 alignment = 1
 
-[node name="TabMint" type="TextureRect" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/TabsBookmarkRow"]
+[node name="TabMint" type="TextureRect" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/TabsBookmarkRow"]
 custom_minimum_size = Vector2(80, 28)
 layout_mode = 2
 texture = ExtResource("21_tab_mint")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="TabHoney" type="TextureRect" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/TabsBookmarkRow"]
+[node name="TabHoney" type="TextureRect" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/TabsBookmarkRow"]
 custom_minimum_size = Vector2(80, 28)
 layout_mode = 2
 texture = ExtResource("22_tab_honey")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="TabBerry" type="TextureRect" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/TabsBookmarkRow"]
+[node name="TabBerry" type="TextureRect" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/TabsBookmarkRow"]
 custom_minimum_size = Vector2(80, 28)
 layout_mode = 2
 texture = ExtResource("23_tab_berry")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="HeaderLabel" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
+[node name="HeaderLabel" type="Label" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.24, 0.16, 0.1, 1)
 theme_override_font_sizes/font_size = 13
 text = "[SETLIST DECK] /// 100-SONG REPERTOIRE"
+horizontal_alignment = 1
 
-[node name="SearchBox" type="LineEdit" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
+[node name="SearchBox" type="LineEdit" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer"]
 custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.14, 0.08, 1)
+theme_override_colors/placeholder_color = Color(0.55, 0.45, 0.35, 1)
 placeholder_text = "Search song, artist, tag..."
 
-[node name="FilterRow" type="HBoxContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
+[node name="FilterRow" type="HBoxContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer"]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="BtnFilterAll" type="Button" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/FilterRow"]
+[node name="BtnFilterAll" type="Button" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/FilterRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "ALL (100)"
 
-[node name="BtnFilterIndo" type="Button" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/FilterRow"]
+[node name="BtnFilterIndo" type="Button" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/FilterRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "INDO (50)"
 
-[node name="BtnFilterWestern" type="Button" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/FilterRow"]
+[node name="BtnFilterWestern" type="Button" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/FilterRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "WEST (50)"
 
-[node name="ActiveHeader" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
+[node name="ActiveHeader" type="Label" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.65, 0.35, 0.05, 1)
 theme_override_font_sizes/font_size = 12
-text = "// ACTIVE MISSION (STAR RECIPE)"
+text = "★ ACTIVE MISSION"
 
-[node name="ActiveCard" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
-custom_minimum_size = Vector2(0, 56)
+[node name="ActiveCard" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer"]
+custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 mouse_filter = 0
 mouse_default_cursor_shape = 2
 
-[node name="RecipeBg" type="TextureRect" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/ActiveCard"]
+[node name="RecipeBg" type="TextureRect" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/ActiveCard"]
 layout_mode = 2
 mouse_filter = 2
 texture = ExtResource("24_recipe_card")
 expand_mode = 1
 
-[node name="MissionName" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/ActiveCard"]
+[node name="Pad" type="MarginContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/ActiveCard"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_colors/font_color = Color(0.2, 0.14, 0.08, 1)
-theme_override_font_sizes/font_size = 15
-text = "★ > 01. DAN - SHEILA ON 7"
-horizontal_alignment = 1
-vertical_alignment = 1
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
 
-[node name="NextHeader" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
+[node name="Row" type="HBoxContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/ActiveCard/Pad"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="StarPin" type="TextureRect" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/ActiveCard/Pad/Row"]
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("25_star_pin")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Col" type="VBoxContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/ActiveCard/Pad/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="MissionName" type="Label" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/ActiveCard/Pad/Row/Col"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.18, 0.12, 0.08, 1)
+theme_override_font_sizes/font_size = 13
+text = "DAN"
+text_overrun_behavior = 3
+
+[node name="MissionMeta" type="Label" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/ActiveCard/Pad/Row/Col"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.5, 0.38, 0.28, 1)
+theme_override_font_sizes/font_size = 10
+text = "Sheila on 7 • G Major • 100 BPM"
+text_overrun_behavior = 3
+
+[node name="NextHeader" type="Label" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.25, 0.42, 0.28, 1)
 theme_override_font_sizes/font_size = 12
 text = "// NEXT QUEUED MISSIONS"
 
-[node name="NextCard1" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
-custom_minimum_size = Vector2(0, 48)
+[node name="NextCard1" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer"]
+custom_minimum_size = Vector2(0, 46)
 layout_mode = 2
 mouse_filter = 0
 mouse_default_cursor_shape = 2
 
-[node name="CardBg" type="TextureRect" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard1"]
+[node name="CardBg" type="TextureRect" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard1"]
 layout_mode = 2
 mouse_filter = 2
 texture = ExtResource("24_recipe_card")
 expand_mode = 1
 
-[node name="Label" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard1"]
+[node name="Pad" type="MarginContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard1"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_colors/font_color = Color(0.2, 0.14, 0.08, 1)
-theme_override_font_sizes/font_size = 13
-text = "    02. KISAH KLASIK [A // 114 BPM]"
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 3
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 3
+
+[node name="Row" type="HBoxContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard1/Pad"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="Badge" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard1/Pad/Row"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="Num" type="Label" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard1/Pad/Row/Badge"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.7, 0.35, 0.05, 1)
+theme_override_font_sizes/font_size = 11
+text = "02"
+horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="NextCard2" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
-custom_minimum_size = Vector2(0, 48)
+[node name="Col" type="VBoxContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard1/Pad/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="Title" type="Label" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard1/Pad/Row/Col"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.18, 0.12, 0.08, 1)
+theme_override_font_sizes/font_size = 12
+text = "KISAH KLASIK"
+text_overrun_behavior = 3
+
+[node name="Meta" type="Label" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard1/Pad/Row/Col"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.5, 0.38, 0.28, 1)
+theme_override_font_sizes/font_size = 10
+text = "Sheila on 7 • A Major • 114 BPM"
+text_overrun_behavior = 3
+
+[node name="NextCard2" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer"]
+custom_minimum_size = Vector2(0, 46)
 layout_mode = 2
 mouse_filter = 0
 mouse_default_cursor_shape = 2
 
-[node name="CardBg" type="TextureRect" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard2"]
+[node name="CardBg" type="TextureRect" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard2"]
 layout_mode = 2
 mouse_filter = 2
 texture = ExtResource("24_recipe_card")
 expand_mode = 1
 
-[node name="Label" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard2"]
+[node name="Pad" type="MarginContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard2"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_colors/font_color = Color(0.2, 0.14, 0.08, 1)
-theme_override_font_sizes/font_size = 13
-text = "    03. MELOMPAT TINGGI [D // 136 BPM]"
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 3
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 3
+
+[node name="Row" type="HBoxContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard2/Pad"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="Badge" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard2/Pad/Row"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="Num" type="Label" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard2/Pad/Row/Badge"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.7, 0.35, 0.05, 1)
+theme_override_font_sizes/font_size = 11
+text = "03"
+horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="NextCard3" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
-custom_minimum_size = Vector2(0, 48)
+[node name="Col" type="VBoxContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard2/Pad/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="Title" type="Label" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard2/Pad/Row/Col"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.18, 0.12, 0.08, 1)
+theme_override_font_sizes/font_size = 12
+text = "MELOMPAT TINGGI"
+text_overrun_behavior = 3
+
+[node name="Meta" type="Label" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard2/Pad/Row/Col"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.5, 0.38, 0.28, 1)
+theme_override_font_sizes/font_size = 10
+text = "Sheila on 7 • D Major • 136 BPM"
+text_overrun_behavior = 3
+
+[node name="NextCard3" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer"]
+custom_minimum_size = Vector2(0, 46)
 layout_mode = 2
 mouse_filter = 0
 mouse_default_cursor_shape = 2
 
-[node name="CardBg" type="TextureRect" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard3"]
+[node name="CardBg" type="TextureRect" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard3"]
 layout_mode = 2
 mouse_filter = 2
 texture = ExtResource("24_recipe_card")
 expand_mode = 1
 
-[node name="Label" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard3"]
+[node name="Pad" type="MarginContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard3"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_colors/font_color = Color(0.2, 0.14, 0.08, 1)
-theme_override_font_sizes/font_size = 13
-text = "    04. SAHABAT SEJATI [C // 120 BPM]"
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 3
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 3
+
+[node name="Row" type="HBoxContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard3/Pad"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="Badge" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard3/Pad/Row"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="Num" type="Label" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard3/Pad/Row/Badge"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.7, 0.35, 0.05, 1)
+theme_override_font_sizes/font_size = 11
+text = "04"
+horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="NextCard4" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
-custom_minimum_size = Vector2(0, 48)
+[node name="Col" type="VBoxContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard3/Pad/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="Title" type="Label" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard3/Pad/Row/Col"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.18, 0.12, 0.08, 1)
+theme_override_font_sizes/font_size = 12
+text = "SAHABAT SEJATI"
+text_overrun_behavior = 3
+
+[node name="Meta" type="Label" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard3/Pad/Row/Col"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.5, 0.38, 0.28, 1)
+theme_override_font_sizes/font_size = 10
+text = "Sheila on 7 • C Major • 120 BPM"
+text_overrun_behavior = 3
+
+[node name="NextCard4" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer"]
+custom_minimum_size = Vector2(0, 46)
 layout_mode = 2
 mouse_filter = 0
 mouse_default_cursor_shape = 2
 
-[node name="CardBg" type="TextureRect" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard4"]
+[node name="CardBg" type="TextureRect" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard4"]
 layout_mode = 2
 mouse_filter = 2
 texture = ExtResource("24_recipe_card")
 expand_mode = 1
 
-[node name="Label" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard4"]
+[node name="Pad" type="MarginContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard4"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_colors/font_color = Color(0.2, 0.14, 0.08, 1)
-theme_override_font_sizes/font_size = 13
-text = "    05. SHE'S THE ONE [Bb // 84 BPM]"
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 3
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 3
+
+[node name="Row" type="HBoxContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard4/Pad"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="Badge" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard4/Pad/Row"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="Num" type="Label" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard4/Pad/Row/Badge"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.7, 0.35, 0.05, 1)
+theme_override_font_sizes/font_size = 11
+text = "05"
+horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="NextCard5" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
-custom_minimum_size = Vector2(0, 48)
+[node name="Col" type="VBoxContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard4/Pad/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="Title" type="Label" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard4/Pad/Row/Col"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.18, 0.12, 0.08, 1)
+theme_override_font_sizes/font_size = 12
+text = "SHE'S THE ONE"
+text_overrun_behavior = 3
+
+[node name="Meta" type="Label" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard4/Pad/Row/Col"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.5, 0.38, 0.28, 1)
+theme_override_font_sizes/font_size = 10
+text = "Robbie Williams • Bb • 84 BPM"
+text_overrun_behavior = 3
+
+[node name="NextCard5" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer"]
+custom_minimum_size = Vector2(0, 46)
 layout_mode = 2
 mouse_filter = 0
 mouse_default_cursor_shape = 2
 
-[node name="CardBg" type="TextureRect" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard5"]
+[node name="CardBg" type="TextureRect" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard5"]
 layout_mode = 2
 mouse_filter = 2
 texture = ExtResource("24_recipe_card")
 expand_mode = 1
 
-[node name="Label" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard5"]
+[node name="Pad" type="MarginContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard5"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_colors/font_color = Color(0.2, 0.14, 0.08, 1)
-theme_override_font_sizes/font_size = 13
-text = "    06. KANGEN [D // 78 BPM]"
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 3
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 3
+
+[node name="Row" type="HBoxContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard5/Pad"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="Badge" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard5/Pad/Row"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="Num" type="Label" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard5/Pad/Row/Badge"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.7, 0.35, 0.05, 1)
+theme_override_font_sizes/font_size = 11
+text = "06"
+horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="NextCard6" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
-custom_minimum_size = Vector2(0, 48)
+[node name="Col" type="VBoxContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard5/Pad/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="Title" type="Label" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard5/Pad/Row/Col"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.18, 0.12, 0.08, 1)
+theme_override_font_sizes/font_size = 12
+text = "KANGEN"
+text_overrun_behavior = 3
+
+[node name="Meta" type="Label" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard5/Pad/Row/Col"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.5, 0.38, 0.28, 1)
+theme_override_font_sizes/font_size = 10
+text = "Dewa 19 • D Major • 78 BPM"
+text_overrun_behavior = 3
+
+[node name="NextCard6" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer"]
+custom_minimum_size = Vector2(0, 46)
 layout_mode = 2
 mouse_filter = 0
 mouse_default_cursor_shape = 2
 
-[node name="CardBg" type="TextureRect" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard6"]
+[node name="CardBg" type="TextureRect" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard6"]
 layout_mode = 2
 mouse_filter = 2
 texture = ExtResource("24_recipe_card")
 expand_mode = 1
 
-[node name="Label" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard6"]
+[node name="Pad" type="MarginContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard6"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_colors/font_color = Color(0.2, 0.14, 0.08, 1)
-theme_override_font_sizes/font_size = 13
-text = "    07. KAMU KAMULAH SURGAKU [G // 128 BPM]"
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 3
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 3
+
+[node name="Row" type="HBoxContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard6/Pad"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="Badge" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard6/Pad/Row"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="Num" type="Label" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard6/Pad/Row/Badge"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.7, 0.35, 0.05, 1)
+theme_override_font_sizes/font_size = 11
+text = "07"
+horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="PaginationRow" type="HBoxContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
+[node name="Col" type="VBoxContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard6/Pad/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="Title" type="Label" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard6/Pad/Row/Col"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.18, 0.12, 0.08, 1)
+theme_override_font_sizes/font_size = 12
+text = "KAMU KAMULAH SURGAKU"
+text_overrun_behavior = 3
+
+[node name="Meta" type="Label" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/NextCard6/Pad/Row/Col"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.5, 0.38, 0.28, 1)
+theme_override_font_sizes/font_size = 10
+text = "The Rock • G Major • 128 BPM"
+text_overrun_behavior = 3
+
+[node name="PaginationRow" type="HBoxContainer" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer"]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="BtnPrevPage" type="Button" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/PaginationRow"]
+[node name="BtnPrevPage" type="Button" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/PaginationRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "< PREV"
 
-[node name="PageIndicator" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/PaginationRow"]
+[node name="PageIndicator" type="Label" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/PaginationRow"]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.24, 0.16, 0.1, 1)
 theme_override_font_sizes/font_size = 12
 text = "PAGE 1/25"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="BtnNextPage" type="Button" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/PaginationRow"]
+[node name="BtnNextPage" type="Button" parent="HUD/CenterSplit/SetlistDeck/NotebookMargin/MissionContainer/PaginationRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "NEXT >"
@@ -734,7 +1043,7 @@ theme_override_font_sizes/font_size = 12
 text = "// CURRENT HARMONY"
 
 [node name="CurrentChordBox" type="PanelContainer" parent="HUD/CenterSplit/ChordHud"]
-custom_minimum_size = Vector2(0, 110)
+custom_minimum_size = Vector2(0, 136)
 layout_mode = 2
 
 [node name="SpellCardBg" type="TextureRect" parent="HUD/CenterSplit/ChordHud/CurrentChordBox"]
@@ -743,25 +1052,34 @@ mouse_filter = 2
 texture = ExtResource("30_spell_card")
 expand_mode = 1
 
-[node name="VBox" type="VBoxContainer" parent="HUD/CenterSplit/ChordHud/CurrentChordBox"]
+[node name="ChordMargin" type="MarginContainer" parent="HUD/CenterSplit/ChordHud/CurrentChordBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 12
+
+[node name="VBox" type="VBoxContainer" parent="HUD/CenterSplit/ChordHud/CurrentChordBox/ChordMargin"]
 layout_mode = 2
 alignment = 1
+theme_override_constants/separation = 2
 
-[node name="ChordLabel" type="Label" parent="HUD/CenterSplit/ChordHud/CurrentChordBox/VBox"]
+[node name="ChordLabel" type="Label" parent="HUD/CenterSplit/ChordHud/CurrentChordBox/ChordMargin/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.95, 0.8, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.8)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
 theme_override_constants/shadow_offset_x = 2
 theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 64
+theme_override_font_sizes/font_size = 48
 text = "[ G#m7 ]"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="TransposePill" type="Label" parent="HUD/CenterSplit/ChordHud/CurrentChordBox/VBox"]
+[node name="TransposePill" type="Label" parent="HUD/CenterSplit/ChordHud/CurrentChordBox/ChordMargin/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.84, 0.2, 1)
-theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(1, 0.85, 0.25, 1)
+theme_override_font_sizes/font_size = 11
 text = "TRANSPOSE: [ +0 SEMITONES ]"
 horizontal_alignment = 1
 
