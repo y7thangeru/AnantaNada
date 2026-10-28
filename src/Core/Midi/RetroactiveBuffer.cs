@@ -107,11 +107,29 @@ public sealed class RetroactiveBuffer
     /// <param name="ppqn">Pulses per quarter note resolution (default 480).</param>
     public bool ExportToMidi(string filePath, long durationMicroseconds = FiveMinutesUs, int targetBpm = 120, short ppqn = 480)
     {
+        return ExportToMidi(filePath, out _, out _, durationMicroseconds, targetBpm, ppqn);
+    }
+
+    /// <summary>
+    /// Instantly serializes the captured buffer into a valid Standard MIDI File (SMF Format 0, .mid),
+    /// outputting the total captured events and estimated bars.
+    /// </summary>
+    public bool ExportToMidi(string filePath, out int eventCount, out int estimatedBars, long durationMicroseconds = FiveMinutesUs, int targetBpm = 120, short ppqn = 480)
+    {
+        eventCount = 0;
+        estimatedBars = 0;
+
         var events = GetRecentEvents(durationMicroseconds);
         if (events.Count == 0)
         {
             return false;
         }
+
+        eventCount = events.Count;
+        long elapsedUs = Math.Max(0, events[^1].TimestampUs - events[0].TimestampUs);
+        double elapsedSec = elapsedUs / 1_000_000.0;
+        double barSec = (60.0 / targetBpm) * 4.0;
+        estimatedBars = Math.Max(1, (int)Math.Round(elapsedSec / barSec));
 
         string? dir = Path.GetDirectoryName(filePath);
         if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))

@@ -149,6 +149,11 @@ public sealed class NativeMidiEngine : IDisposable
     // Event Dispatching
     public delegate void MessageReceivedHandler(in MidiRawMessage message);
     public event MessageReceivedHandler? OnMessageReceived;
+    public delegate void NoteEventHandler(byte channel, byte note, byte velocity);
+    public event NoteEventHandler? OnNoteOn;
+    public event NoteEventHandler? OnNoteOff;
+    public delegate void ControlChangeHandler(byte channel, byte controller, byte value);
+    public event ControlChangeHandler? OnControlChange;
     public event Action<string>? OnLog;
     public event Action<string>? OnDeviceConnected;
     public event Action? OnDeviceDisconnected;
@@ -335,6 +340,19 @@ public sealed class NativeMidiEngine : IDisposable
 
         // Direct callback invocation (no boxing)
         OnMessageReceived?.Invoke(in msg);
+
+        if (msg.IsNoteOn)
+        {
+            OnNoteOn?.Invoke(msg.Channel, msg.Data1, msg.Data2);
+        }
+        else if (msg.IsNoteOff)
+        {
+            OnNoteOff?.Invoke(msg.Channel, msg.Data1, msg.Data2);
+        }
+        else if (msg.IsControlChange)
+        {
+            OnControlChange?.Invoke(msg.Channel, msg.Data1, msg.Data2);
+        }
     }
 
     /// <summary>

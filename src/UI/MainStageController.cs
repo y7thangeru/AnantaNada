@@ -5,9 +5,9 @@ using AnantaNada.Network;
 namespace AnantaNada.UI;
 
 /// <summary>
-/// Diegetic Game Console Controller for Roland Go:Keys 3 (Cockpit HUD).
-/// Blends Atlus Persona 5 slanted typography, Arknights tactical telemetry,
-/// and Hi-Fi Rush beat-synced rhythm scoring.
+/// Lead Game Console Controller for Roland Go:Keys 3 (Cockpit HUD).
+/// Orchestrates the live MIDI pipeline, dynamic 64x1 keybed texture,
+/// 5-minute retroactive capture buffer, and StageHub WebSocket telemetry.
 /// </summary>
 public partial class MainStageController : Control
 {
@@ -38,6 +38,9 @@ public partial class MainStageController : Control
     private ColorRect _waterfallRect = null!;
     private PanelContainer _nextChordBox = null!;
     private PanelContainer _currentChordBox = null!;
+    private PanelContainer _nextCard1 = null!;
+    private PanelContainer _nextCard2 = null!;
+    private PanelContainer _nextCard3 = null!;
     private Control _hudContainer = null!;
 
     // Shaders
@@ -46,12 +49,13 @@ public partial class MainStageController : Control
     private ShaderMaterial? _nextChordMaterial;
     private ShaderMaterial? _currentChordMaterial;
 
-    // Keybed 64x1 State Texture
+    // Keybed 64x1 State Texture (R: Velocity, G: Split Zone, B: Impact Flash)
     private readonly byte[] _keyStatePixels = new byte[64 * 4];
     private readonly float[] _keyVelocities = new float[64];
     private readonly float[] _keyImpacts = new float[64];
     private Image _keyStateImage = null!;
     private ImageTexture _keyStateTexture = null!;
+    private readonly object _stateLock = new();
 
     // Gameplay & Timing State
     private int _currentSongIndex = 0;
@@ -74,6 +78,10 @@ public partial class MainStageController : Control
     private float _glitchIntensity = 0.0f;
     private float _transitionPulse = 0.0f;
     private Vector2 _originalHudPos = Vector2.Zero;
+
+    // Retroactive Feedback Timer
+    private double _retroFeedbackTimer = 0.0;
+    private bool _isShowingRetroFeedback = false;
 
     // Song Missions with Lyrics
     public record SongMission(
@@ -102,7 +110,7 @@ public partial class MainStageController : Control
 
     public override void _Ready()
     {
-        // 1. Initialize Audio/MIDI & Network
+        // 1. Initialize Subsystems
         CaptureBuffer = new RetroactiveBuffer();
         MidiEngine = new NativeMidiEngine();
         HubServer = new StageHubServer(HttpPort);
@@ -136,31 +144,44 @@ public partial class MainStageController : Control
         _keybedRect = GetNodeOrNull<ColorRect>("HUD/BottomKeybed/KeybedContainer/KeybedRect") ?? new ColorRect();
         _waterfallRect = GetNodeOrNull<ColorRect>("HUD/CenterSplit/CenterCascade/WaterfallRect") ?? new ColorRect();
 
-        // 3. Materials
+        _nextCard1 = GetNodeOrNull<PanelContainer>("HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard1") ?? new PanelContainer();
+        _nextCard2 = GetNodeOrNull<PanelContainer>("HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard2") ?? new PanelContainer();
+        _nextCard3 = GetNodeOrNull<PanelContainer>("HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard3") ?? new PanelContainer();
+
+        // 3. Shaders
         if (_keybedRect.Material is ShaderMaterial km) _keybedMaterial = km;
         if (_waterfallRect.Material is ShaderMaterial wm) _waterfallMaterial = wm;
         if (_nextChordBox.Material is ShaderMaterial ncm) _nextChordMaterial = ncm;
         if (_currentChordBox.Material is ShaderMaterial ccm) _currentChordMaterial = ccm;
 
-        // 4. Setup Keybed State Texture
+        // 4. Setup Keybed State Texture (64x1 RGBA8)
         _keyStateImage = Image.CreateEmpty(64, 1, false, Image.Format.Rgba8);
         _keyStateTexture = ImageTexture.CreateFromImage(_keyStateImage);
         _keybedMaterial?.SetShaderParameter("key_states", _keyStateTexture);
 
-        // 5. Wire MIDI Engine & Server Callbacks
-        MidiEngine.OnMessageReceived += HandleIncomingMidi;
+        // 5. Wire MIDI Engine Pipelines
+        MidiEngine.OnMessageReceived += (in MidiRawMessage msg) => CaptureBuffer.Push(in msg);
+        MidiEngine.OnNoteOn += HandleMidiNoteOn;
+        MidiEngine.OnNoteOff += HandleMidiNoteOff;
         MidiEngine.OnLog += msg => GD.Print(msg);
         MidiEngine.OnDeviceConnected += dev => CallDeferred(nameof(UpdateDeviceLabel), dev, true);
         MidiEngine.OnDeviceDisconnected += () => CallDeferred(nameof(UpdateDeviceLabel), "DISCONNECTED", false);
 
+        // 6. Wire StageHub Server Pipelines
         HubServer.OnLog += msg => GD.Print(msg);
         HubServer.OnPanicTriggered += () => CallDeferred(nameof(TriggerPanicPurge));
         HubServer.OnSetlistItemTriggered += payload => CallDeferred(nameof(SelectMission), payload.SongIndex);
 
+        // 7. Wire UI Button Actions
         _btnPanic.Pressed += TriggerPanicPurge;
         _btnNeverLostMelody.Pressed += OnNeverLostMelodyPressed;
 
-        // 6. Connect Hardware & Start Mini-Server
+        // Desktop Setlist Card Click handlers
+        _nextCard1.GuiInput += @event => HandleCardClick(@event, 1);
+        _nextCard2.GuiInput += @event => HandleCardClick(@event, 2);
+        _nextCard3.GuiInput += @event => HandleCardClick(@event, 3);
+
+        // 8. Connect Hardware & Start Server
         MidiEngine.Connect("Go:Keys");
         HubServer.Start();
 
@@ -172,32 +193,48 @@ public partial class MainStageController : Control
         SelectMission(0);
     }
 
+    private void HandleCardClick(InputEvent @event, int missionIndex)
+    {
+        if (@event is InputEventMouseButton mb && mb.Pressed && mb.ButtonIndex == MouseButton.Left)
+        {
+            SelectMission(missionIndex);
+        }
+    }
+
     private void UpdateDeviceLabel(string name, bool connected)
     {
         _lblDeviceStatus.Text = connected ? $"> LINK: ROLAND [{name.ToUpper()}]" : "> LINK: NO HARDWARE (STANDALONE)";
         _lblDeviceStatus.Modulate = connected ? new Color(0.0f, 0.96f, 0.83f) : new Color(0.93f, 0.14f, 0.23f);
     }
 
-    private void HandleIncomingMidi(in MidiRawMessage msg)
+    /// <summary>
+    /// Hot-path Note On event handler called directly from MIDI thread.
+    /// Updates zero-allocation key buffer and evaluates timing metrics.
+    /// </summary>
+    private void HandleMidiNoteOn(byte channel, byte note, byte velocity)
     {
-        CaptureBuffer.Push(in msg);
-
-        if (msg.IsNoteOn)
+        int keyIndex = note - MidiConstants.LowestNote; // C2 = 36 to C7 = 96
+        if (keyIndex >= 0 && keyIndex < 61)
         {
-            int keyIndex = msg.Data1 - MidiConstants.LowestNote;
-            if (keyIndex >= 0 && keyIndex < 61)
+            lock (_stateLock)
             {
-                float normalizedVel = msg.Data2 / 127.0f;
-                _keyVelocities[keyIndex] = normalizedVel;
+                _keyVelocities[keyIndex] = velocity / 127.0f;
                 _keyImpacts[keyIndex] = 1.0f;
-
-                CallDeferred(nameof(EvaluateTimingAndVelocity), msg.Data2);
             }
+
+            CallDeferred(nameof(EvaluateTimingAndVelocity), velocity);
         }
-        else if (msg.IsNoteOff)
+    }
+
+    /// <summary>
+    /// Hot-path Note Off event handler.
+    /// </summary>
+    private void HandleMidiNoteOff(byte channel, byte note, byte velocity)
+    {
+        int keyIndex = note - MidiConstants.LowestNote;
+        if (keyIndex >= 0 && keyIndex < 61)
         {
-            int keyIndex = msg.Data1 - MidiConstants.LowestNote;
-            if (keyIndex >= 0 && keyIndex < 61)
+            lock (_stateLock)
             {
                 _keyVelocities[keyIndex] = 0.0f;
             }
@@ -206,7 +243,7 @@ public partial class MainStageController : Control
 
     private void EvaluateTimingAndVelocity(byte rawVelocity)
     {
-        // 1. Dynamic Strike Gauge & Rank
+        // 1. Dynamic Strike Gauge & Rank Display
         string rank;
         Color rankColor;
         string dynamicDashes;
@@ -245,7 +282,7 @@ public partial class MainStageController : Control
         _lblVelocityRank.Modulate = rankColor;
         _lblStrikeGauge.Text = $"STRIKE: [ {dynamicDashes} ] {rawVelocity} ({(rawVelocity >= 110 ? "fff" : rawVelocity >= 90 ? "ff" : "p")})";
 
-        // 2. Rhythm Timing Coach
+        // 2. Rhythm Timing Coach (Evaluation against metronome ticks)
         double currentSec = Time.GetTicksMsec() / 1000.0;
         double timeSinceLastBeat = currentSec - _lastBeatTimestamp;
         double deviationSec = timeSinceLastBeat % _secondsPerBeat;
@@ -281,35 +318,43 @@ public partial class MainStageController : Control
         }
 
         _rollingAccuracy = Mathf.Clamp((float)_perfectHits / _totalHits * 100.0f, 60.0f, 100.0f);
-        _lblTimingVerdict.Text = $"ACCURACY: {verdict}";
-        _lblTimingVerdict.Modulate = verdictColor;
+
+        if (!_isShowingRetroFeedback)
+        {
+            _lblTimingVerdict.Text = $"ACCURACY: {verdict}";
+            _lblTimingVerdict.Modulate = verdictColor;
+        }
+
         _lblRhythmAccuracy.Text = $"SCORE ACC: {_rollingAccuracy:F1}%";
     }
 
     public override void _Process(double delta)
     {
-        // 1. Keybed visual updates
+        // 1. Stream key state buffer into 64x1 texture for piano_keybed.gdshader
         bool textureNeedsUpdate = false;
-        for (int i = 0; i < 61; i++)
+        lock (_stateLock)
         {
-            if (_keyImpacts[i] > 0.0f)
+            for (int i = 0; i < 61; i++)
             {
-                _keyImpacts[i] = Mathf.Max(0.0f, _keyImpacts[i] - (float)delta * 14.0f);
-                textureNeedsUpdate = true;
-            }
+                if (_keyImpacts[i] > 0.0f)
+                {
+                    _keyImpacts[i] = Mathf.Max(0.0f, _keyImpacts[i] - (float)delta * 14.0f);
+                    textureNeedsUpdate = true;
+                }
 
-            int pixelOffset = i * 4;
-            byte velByte = (byte)(_keyVelocities[i] * 255);
-            byte handByte = (byte)(i < 24 ? 0 : 255); // C4 split
-            byte impactByte = (byte)(_keyImpacts[i] * 255);
+                int pixelOffset = i * 4;
+                byte velByte = (byte)(_keyVelocities[i] * 255);
+                byte handByte = (byte)(i < 24 ? 0 : 255); // C4 Split Point
+                byte impactByte = (byte)(_keyImpacts[i] * 255);
 
-            if (_keyStatePixels[pixelOffset] != velByte || _keyStatePixels[pixelOffset + 2] != impactByte)
-            {
-                _keyStatePixels[pixelOffset] = velByte;
-                _keyStatePixels[pixelOffset + 1] = handByte;
-                _keyStatePixels[pixelOffset + 2] = impactByte;
-                _keyStatePixels[pixelOffset + 3] = 255;
-                textureNeedsUpdate = true;
+                if (_keyStatePixels[pixelOffset] != velByte || _keyStatePixels[pixelOffset + 2] != impactByte)
+                {
+                    _keyStatePixels[pixelOffset] = velByte;
+                    _keyStatePixels[pixelOffset + 1] = handByte;
+                    _keyStatePixels[pixelOffset + 2] = impactByte;
+                    _keyStatePixels[pixelOffset + 3] = 255;
+                    textureNeedsUpdate = true;
+                }
             }
         }
 
@@ -319,7 +364,7 @@ public partial class MainStageController : Control
             _keyStateTexture.Update(_keyStateImage);
         }
 
-        // 2. Metronome Advance
+        // 2. Advance Metronome Clock
         _beatTimer += delta;
         if (_beatTimer >= _secondsPerBeat)
         {
@@ -328,7 +373,7 @@ public partial class MainStageController : Control
             AdvanceBeat();
         }
 
-        // 3. Hi-Fi Rush Beat Pulse Decay
+        // 3. Beat Pulse Decay
         if (_beatPulse > 0.0f)
         {
             _beatPulse = Mathf.Max(0.0f, _beatPulse - (float)delta * 4.5f);
@@ -343,9 +388,9 @@ public partial class MainStageController : Control
             _waterfallMaterial?.SetShaderParameter("hit_beam_flash", _hitBeamFlash);
         }
 
-        // 5. Breathing pulse for incoming chord container (intensifies on beat 3 & 4)
-        float targetPulse = (_currentBeat >= 3) ? 0.7f : 0.0f;
-        _transitionPulse = Mathf.MoveToward(_transitionPulse, targetPulse, (float)delta * 3.0f);
+        // 5. Incoming Chord Transition Breathing Pulse (Intensifies on beat 3 & 4)
+        float targetPulse = (_currentBeat >= 3) ? 0.75f : 0.0f;
+        _transitionPulse = Mathf.MoveToward(_transitionPulse, targetPulse, (float)delta * 3.5f);
         _nextChordMaterial?.SetShaderParameter("pulse_intensity", _transitionPulse);
 
         // 6. Red Glitch Flash Decay
@@ -367,6 +412,20 @@ public partial class MainStageController : Control
         {
             _hudContainer.Position = _originalHudPos;
         }
+
+        // 8. Revert Retroactive Capture UI Button after timeout
+        if (_isShowingRetroFeedback)
+        {
+            _retroFeedbackTimer -= delta;
+            if (_retroFeedbackTimer <= 0.0)
+            {
+                _isShowingRetroFeedback = false;
+                _btnNeverLostMelody.Text = "RETRO-BUFFER: [ 5m CAPTURE ARMED ]";
+                _btnNeverLostMelody.Modulate = new Color(1.0f, 1.0f, 1.0f);
+                _lblTimingVerdict.Modulate = new Color(0.0f, 0.96f, 0.83f);
+                _lblTimingVerdict.Text = "ACCURACY: [ PERFECT! ]";
+            }
+        }
     }
 
     private void AdvanceBeat()
@@ -385,14 +444,14 @@ public partial class MainStageController : Control
 
         var mission = _missions[_currentSongIndex];
 
-        // Synchronize lyric lines
+        // Synchronize lyric lines to bars
         if (mission.Lyrics.Length > 0)
         {
             int lyricIndex = (_currentBar - 1) % mission.Lyrics.Length;
             _lblLyricTeleprompter.Text = $"\"{mission.Lyrics[lyricIndex]}\"";
         }
 
-        // Telemetry broadcast
+        // Broadcast telemetry to connected mobile teleprompters
         var tickData = new PlaybackTickData
         {
             SongId = $"mission_{_currentSongIndex + 1:D2}",
@@ -431,19 +490,27 @@ public partial class MainStageController : Control
             _lblLyricTeleprompter.Text = $"\"{m.Lyrics[0]}\"";
         }
 
+        // Volatile hardware patch change to Roland Go:Keys 3 (Zero flash writes)
         MidiEngine.SelectPatchVolatile(channel: 0, m.BankMsb, m.BankLsb, m.Pc);
     }
 
     public void TriggerPanicPurge()
     {
+        // 1. Hardware Panic (CC 120, CC 123, CC 64 across 16 channels)
         MidiEngine.TriggerPanic();
 
+        // 2. Trigger Red Glitch Flash & Screen Shake
         _glitchIntensity = 1.0f;
-        _screenShake = ScreenShakeIntensity * 2.0f;
+        _screenShake = ScreenShakeIntensity * 2.5f;
 
-        Array.Clear(_keyVelocities, 0, _keyVelocities.Length);
-        Array.Clear(_keyImpacts, 0, _keyImpacts.Length);
-        Array.Clear(_keyStatePixels, 0, _keyStatePixels.Length);
+        // 3. Clear all active key states
+        lock (_stateLock)
+        {
+            Array.Clear(_keyVelocities, 0, _keyVelocities.Length);
+            Array.Clear(_keyImpacts, 0, _keyImpacts.Length);
+            Array.Clear(_keyStatePixels, 0, _keyStatePixels.Length);
+        }
+
         _keyStateImage.SetData(64, 1, false, Image.Format.Rgba8, _keyStatePixels);
         _keyStateTexture.Update(_keyStateImage);
 
@@ -455,16 +522,37 @@ public partial class MainStageController : Control
 
     public void OnNeverLostMelodyPressed()
     {
-        string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmm");
         string exportDir = Path.Combine(Directory.GetCurrentDirectory(), "captures");
-        string filePath = Path.Combine(exportDir, $"AnantaNada_Cockpit_{timestamp}.mid");
+        string fileName = $"session_{timestamp}.mid";
+        string filePath = Path.Combine(exportDir, fileName);
 
-        bool success = CaptureBuffer.ExportToMidi(filePath, RetroactiveBuffer.FiveMinutesUs, _currentBpm);
+        bool success = CaptureBuffer.ExportToMidi(
+            filePath,
+            out int eventCount,
+            out int estimatedBars,
+            RetroactiveBuffer.FiveMinutesUs,
+            _currentBpm
+        );
+
         if (success)
         {
-            _lblTimingVerdict.Text = "RETRO-BUFFER: [ 5m SMF EXPORTED! ]";
-            _lblTimingVerdict.Modulate = new Color(0.0f, 0.96f, 0.83f);
-            GD.PrintRich($"[color=green][b]Never-Lost Melody Saved:[/b] {filePath}[/color]");
+            _isShowingRetroFeedback = true;
+            _retroFeedbackTimer = 3.0; // 3 seconds feedback
+
+            // Golden/Cyan HUD Flash on Button & Toast
+            _btnNeverLostMelody.Text = $">> CAPTURED: {fileName} ({estimatedBars} bars saved)";
+            _btnNeverLostMelody.Modulate = new Color(0.0f, 0.96f, 0.83f);
+
+            _lblTimingVerdict.Text = $">> SAVED: {fileName} ({eventCount} events)";
+            _lblTimingVerdict.Modulate = new Color(1.0f, 0.72f, 0.01f);
+
+            GD.PrintRich($"[color=green][b]>> Retroactive Melody Exported:[/b] {filePath} ({eventCount} events, {estimatedBars} bars)[/color]");
+        }
+        else
+        {
+            _lblTimingVerdict.Text = "RETRO-BUFFER: [ NO RECENT EVENTS ]";
+            _lblTimingVerdict.Modulate = new Color(1.0f, 0.82f, 0.05f);
         }
     }
 

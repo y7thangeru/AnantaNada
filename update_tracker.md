@@ -167,3 +167,19 @@ This file logs all file creations, modifications, deletions, refactorings, and f
 ### [2026-10-28 14:08:19 +07:00] - [MODIFY] `src/UI/MainStageController.cs`
 - **Action**: Added transition breathing pulse on incoming chord box (`_transitionPulse`) and synced lyric bar counter.
 - **Reason**: Enhances diegetic feedback ahead of song section transitions.
+
+### [2026-10-28 14:54:13 +07:00] - [MODIFY] `src/Core/Midi/NativeMidiEngine.cs`
+- **Action**: Added dedicated zero-allocation event delegates `OnNoteOn`, `OnNoteOff`, and `OnControlChange`.
+- **Reason**: Enables direct subscriptions from UI controllers without manual status byte masking.
+
+### [2026-10-28 14:54:13 +07:00] - [MODIFY] `src/Core/Midi/RetroactiveBuffer.cs`
+- **Action**: Added `ExportToMidi` overload returning `out int eventCount` and `out int estimatedBars`.
+- **Reason**: Enables real-time UI toast notifications displaying accurate bar counts upon scratchpad export.
+
+### [2026-10-28 14:55:22 +07:00] - [REFACTOR] `src/UI/MainStageController.cs`
+- **Action**: Completely wired live pipelines:
+  - Subscribed to `OnNoteOn` and `OnNoteOff` streaming into 64x1 key state texture for `piano_keybed.gdshader`.
+  - Bound `_btnNeverLostMelody` to export session MIDI with 3-second golden/cyan toast feedback.
+  - Linked bidirectional mobile telemetry (`PLAYBACK_TICK`, `TRIGGER_SETLIST_ITEM`, `TRIGGER_PANIC`).
+  - Added desktop setlist card click handlers (`NextCard1`, `NextCard2`, `NextCard3`).
+- **Reason**: Fulfills functional wiring objective connecting physical Roland hardware, RAM buffer, and mobile StageHub.
