@@ -27,6 +27,7 @@ public partial class MainStageController : Control
     private Label _lblCurrentChord = null!;
     private Label _lblNextChord = null!;
     private Label _lblLyricTeleprompter = null!;
+    private Label _lblLyricBar = null!;
     private Label _lblRhythmAccuracy = null!;
     private Label _lblTimingVerdict = null!;
     private Label _lblStrikeGauge = null!;
@@ -35,11 +36,15 @@ public partial class MainStageController : Control
     private Button _btnNeverLostMelody = null!;
     private ColorRect _keybedRect = null!;
     private ColorRect _waterfallRect = null!;
+    private PanelContainer _nextChordBox = null!;
+    private PanelContainer _currentChordBox = null!;
     private Control _hudContainer = null!;
 
     // Shaders
     private ShaderMaterial? _keybedMaterial;
     private ShaderMaterial? _waterfallMaterial;
+    private ShaderMaterial? _nextChordMaterial;
+    private ShaderMaterial? _currentChordMaterial;
 
     // Keybed 64x1 State Texture
     private readonly byte[] _keyStatePixels = new byte[64 * 4];
@@ -62,11 +67,12 @@ public partial class MainStageController : Control
     private int _perfectHits = 0;
     private float _rollingAccuracy = 98.4f;
 
-    // Visual FX (Hit Beam, Beat Pulse, Glitch Flash, Screen Shake)
+    // Visual FX (Hit Beam, Beat Pulse, Glitch Flash, Screen Shake, Transition Pulse)
     private float _beatPulse = 0.0f;
     private float _hitBeamFlash = 0.0f;
     private float _screenShake = 0.0f;
     private float _glitchIntensity = 0.0f;
+    private float _transitionPulse = 0.0f;
     private Vector2 _originalHudPos = Vector2.Zero;
 
     // Song Missions with Lyrics
@@ -109,21 +115,32 @@ public partial class MainStageController : Control
         _lblIpAddress = GetNodeOrNull<Label>("HUD/TopBar/NetworkPill/IpLabel") ?? new Label();
         _lblBpmBeat = GetNodeOrNull<Label>("HUD/TopBar/BpmPill/BpmLabel") ?? new Label();
         _lblActiveMission = GetNodeOrNull<Label>("HUD/CenterSplit/SetlistDeck/MissionContainer/ActiveCard/MissionName") ?? new Label();
-        _lblCurrentChord = GetNodeOrNull<Label>("HUD/CenterSplit/ChordHud/CurrentChordBox/ChordLabel") ?? new Label();
+
+        _currentChordBox = GetNodeOrNull<PanelContainer>("HUD/CenterSplit/ChordHud/CurrentChordBox") ?? new PanelContainer();
+        _lblCurrentChord = GetNodeOrNull<Label>("HUD/CenterSplit/ChordHud/CurrentChordBox/VBox/ChordLabel") ?? new Label();
+
+        _nextChordBox = GetNodeOrNull<PanelContainer>("HUD/CenterSplit/ChordHud/NextChordBox") ?? new PanelContainer();
         _lblNextChord = GetNodeOrNull<Label>("HUD/CenterSplit/ChordHud/NextChordBox/NextLabel") ?? new Label();
-        _lblLyricTeleprompter = GetNodeOrNull<Label>("HUD/CenterSplit/ChordHud/LyricBox/LyricText") ?? new Label();
+
+        _lblLyricTeleprompter = GetNodeOrNull<Label>("HUD/CenterSplit/ChordHud/LyricBox/VBox/LyricText") ?? new Label();
+        _lblLyricBar = GetNodeOrNull<Label>("HUD/CenterSplit/ChordHud/LyricBox/VBox/LyricBarIndicator") ?? new Label();
+
         _lblRhythmAccuracy = GetNodeOrNull<Label>("HUD/CenterSplit/CenterCascade/CoachDeck/AccuracyValue") ?? new Label();
         _lblTimingVerdict = GetNodeOrNull<Label>("HUD/CenterSplit/CenterCascade/CoachDeck/TimingVerdict") ?? new Label();
         _lblStrikeGauge = GetNodeOrNull<Label>("HUD/CenterSplit/CenterCascade/CoachDeck/StrikeGauge") ?? new Label();
         _lblVelocityRank = GetNodeOrNull<Label>("HUD/CenterSplit/CenterCascade/CoachDeck/RankBadge") ?? new Label();
-        _btnPanic = GetNodeOrNull<Button>("HUD/TopBar/PanicButton") ?? new Button();
+
+        _btnPanic = GetNodeOrNull<Button>("HUD/TopBar/PanicButtonContainer/PanicButton") ?? new Button();
         _btnNeverLostMelody = GetNodeOrNull<Button>("HUD/CenterSplit/CenterCascade/CoachDeck/RetroBufferBtn") ?? new Button();
+
         _keybedRect = GetNodeOrNull<ColorRect>("HUD/BottomKeybed/KeybedContainer/KeybedRect") ?? new ColorRect();
         _waterfallRect = GetNodeOrNull<ColorRect>("HUD/CenterSplit/CenterCascade/WaterfallRect") ?? new ColorRect();
 
         // 3. Materials
         if (_keybedRect.Material is ShaderMaterial km) _keybedMaterial = km;
         if (_waterfallRect.Material is ShaderMaterial wm) _waterfallMaterial = wm;
+        if (_nextChordBox.Material is ShaderMaterial ncm) _nextChordMaterial = ncm;
+        if (_currentChordBox.Material is ShaderMaterial ccm) _currentChordMaterial = ccm;
 
         // 4. Setup Keybed State Texture
         _keyStateImage = Image.CreateEmpty(64, 1, false, Image.Format.Rgba8);
@@ -163,7 +180,6 @@ public partial class MainStageController : Control
 
     private void HandleIncomingMidi(in MidiRawMessage msg)
     {
-        // 1. Retroactive circular RAM buffer push
         CaptureBuffer.Push(in msg);
 
         if (msg.IsNoteOn)
@@ -190,7 +206,7 @@ public partial class MainStageController : Control
 
     private void EvaluateTimingAndVelocity(byte rawVelocity)
     {
-        // 1. Velocity Dynamic Gauge & Rank (Armored Core / Cyberpunk HUD)
+        // 1. Dynamic Strike Gauge & Rank
         string rank;
         Color rankColor;
         string dynamicDashes;
@@ -198,22 +214,22 @@ public partial class MainStageController : Control
         if (rawVelocity >= 110)
         {
             rank = "RANK [S]";
-            rankColor = new Color(1.0f, 0.2f, 0.4f); // Crimson Overdrive
+            rankColor = new Color(1.0f, 0.2f, 0.4f);
             dynamicDashes = "||||||||||||||||||||";
-            _screenShake = ScreenShakeIntensity; // Screen shake on S-rank strike
+            _screenShake = ScreenShakeIntensity;
             _hitBeamFlash = 1.8f;
         }
         else if (rawVelocity >= 90)
         {
             rank = "RANK [A]";
-            rankColor = new Color(0.0f, 0.96f, 0.83f); // Cyber Cyan
+            rankColor = new Color(0.0f, 0.96f, 0.83f);
             dynamicDashes = "|||||||||||||||.....";
             _hitBeamFlash = 1.2f;
         }
         else if (rawVelocity >= 70)
         {
             rank = "RANK [B]";
-            rankColor = new Color(1.0f, 0.82f, 0.05f); // Electric Amber
+            rankColor = new Color(1.0f, 0.82f, 0.05f);
             dynamicDashes = "||||||||||..........";
             _hitBeamFlash = 0.8f;
         }
@@ -229,7 +245,7 @@ public partial class MainStageController : Control
         _lblVelocityRank.Modulate = rankColor;
         _lblStrikeGauge.Text = $"STRIKE: [ {dynamicDashes} ] {rawVelocity} ({(rawVelocity >= 110 ? "fff" : rawVelocity >= 90 ? "ff" : "p")})";
 
-        // 2. Rhythm Timing Coach (Hi-Fi Rush / Muse Dash Accuracy Evaluation)
+        // 2. Rhythm Timing Coach
         double currentSec = Time.GetTicksMsec() / 1000.0;
         double timeSinceLastBeat = currentSec - _lastBeatTimestamp;
         double deviationSec = timeSinceLastBeat % _secondsPerBeat;
@@ -272,7 +288,7 @@ public partial class MainStageController : Control
 
     public override void _Process(double delta)
     {
-        // 1. Decay visual impact flashes and update Keybed Shader texture
+        // 1. Keybed visual updates
         bool textureNeedsUpdate = false;
         for (int i = 0; i < 61; i++)
         {
@@ -284,8 +300,7 @@ public partial class MainStageController : Control
 
             int pixelOffset = i * 4;
             byte velByte = (byte)(_keyVelocities[i] * 255);
-            // Split Point: C4 (Note 60, index 24). Zone A Bass = 0 (Amber), Zone B Lead = 255 (Cyan)
-            byte handByte = (byte)(i < 24 ? 0 : 255);
+            byte handByte = (byte)(i < 24 ? 0 : 255); // C4 split
             byte impactByte = (byte)(_keyImpacts[i] * 255);
 
             if (_keyStatePixels[pixelOffset] != velByte || _keyStatePixels[pixelOffset + 2] != impactByte)
@@ -304,7 +319,7 @@ public partial class MainStageController : Control
             _keyStateTexture.Update(_keyStateImage);
         }
 
-        // 2. Metronome Beat Advance
+        // 2. Metronome Advance
         _beatTimer += delta;
         if (_beatTimer >= _secondsPerBeat)
         {
@@ -328,14 +343,19 @@ public partial class MainStageController : Control
             _waterfallMaterial?.SetShaderParameter("hit_beam_flash", _hitBeamFlash);
         }
 
-        // 5. Red Glitch Flash Decay (Post-Panic)
+        // 5. Breathing pulse for incoming chord container (intensifies on beat 3 & 4)
+        float targetPulse = (_currentBeat >= 3) ? 0.7f : 0.0f;
+        _transitionPulse = Mathf.MoveToward(_transitionPulse, targetPulse, (float)delta * 3.0f);
+        _nextChordMaterial?.SetShaderParameter("pulse_intensity", _transitionPulse);
+
+        // 6. Red Glitch Flash Decay
         if (_glitchIntensity > 0.0f)
         {
             _glitchIntensity = Mathf.Max(0.0f, _glitchIntensity - (float)delta * 3.5f);
             _keybedMaterial?.SetShaderParameter("glitch_intensity", _glitchIntensity);
         }
 
-        // 6. Kinetic Screen Shake
+        // 7. Kinetic Screen Shake
         if (_screenShake > 0.01f)
         {
             _screenShake = Mathf.Max(0.0f, _screenShake - (float)delta * 25.0f);
@@ -358,20 +378,21 @@ public partial class MainStageController : Control
             _currentBar++;
         }
 
-        _beatPulse = 1.0f; // Trigger rhythm pulse on beat
+        _beatPulse = 1.0f;
 
         _lblBpmBeat.Text = $"[BPM: {_currentBpm} /// 4/4] [BAR: {_currentBar:D3} . BEAT: {_currentBeat}/4]";
+        _lblLyricBar.Text = $">> CURRENT BAR {_currentBar:D3} // BEAT {_currentBeat} OF 4";
 
         var mission = _missions[_currentSongIndex];
 
-        // Synchronize lyric lines to bars
+        // Synchronize lyric lines
         if (mission.Lyrics.Length > 0)
         {
             int lyricIndex = (_currentBar - 1) % mission.Lyrics.Length;
             _lblLyricTeleprompter.Text = $"\"{mission.Lyrics[lyricIndex]}\"";
         }
 
-        // Broadcast telemetry to connected mobile teleprompters
+        // Telemetry broadcast
         var tickData = new PlaybackTickData
         {
             SongId = $"mission_{_currentSongIndex + 1:D2}",
@@ -403,26 +424,23 @@ public partial class MainStageController : Control
         _lblCurrentChord.Text = $"[ {m.CurrentChord} ]";
         _lblNextChord.Text = $"NEXT CHORD -> {m.NextChord}";
         _lblBpmBeat.Text = $"[BPM: {_currentBpm} /// 4/4] [BEAT: 01/4]";
+        _lblLyricBar.Text = ">> CURRENT BAR 001 // BEAT 1 OF 4";
 
         if (m.Lyrics.Length > 0)
         {
             _lblLyricTeleprompter.Text = $"\"{m.Lyrics[0]}\"";
         }
 
-        // Volatile hardware patch change to Roland Go:Keys 3 (Zero flash writes)
         MidiEngine.SelectPatchVolatile(channel: 0, m.BankMsb, m.BankLsb, m.Pc);
     }
 
     public void TriggerPanicPurge()
     {
-        // 1. Hardware Panic
         MidiEngine.TriggerPanic();
 
-        // 2. Trigger Red Glitch Flash & Screen Shake
         _glitchIntensity = 1.0f;
         _screenShake = ScreenShakeIntensity * 2.0f;
 
-        // 3. Clear all active key states
         Array.Clear(_keyVelocities, 0, _keyVelocities.Length);
         Array.Clear(_keyImpacts, 0, _keyImpacts.Length);
         Array.Clear(_keyStatePixels, 0, _keyStatePixels.Length);

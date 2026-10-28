@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://b5d8g2hq9x8a"]
+[gd_scene load_steps=11 format=3 uid="uid://b5d8g2hq9x8a"]
 
 [ext_resource type="Script" path="res://src/UI/MainStageController.cs" id="1_controller"]
 [ext_resource type="Shader" path="res://src/Shaders/piano_keybed.gdshader" id="2_keybed_shader"]
@@ -7,47 +7,96 @@
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_keybed"]
 shader = ExtResource("2_keybed_shader")
-shader_parameter/color_white_key = Color(0.9, 0.92, 0.96, 1)
-shader_parameter/color_black_key = Color(0.06, 0.07, 0.09, 1)
+shader_parameter/color_white_key = Color(0.92, 0.94, 0.97, 1)
+shader_parameter/color_white_shadow = Color(0.78, 0.82, 0.87, 1)
+shader_parameter/color_black_key = Color(0.08, 0.09, 0.12, 1)
+shader_parameter/color_black_bevel = Color(0.22, 0.26, 0.34, 1)
 shader_parameter/color_neon_cyan = Color(0, 0.96, 0.83, 1)
 shader_parameter/color_neon_amber = Color(1, 0.72, 0.01, 1)
-shader_parameter/color_border = Color(0.04, 0.05, 0.06, 1)
-shader_parameter/color_split_divider = Color(1, 0.2, 0.4, 0.8)
-shader_parameter/black_key_height_ratio = 0.62
-shader_parameter/black_key_width_ratio = 0.58
-shader_parameter/border_thickness = 0.006
-shader_parameter/glow_intensity = 3.2
-shader_parameter/chromatic_offset = 0.005
+shader_parameter/color_slit_dark = Color(0.03, 0.04, 0.05, 1)
+shader_parameter/color_split_marker = Color(1, 0.2, 0.35, 1)
+shader_parameter/black_key_length = 0.6
+shader_parameter/black_key_width = 0.58
+shader_parameter/key_slit_width = 0.035
+shader_parameter/glow_intensity = 3.0
 shader_parameter/beat_pulse = 0.0
-shader_parameter/split_point_norm = 0.393
+shader_parameter/glitch_intensity = 0.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_waterfall"]
 shader = ExtResource("3_waterfall_shader")
-shader_parameter/background_color = Color(0.043, 0.051, 0.063, 0.98)
-shader_parameter/grid_line_color = Color(0.12, 0.16, 0.22, 0.5)
+shader_parameter/background_color = Color(0.043, 0.051, 0.067, 0.98)
+shader_parameter/track_lane_even = Color(0.055, 0.067, 0.086, 0.98)
+shader_parameter/grid_line_color = Color(0.14, 0.18, 0.25, 0.55)
 shader_parameter/hit_beam_color = Color(0, 0.96, 0.83, 1)
-shader_parameter/beat_marker_color = Color(1, 0.72, 0.01, 0.45)
+shader_parameter/beat_marker_color = Color(1, 0.72, 0.01, 0.4)
 shader_parameter/spark_flash_color = Color(1, 1, 1, 1)
 shader_parameter/scroll_speed = 1.3
 shader_parameter/beat_frequency = 2.0
-shader_parameter/strike_line_y = 0.95
-shader_parameter/bloom_spread = 0.1
+shader_parameter/strike_line_y = 0.94
+shader_parameter/bloom_spread = 0.06
 shader_parameter/beat_pulse = 0.0
 shader_parameter/hit_beam_flash = 0.0
+shader_parameter/trapezoid_perspective = 0.76
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_panic"]
 shader = ExtResource("4_tactical_shader")
-shader_parameter/panel_bg_color = Color(0.15, 0.04, 0.06, 0.95)
+shader_parameter/panel_bg_color = Color(0.16, 0.03, 0.05, 0.98)
 shader_parameter/border_color = Color(0.93, 0.14, 0.23, 1)
 shader_parameter/accent_color = Color(1, 0.82, 0.05, 1)
 shader_parameter/hazard_yellow = Color(1, 0.82, 0.05, 1)
-shader_parameter/hazard_black = Color(0.08, 0.08, 0.08, 1)
+shader_parameter/hazard_black = Color(0.06, 0.06, 0.08, 1)
 shader_parameter/enable_hazard_stripes = true
 shader_parameter/is_panic_panel = true
-shader_parameter/border_width = 3.0
+shader_parameter/border_width = 4.0
 shader_parameter/corner_cut_size = 14.0
-shader_parameter/scanline_strength = 0.03
+shader_parameter/scanline_strength = 0.025
 shader_parameter/glitch_intensity = 0.0
+shader_parameter/pulse_intensity = 0.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_chord"]
+shader = ExtResource("4_tactical_shader")
+shader_parameter/panel_bg_color = Color(0.07, 0.085, 0.12, 0.96)
+shader_parameter/border_color = Color(0, 0.96, 0.83, 0.85)
+shader_parameter/accent_color = Color(0, 0.96, 0.83, 1)
+shader_parameter/hazard_yellow = Color(1, 0.82, 0.05, 1)
+shader_parameter/hazard_black = Color(0.06, 0.06, 0.08, 1)
+shader_parameter/enable_hazard_stripes = false
+shader_parameter/is_panic_panel = false
+shader_parameter/border_width = 2.5
+shader_parameter/corner_cut_size = 16.0
+shader_parameter/scanline_strength = 0.02
+shader_parameter/glitch_intensity = 0.0
+shader_parameter/pulse_intensity = 0.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_next_chord"]
+shader = ExtResource("4_tactical_shader")
+shader_parameter/panel_bg_color = Color(0.09, 0.10, 0.14, 0.96)
+shader_parameter/border_color = Color(1, 0.72, 0.01, 0.85)
+shader_parameter/accent_color = Color(1, 0.72, 0.01, 1)
+shader_parameter/hazard_yellow = Color(1, 0.82, 0.05, 1)
+shader_parameter/hazard_black = Color(0.06, 0.06, 0.08, 1)
+shader_parameter/enable_hazard_stripes = false
+shader_parameter/is_panic_panel = false
+shader_parameter/border_width = 2.0
+shader_parameter/corner_cut_size = 12.0
+shader_parameter/scanline_strength = 0.02
+shader_parameter/glitch_intensity = 0.0
+shader_parameter/pulse_intensity = 0.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lyric"]
+shader = ExtResource("4_tactical_shader")
+shader_parameter/panel_bg_color = Color(0.055, 0.065, 0.09, 0.96)
+shader_parameter/border_color = Color(0.25, 0.32, 0.44, 0.8)
+shader_parameter/accent_color = Color(0, 0.96, 0.83, 0.4)
+shader_parameter/hazard_yellow = Color(1, 0.82, 0.05, 1)
+shader_parameter/hazard_black = Color(0.06, 0.06, 0.08, 1)
+shader_parameter/enable_hazard_stripes = false
+shader_parameter/is_panic_panel = false
+shader_parameter/border_width = 1.5
+shader_parameter/corner_cut_size = 12.0
+shader_parameter/scanline_strength = 0.02
+shader_parameter/glitch_intensity = 0.0
+shader_parameter/pulse_intensity = 0.0
 
 [node name="MainStageView" type="Control"]
 layout_mode = 3
@@ -65,7 +114,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.0431373, 0.0509804, 0.0627451, 1)
+color = Color(0.039, 0.045, 0.058, 1)
 
 [node name="HUD" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -86,7 +135,7 @@ layout_mode = 2
 theme_override_constants/separation = 14
 
 [node name="BrandPill" type="PanelContainer" parent="HUD/TopBar"]
-custom_minimum_size = Vector2(320, 0)
+custom_minimum_size = Vector2(330, 0)
 layout_mode = 2
 
 [node name="BrandLabel" type="Label" parent="HUD/TopBar/BrandPill"]
@@ -144,13 +193,25 @@ text = "[BPM: 128 /// 4/4] [BEAT: 03/16]"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="PanicButton" type="Button" parent="HUD/TopBar"]
+[node name="PanicButtonContainer" type="PanelContainer" parent="HUD/TopBar"]
 material = SubResource("ShaderMaterial_panic")
-custom_minimum_size = Vector2(240, 0)
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+
+[node name="PanicButton" type="Button" parent="HUD/TopBar/PanicButtonContainer"]
+layout_mode = 2
+flat = true
+
+[node name="PanicLabel" type="Label" parent="HUD/TopBar/PanicButtonContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 13
-text = "! EMERGENCY PURGE / PANIC !"
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 14
+text = "[ ! PANIC / PURGE ! ]"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="CenterSplit" type="HBoxContainer" parent="HUD"]
 layout_mode = 2
@@ -172,7 +233,7 @@ theme_override_constants/separation = 12
 [node name="HeaderLabel" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
-text = "[SETLIST DECK] /// SLANTED TACTICAL CARDS"
+text = "[SETLIST DECK] /// SLANTED CARDS"
 
 [node name="ActiveHeader" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
 layout_mode = 2
@@ -315,21 +376,26 @@ theme_override_font_sizes/font_size = 12
 text = "// CURRENT HARMONY"
 
 [node name="CurrentChordBox" type="PanelContainer" parent="HUD/CenterSplit/ChordHud"]
+material = SubResource("ShaderMaterial_chord")
 custom_minimum_size = Vector2(0, 110)
 layout_mode = 2
 
-[node name="ChordLabel" type="Label" parent="HUD/CenterSplit/ChordHud/CurrentChordBox"]
+[node name="VBox" type="VBoxContainer" parent="HUD/CenterSplit/ChordHud/CurrentChordBox"]
+layout_mode = 2
+alignment = 1
+
+[node name="ChordLabel" type="Label" parent="HUD/CenterSplit/ChordHud/CurrentChordBox/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 72
+theme_override_font_sizes/font_size = 68
 text = "[ G#m7 ]"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="TransposePill" type="Label" parent="HUD/CenterSplit/ChordHud"]
+[node name="TransposePill" type="Label" parent="HUD/CenterSplit/ChordHud/CurrentChordBox/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0.96, 0.83, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "TRANSPOSE: [ +0 SEMITONES ]"
 horizontal_alignment = 1
 
@@ -340,13 +406,14 @@ theme_override_font_sizes/font_size = 12
 text = "// INCOMING TRANSITION"
 
 [node name="NextChordBox" type="PanelContainer" parent="HUD/CenterSplit/ChordHud"]
-custom_minimum_size = Vector2(0, 48)
+material = SubResource("ShaderMaterial_next_chord")
+custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 
 [node name="NextLabel" type="Label" parent="HUD/CenterSplit/ChordHud/NextChordBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.72, 0.01, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 18
 text = "NEXT CHORD -> C#m7"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -355,15 +422,31 @@ vertical_alignment = 1
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.8, 0.9, 1)
 theme_override_font_sizes/font_size = 12
-text = "// LYRIC TELEPROMPTER"
+text = "// LYRIC TELEPROMPTER [BAR: ACTIVE]"
 
 [node name="LyricBox" type="PanelContainer" parent="HUD/CenterSplit/ChordHud"]
+material = SubResource("ShaderMaterial_lyric")
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="LyricText" type="Label" parent="HUD/CenterSplit/ChordHud/LyricBox"]
+[node name="VBox" type="VBoxContainer" parent="HUD/CenterSplit/ChordHud/LyricBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.9, 0.95, 1, 1)
+offset_left = 12.0
+offset_top = 8.0
+offset_right = -12.0
+offset_bottom = -8.0
+alignment = 1
+
+[node name="LyricBarIndicator" type="Label" parent="HUD/CenterSplit/ChordHud/LyricBox/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.96, 0.83, 0.8)
+theme_override_font_sizes/font_size = 11
+text = ">> CURRENT BAR 012 // 4/4"
+horizontal_alignment = 1
+
+[node name="LyricText" type="Label" parent="HUD/CenterSplit/ChordHud/LyricBox/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.96, 1, 1)
 theme_override_font_sizes/font_size = 18
 text = "\"Kala fajar tiba,
 melangkah di tanah tua\""
@@ -387,7 +470,7 @@ text = "ZONE A: SUB-BASS (AMBER PULSE // C2-B3)"
 
 [node name="SplitLine" type="Label" parent="HUD/BottomKeybed/ZoneRow"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.2, 0.4, 1)
+theme_override_colors/font_color = Color(1, 0.2, 0.35, 1)
 theme_override_font_sizes/font_size = 12
 text = "[ SPLIT POINT: C4 ]"
 

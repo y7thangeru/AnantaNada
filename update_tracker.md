@@ -151,3 +151,19 @@ This file logs all file creations, modifications, deletions, refactorings, and f
 ### [2026-10-28 13:53:00 +07:00] - [MODIFY] `web/` (`index.html`, `style.css`, `app.js`)
 - **Action**: Upgraded mobile stage remote to the tactical cockpit theme.
 - **Reason**: Provides the same game HUD experience on stand-mounted mobile phones and tablets.
+
+### [2026-10-28 14:06:54 +07:00] - [REFACTOR] `src/Shaders/piano_keybed.gdshader`
+- **Action**: Completely overhauled 61-key piano shader to mathematically render 36 full-length ivory white keys and 25 elevated 60%-length obsidian black keys.
+- **Reason**: Solves key indistinguishability defect, adds realistic black key drop shadows, 3D specular bevels, and prominent Split Point C4 red divider.
+
+### [2026-10-28 14:08:55 +07:00] - [REFACTOR] `src/Shaders/waterfall_visualizer.gdshader`
+- **Action**: Solved cyan monolith washout by setting deep obsidian background (`#0b0d11`), added 18° trapezoidal 3D perspective runway, 61 lane column dividers, `hint_default_black` guard, and focused Hit Beam bloom.
+- **Reason**: Elevates visual depth and guarantees crisp falling note visibility without blinding stage glare.
+
+### [2026-10-28 14:07:38 +07:00] - [MODIFY] `scenes/MainStageView.tscn`
+- **Action**: Wrapped current and incoming chord boxes in Arknights-style chamfered polygonal tactical panels (`tactical_panel.gdshader`), added high-contrast `[ ! PANIC / PURGE ! ]` button labeling, and formatted lyric teleprompter with bar indicators.
+- **Reason**: Eliminates floating text defects and ensures instant recognition of stage emergency controls.
+
+### [2026-10-28 14:08:19 +07:00] - [MODIFY] `src/UI/MainStageController.cs`
+- **Action**: Added transition breathing pulse on incoming chord box (`_transitionPulse`) and synced lyric bar counter.
+- **Reason**: Enhances diegetic feedback ahead of song section transitions.
