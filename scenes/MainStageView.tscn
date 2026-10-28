@@ -1,32 +1,53 @@
-[gd_scene load_steps=6 format=3 uid="uid://b5d8g2hq9x8a"]
+[gd_scene load_steps=8 format=3 uid="uid://b5d8g2hq9x8a"]
 
 [ext_resource type="Script" path="res://src/UI/MainStageController.cs" id="1_controller"]
 [ext_resource type="Shader" path="res://src/Shaders/piano_keybed.gdshader" id="2_keybed_shader"]
 [ext_resource type="Shader" path="res://src/Shaders/waterfall_visualizer.gdshader" id="3_waterfall_shader"]
+[ext_resource type="Shader" path="res://src/Shaders/tactical_panel.gdshader" id="4_tactical_shader"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_keybed"]
 shader = ExtResource("2_keybed_shader")
-shader_parameter/color_white_key = Color(0.90, 0.92, 0.95, 1)
-shader_parameter/color_black_key = Color(0.07, 0.08, 0.11, 1)
+shader_parameter/color_white_key = Color(0.9, 0.92, 0.96, 1)
+shader_parameter/color_black_key = Color(0.06, 0.07, 0.09, 1)
 shader_parameter/color_neon_cyan = Color(0, 0.96, 0.83, 1)
 shader_parameter/color_neon_amber = Color(1, 0.72, 0.01, 1)
 shader_parameter/color_border = Color(0.04, 0.05, 0.06, 1)
+shader_parameter/color_split_divider = Color(1, 0.2, 0.4, 0.8)
 shader_parameter/black_key_height_ratio = 0.62
 shader_parameter/black_key_width_ratio = 0.58
 shader_parameter/border_thickness = 0.006
-shader_parameter/glow_intensity = 2.4
-shader_parameter/chromatic_offset = 0.003
+shader_parameter/glow_intensity = 3.2
+shader_parameter/chromatic_offset = 0.005
+shader_parameter/beat_pulse = 0.0
+shader_parameter/split_point_norm = 0.393
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_waterfall"]
 shader = ExtResource("3_waterfall_shader")
-shader_parameter/background_color = Color(0.043, 0.051, 0.063, 0.95)
-shader_parameter/grid_line_color = Color(0.12, 0.15, 0.20, 0.4)
-shader_parameter/strike_line_color = Color(0, 0.96, 0.83, 1)
-shader_parameter/beat_marker_color = Color(1, 0.72, 0.01, 0.35)
-shader_parameter/scroll_speed = 1.2
+shader_parameter/background_color = Color(0.043, 0.051, 0.063, 0.98)
+shader_parameter/grid_line_color = Color(0.12, 0.16, 0.22, 0.5)
+shader_parameter/hit_beam_color = Color(0, 0.96, 0.83, 1)
+shader_parameter/beat_marker_color = Color(1, 0.72, 0.01, 0.45)
+shader_parameter/spark_flash_color = Color(1, 1, 1, 1)
+shader_parameter/scroll_speed = 1.3
 shader_parameter/beat_frequency = 2.0
-shader_parameter/strike_line_y = 0.96
-shader_parameter/bloom_spread = 0.08
+shader_parameter/strike_line_y = 0.95
+shader_parameter/bloom_spread = 0.1
+shader_parameter/beat_pulse = 0.0
+shader_parameter/hit_beam_flash = 0.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_panic"]
+shader = ExtResource("4_tactical_shader")
+shader_parameter/panel_bg_color = Color(0.15, 0.04, 0.06, 0.95)
+shader_parameter/border_color = Color(0.93, 0.14, 0.23, 1)
+shader_parameter/accent_color = Color(1, 0.82, 0.05, 1)
+shader_parameter/hazard_yellow = Color(1, 0.82, 0.05, 1)
+shader_parameter/hazard_black = Color(0.08, 0.08, 0.08, 1)
+shader_parameter/enable_hazard_stripes = true
+shader_parameter/is_panic_panel = true
+shader_parameter/border_width = 3.0
+shader_parameter/corner_cut_size = 14.0
+shader_parameter/scanline_strength = 0.03
+shader_parameter/glitch_intensity = 0.0
 
 [node name="MainStageView" type="Control"]
 layout_mode = 3
@@ -51,46 +72,60 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 24.0
-offset_top = 20.0
-offset_right = -24.0
-offset_bottom = -20.0
+offset_left = 20.0
+offset_top = 16.0
+offset_right = -20.0
+offset_bottom = -16.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 12
 
 [node name="TopBar" type="HBoxContainer" parent="HUD"]
-custom_minimum_size = Vector2(0, 64)
+custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 14
 
 [node name="BrandPill" type="PanelContainer" parent="HUD/TopBar"]
-custom_minimum_size = Vector2(260, 0)
+custom_minimum_size = Vector2(320, 0)
 layout_mode = 2
 
 [node name="BrandLabel" type="Label" parent="HUD/TopBar/BrandPill"]
 layout_mode = 2
-text = "ANANTANADA // GO:KEYS 3"
+theme_override_font_sizes/font_size = 13
+text = "// SYS_STATUS: OPERATIONAL [ANANTANADA V1.0]"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="DevicePill" type="PanelContainer" parent="HUD/TopBar"]
-custom_minimum_size = Vector2(240, 0)
+custom_minimum_size = Vector2(260, 0)
 layout_mode = 2
 
 [node name="StatusLabel" type="Label" parent="HUD/TopBar/DevicePill"]
 layout_mode = 2
-text = "SCANNING HARDWARE..."
+theme_override_font_sizes/font_size = 13
+text = "> LINK: ROLAND GO:KEYS 3 [ONLINE]"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MemoryPill" type="PanelContainer" parent="HUD/TopBar"]
+custom_minimum_size = Vector2(210, 0)
+layout_mode = 2
+
+[node name="MemoryLabel" type="Label" parent="HUD/TopBar/MemoryPill"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "> MEMORY: IN-RAM SAFE"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="NetworkPill" type="PanelContainer" parent="HUD/TopBar"]
-custom_minimum_size = Vector2(300, 0)
+custom_minimum_size = Vector2(260, 0)
 layout_mode = 2
 
 [node name="IpLabel" type="Label" parent="HUD/TopBar/NetworkPill"]
 layout_mode = 2
-text = "HUB: http://127.0.0.1:8080"
+theme_override_font_sizes/font_size = 13
+text = "> LINK: http://127.0.0.1:8080"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -99,103 +134,276 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="BpmPill" type="PanelContainer" parent="HUD/TopBar"]
-custom_minimum_size = Vector2(140, 0)
+custom_minimum_size = Vector2(280, 0)
 layout_mode = 2
 
 [node name="BpmLabel" type="Label" parent="HUD/TopBar/BpmPill"]
 layout_mode = 2
-text = "128 BPM"
+theme_override_font_sizes/font_size = 13
+text = "[BPM: 128 /// 4/4] [BEAT: 03/16]"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="PanicButton" type="Button" parent="HUD/TopBar"]
-custom_minimum_size = Vector2(180, 0)
+material = SubResource("ShaderMaterial_panic")
+custom_minimum_size = Vector2(240, 0)
 layout_mode = 2
-text = "EMERGENCY PANIC"
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "! EMERGENCY PURGE / PANIC !"
 
-[node name="CenterPanel" type="HSplitContainer" parent="HUD"]
+[node name="CenterSplit" type="HBoxContainer" parent="HUD"]
 layout_mode = 2
 size_flags_vertical = 3
+theme_override_constants/separation = 16
 
-[node name="SetlistDrawer" type="PanelContainer" parent="HUD/CenterPanel"]
-custom_minimum_size = Vector2(340, 0)
+[node name="SetlistDeck" type="PanelContainer" parent="HUD/CenterSplit"]
+custom_minimum_size = Vector2(330, 0)
 layout_mode = 2
 
-[node name="VBox" type="VBoxContainer" parent="HUD/CenterPanel/SetlistDrawer"]
+[node name="MissionContainer" type="VBoxContainer" parent="HUD/CenterSplit/SetlistDeck"]
 layout_mode = 2
-offset_left = 12.0
+offset_left = 14.0
 offset_top = 12.0
-offset_right = -12.0
+offset_right = -14.0
 offset_bottom = -12.0
-theme_override_constants/separation = 10
+theme_override_constants/separation = 12
 
-[node name="Title" type="Label" parent="HUD/CenterPanel/SetlistDrawer/VBox"]
+[node name="HeaderLabel" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
 layout_mode = 2
-text = "/// LIVE SETLIST ROSTER"
+theme_override_font_sizes/font_size = 13
+text = "[SETLIST DECK] /// SLANTED TACTICAL CARDS"
 
-[node name="SongList" type="ItemList" parent="HUD/CenterPanel/SetlistDrawer/VBox"]
+[node name="ActiveHeader" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
 layout_mode = 2
-size_flags_vertical = 3
-item_count = 4
-item_0/text = "01. Neo Shibuya Dawn [128 BPM]"
-item_1/text = "02. Cybernetic Groove [134 BPM]"
-item_2/text = "03. Midnight Reverie [92 BPM]"
-item_3/text = "04. Overdrive Anthem [140 BPM]"
+theme_override_colors/font_color = Color(1, 0.72, 0.01, 1)
+theme_override_font_sizes/font_size = 12
+text = "// ACTIVE MISSION"
 
-[node name="Teleprompter" type="VBoxContainer" parent="HUD/CenterPanel"]
+[node name="ActiveCard" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+
+[node name="MissionName" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/ActiveCard"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "> 01. SENJA DUST"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NextHeader" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.96, 0.83, 1)
+theme_override_font_sizes/font_size = 12
+text = "// NEXT MISSIONS"
+
+[node name="NextCard1" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard1"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "    02. KELANA BEAT"
+vertical_alignment = 1
+
+[node name="NextCard2" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard2"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "    03. FAJAR REVERIE"
+vertical_alignment = 1
+
+[node name="NextCard3" type="PanelContainer" parent="HUD/CenterSplit/SetlistDeck/MissionContainer"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HUD/CenterSplit/SetlistDeck/MissionContainer/NextCard3"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "    04. OVERDRIVE ANTHEM"
+vertical_alignment = 1
+
+[node name="CenterCascade" type="VBoxContainer" parent="HUD/CenterSplit"]
 layout_mode = 2
 size_flags_horizontal = 3
-alignment = 1
+theme_override_constants/separation = 10
 
-[node name="SongTitle" type="Label" parent="HUD/CenterPanel/Teleprompter"]
-layout_mode = 2
-text = "01. Neo Shibuya Dawn"
-horizontal_alignment = 1
-
-[node name="CurrentChord" type="Label" parent="HUD/CenterPanel/Teleprompter"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 96
-text = "G#m7"
-horizontal_alignment = 1
-
-[node name="NextChord" type="Label" parent="HUD/CenterPanel/Teleprompter"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "NEXT: C#m7"
-horizontal_alignment = 1
-
-[node name="BarBeatLabel" type="Label" parent="HUD/CenterPanel/Teleprompter"]
-layout_mode = 2
-text = "BAR 012 . BEAT 3"
-horizontal_alignment = 1
-
-[node name="ActivePatch" type="Label" parent="HUD/CenterPanel/Teleprompter"]
-layout_mode = 2
-text = "PATCH: Vintage EP 1 (MSB:87 LSB:64 PC:14)"
-horizontal_alignment = 1
-
-[node name="WaterfallContainer" type="Control" parent="HUD"]
-custom_minimum_size = Vector2(0, 160)
+[node name="CascadeHeader" type="HBoxContainer" parent="HUD/CenterSplit/CenterCascade"]
 layout_mode = 2
 
-[node name="WaterfallRect" type="ColorRect" parent="HUD/WaterfallContainer"]
+[node name="Title" type="Label" parent="HUD/CenterSplit/CenterCascade/CascadeHeader"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "[CYBER-CASCADE: WATERFALL VISUALIZER] ===== HIT BEAM ====="
+
+[node name="Spacer" type="Control" parent="HUD/CenterSplit/CenterCascade/CascadeHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HitBeamTag" type="Label" parent="HUD/CenterSplit/CenterCascade/CascadeHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.96, 0.83, 1)
+theme_override_font_sizes/font_size = 13
+text = "NEON EXPLOSION FX // READY"
+
+[node name="WaterfallRect" type="ColorRect" parent="HUD/CenterSplit/CenterCascade"]
 material = SubResource("ShaderMaterial_waterfall")
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 2
+size_flags_vertical = 3
 
-[node name="BottomBar" type="VBoxContainer" parent="HUD"]
+[node name="CoachDeck" type="HBoxContainer" parent="HUD/CenterSplit/CenterCascade"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TimingVerdict" type="Label" parent="HUD/CenterSplit/CenterCascade/CoachDeck"]
+custom_minimum_size = Vector2(230, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.96, 0.83, 1)
+theme_override_font_sizes/font_size = 14
+text = "ACCURACY: [ PERFECT! ]"
+vertical_alignment = 1
+
+[node name="AccuracyValue" type="Label" parent="HUD/CenterSplit/CenterCascade/CoachDeck"]
+custom_minimum_size = Vector2(170, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.72, 0.01, 1)
+theme_override_font_sizes/font_size = 14
+text = "SCORE ACC: 98.4%"
+vertical_alignment = 1
+
+[node name="StrikeGauge" type="Label" parent="HUD/CenterSplit/CenterCascade/CoachDeck"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 14
+text = "STRIKE: [ |||||||||||||||| ] 118 (ff)"
+vertical_alignment = 1
+
+[node name="RankBadge" type="Label" parent="HUD/CenterSplit/CenterCascade/CoachDeck"]
+custom_minimum_size = Vector2(110, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.2, 0.4, 1)
+theme_override_font_sizes/font_size = 18
+text = "RANK [S]"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RetroBufferBtn" type="Button" parent="HUD/CenterSplit/CenterCascade/CoachDeck"]
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "RETRO-BUFFER: [ 5m CAPTURE ARMED ]"
+
+[node name="ChordHud" type="VBoxContainer" parent="HUD/CenterSplit"]
+custom_minimum_size = Vector2(360, 0)
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="KeybedContainer" type="Control" parent="HUD/BottomBar"]
+[node name="HudHeader" type="Label" parent="HUD/CenterSplit/ChordHud"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "[CHORD TACTICAL HUD]"
+
+[node name="CurrentHarmonyHeader" type="Label" parent="HUD/CenterSplit/ChordHud"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.72, 0.01, 1)
+theme_override_font_sizes/font_size = 12
+text = "// CURRENT HARMONY"
+
+[node name="CurrentChordBox" type="PanelContainer" parent="HUD/CenterSplit/ChordHud"]
+custom_minimum_size = Vector2(0, 110)
+layout_mode = 2
+
+[node name="ChordLabel" type="Label" parent="HUD/CenterSplit/ChordHud/CurrentChordBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 72
+text = "[ G#m7 ]"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TransposePill" type="Label" parent="HUD/CenterSplit/ChordHud"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.96, 0.83, 1)
+theme_override_font_sizes/font_size = 13
+text = "TRANSPOSE: [ +0 SEMITONES ]"
+horizontal_alignment = 1
+
+[node name="TransitionHeader" type="Label" parent="HUD/CenterSplit/ChordHud"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.96, 0.83, 1)
+theme_override_font_sizes/font_size = 12
+text = "// INCOMING TRANSITION"
+
+[node name="NextChordBox" type="PanelContainer" parent="HUD/CenterSplit/ChordHud"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+
+[node name="NextLabel" type="Label" parent="HUD/CenterSplit/ChordHud/NextChordBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.72, 0.01, 1)
+theme_override_font_sizes/font_size = 20
+text = "NEXT CHORD -> C#m7"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LyricHeader" type="Label" parent="HUD/CenterSplit/ChordHud"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.8, 0.9, 1)
+theme_override_font_sizes/font_size = 12
+text = "// LYRIC TELEPROMPTER"
+
+[node name="LyricBox" type="PanelContainer" parent="HUD/CenterSplit/ChordHud"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LyricText" type="Label" parent="HUD/CenterSplit/ChordHud/LyricBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "\"Kala fajar tiba,
+melangkah di tanah tua\""
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="BottomKeybed" type="VBoxContainer" parent="HUD"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ZoneRow" type="HBoxContainer" parent="HUD/BottomKeybed"]
+layout_mode = 2
+
+[node name="ZoneALabel" type="Label" parent="HUD/BottomKeybed/ZoneRow"]
+custom_minimum_size = Vector2(680, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.72, 0.01, 1)
+theme_override_font_sizes/font_size = 12
+text = "ZONE A: SUB-BASS (AMBER PULSE // C2-B3)"
+
+[node name="SplitLine" type="Label" parent="HUD/BottomKeybed/ZoneRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.2, 0.4, 1)
+theme_override_font_sizes/font_size = 12
+text = "[ SPLIT POINT: C4 ]"
+
+[node name="ZoneBLabel" type="Label" parent="HUD/BottomKeybed/ZoneRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0, 0.96, 0.83, 1)
+theme_override_font_sizes/font_size = 12
+text = "ZONE B: NEO-SOLO LEAD (CYAN OVERDRIVE // C4-C7)"
+horizontal_alignment = 2
+
+[node name="KeybedContainer" type="Control" parent="HUD/BottomKeybed"]
 custom_minimum_size = Vector2(0, 130)
 layout_mode = 2
 
-[node name="KeybedRect" type="ColorRect" parent="HUD/BottomBar/KeybedContainer"]
+[node name="KeybedRect" type="ColorRect" parent="HUD/BottomKeybed/KeybedContainer"]
 material = SubResource("ShaderMaterial_keybed")
 layout_mode = 1
 anchors_preset = 15
@@ -203,47 +411,3 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-
-[node name="ControlRow" type="HBoxContainer" parent="HUD/BottomBar"]
-custom_minimum_size = Vector2(0, 50)
-layout_mode = 2
-theme_override_constants/separation = 20
-
-[node name="NeverLostMelodyBtn" type="Button" parent="HUD/BottomBar/ControlRow"]
-custom_minimum_size = Vector2(280, 0)
-layout_mode = 2
-text = "AMBIL IDE TADI (LAST 5 MINS .MID)"
-
-[node name="SplitMonitorPill" type="PanelContainer" parent="HUD/BottomBar/ControlRow"]
-custom_minimum_size = Vector2(320, 0)
-layout_mode = 2
-
-[node name="SplitLabel" type="Label" parent="HUD/BottomBar/ControlRow/SplitMonitorPill"]
-layout_mode = 2
-text = "SPLIT: C2-B3 (BASS) / C4-C7 (LEAD)"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="CueSplitPill" type="PanelContainer" parent="HUD/BottomBar/ControlRow"]
-custom_minimum_size = Vector2(260, 0)
-layout_mode = 2
-
-[node name="CueLabel" type="Label" parent="HUD/BottomBar/ControlRow/CueSplitPill"]
-layout_mode = 2
-text = "OUTPUT: MAIN (PA) + CUE (IEM)"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Spacer" type="Control" parent="HUD/BottomBar/ControlRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="TransposePill" type="PanelContainer" parent="HUD/BottomBar/ControlRow"]
-custom_minimum_size = Vector2(200, 0)
-layout_mode = 2
-
-[node name="TransposeLabel" type="Label" parent="HUD/BottomBar/ControlRow/TransposePill"]
-layout_mode = 2
-text = "TRANSPOSE: +0 SEMITONES"
-horizontal_alignment = 1
-vertical_alignment = 1
