@@ -3,165 +3,562 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AnantaNada // Tactical Cockpit Remote</title>
+  <title>ANANTANADA // Designed for Roland GO:KEYS 3</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
 </head>
-<body class="cockpit-body">
-  <div class="cockpit-container">
-    <!-- Top System Telemetry Header -->
-    <header class="tactical-header">
-      <div class="sys-badge">
-        <span class="status-dot online"></span>
-        <span class="sys-title">// SYS_STATUS: OPERATIONAL</span>
+<body class="ohpe-body">
+  <!-- Outer Matte Cream Anodized Unibody Chassis -->
+  <div class="ohpe-chassis">
+
+    <!-- Top Hardware Navigation Bar -->
+    <header class="ohpe-topbar">
+      <div class="topbar-left">
+        <span class="ohpe-version">V0.9.3</span>
+        <div class="ohpe-logo">
+          <span class="logo-mark">Ⓦ</span>
+          <span class="logo-text">ANANTANADA<span class="logo-dot">.</span></span>
+          <span class="logo-sub">designed for roland go:keys 3</span>
+        </div>
       </div>
-      <div class="link-badge" id="deviceTag">> LINK: ROLAND GO:KEYS 3 [ONLINE]</div>
-      <div class="cadence-beat-widget">
-        <img src="assets/ui_sprites/png/hud_cadence_heart_pulse.png" alt="Cadence Beat Pulse" id="cadenceHeart" class="beat-pulse-img" />
+
+      <div class="topbar-center">
+        <!-- Part / Zone Selector -->
+        <div class="part-selector">
+          <span class="top-label">PART</span>
+          <div class="part-pill-group">
+            <button class="part-pill active" data-part="1">1</button>
+            <button class="part-pill" data-part="2">2</button>
+            <button class="part-pill" data-part="3">3</button>
+            <button class="part-pill" data-part="4">4</button>
+          </div>
+        </div>
+
+        <!-- Preset / Repertoire Navigator -->
+        <div class="preset-navigator">
+          <span class="top-label">PRESET / REPERTOIRE</span>
+          <div class="preset-box">
+            <button class="preset-arrow" id="btnPrevSong">◀</button>
+            <span class="preset-name" id="activeMissionName">001. Dan - Sheila on 7</span>
+            <button class="preset-arrow" id="btnNextSong">▶</button>
+          </div>
+        </div>
+
+        <!-- View Switchers -->
+        <div class="view-switchers">
+          <button class="view-pill" id="btnLibrary">
+            <img src="assets/ui_sprites/png/ohpe_ic_lyrics.png" class="view-icon" alt="Lib">
+            LIBRARY
+          </button>
+          <button class="view-pill active" id="btnPro">
+            <img src="assets/ui_sprites/png/ohpe_ic_stage.png" class="view-icon" alt="Stage">
+            STAGE
+          </button>
+          <button class="view-pill" id="btnTape">
+            <img src="assets/ui_sprites/png/ohpe_ic_tape.png" class="view-icon" alt="Tape">
+            RETRO
+          </button>
+        </div>
       </div>
-      <div class="bpm-badge" id="bpmTag">[BPM: 128 /// 4/4] [BEAT: 03/16]</div>
-      <div class="gold-coin-box" title="Moonlighter Merchant Sovereign">
-        <img src="assets/ui_sprites/png/badge_gold_coin_rpg.png" class="gold-coin-img" alt="Gold Sovereign" />
+
+      <div class="topbar-right">
+        <div class="quick-dials">
+          <button class="circle-dial dial-random" id="btnPanic" title="Emergency MIDI Panic">
+            <img src="assets/ui_sprites/png/ohpe_dial_random.png" alt="Panic">
+            <span class="dial-label">PANIC</span>
+          </button>
+          <button class="circle-dial dial-save" id="btnCapture" title="Capture 5m Retroactive MIDI Buffer">
+            <img src="assets/ui_sprites/png/ohpe_dial_save.png" alt="Save">
+            <span class="dial-label">SAVE</span>
+          </button>
+          <button class="circle-dial dial-settings" id="btnSettings" title="Workstation Settings">
+            <img src="assets/ui_sprites/png/ohpe_dial_settings.png" alt="Settings">
+            <span class="dial-label">SETTINGS</span>
+          </button>
+        </div>
+
+        <div class="sys-telemetry">
+          <div class="telem-row"><span class="telem-key">LINK</span><span class="telem-val green" id="linkTag">BLE MIDI [ONLINE]</span></div>
+          <div class="telem-row"><span class="telem-key">CPU</span><span class="telem-val">0 %</span></div>
+        </div>
       </div>
-      <button class="hazard-purge-btn" id="panicBtn">! EMERGENCY PURGE / PANIC !</button>
     </header>
 
-    <!-- Main Tactical Workspace -->
-    <main class="cockpit-grid">
-      <!-- Left: Setlist Deck -->
-      <section class="panel setlist-deck">
-        <div class="setlist-badge-banner">
-          <img src="assets/ui_sprites/png/frame_moonlighter_stitched_tab.png" class="moonlighter-tab" alt="Moonlighter Ledger" />
-          <img src="assets/ui_sprites/png/tape_lis_washi_strip.png" class="washi-tape" alt="LiS Tape" />
+    <!-- Main Workspace (3-Column Symmetrical Grid) -->
+    <main class="ohpe-main-grid">
+
+      <!-- Left Rail: Roland Sound Categories / Engines (2x4 Grid) -->
+      <aside class="ohpe-rail left-rail">
+        <div class="rail-header">ENGINE / CATEGORY</div>
+        <div class="tiles-grid">
+          <button class="ohpe-tile active" data-cat="PIANO">
+            <img src="assets/ui_sprites/png/ohpe_ic_piano.png" class="tile-icon" alt="Piano">
+            <span class="tile-label">PIANO</span>
+          </button>
+          <button class="ohpe-tile" data-cat="E.PIANO">
+            <img src="assets/ui_sprites/png/ohpe_ic_epiano.png" class="tile-icon" alt="EP">
+            <span class="tile-label">E.PIANO</span>
+          </button>
+          <button class="ohpe-tile" data-cat="ORGAN">
+            <img src="assets/ui_sprites/png/ohpe_ic_organ.png" class="tile-icon" alt="Organ">
+            <span class="tile-label">ORGAN</span>
+          </button>
+          <button class="ohpe-tile" data-cat="STRINGS">
+            <img src="assets/ui_sprites/png/ohpe_ic_strings.png" class="tile-icon" alt="Strings">
+            <span class="tile-label">STRINGS</span>
+          </button>
+          <button class="ohpe-tile" data-cat="BRASS">
+            <img src="assets/ui_sprites/png/ohpe_ic_brass.png" class="tile-icon" alt="Brass">
+            <span class="tile-label">BRASS</span>
+          </button>
+          <button class="ohpe-tile" data-cat="SYNTH">
+            <img src="assets/ui_sprites/png/ohpe_ic_synth.png" class="tile-icon" alt="Synth">
+            <span class="tile-label">SYNTH</span>
+          </button>
+          <button class="ohpe-tile" data-cat="PAD">
+            <img src="assets/ui_sprites/png/ohpe_ic_pad.png" class="tile-icon" alt="Pad">
+            <span class="tile-label">PAD</span>
+          </button>
+          <button class="ohpe-tile" data-cat="SAMPLER">
+            <img src="assets/ui_sprites/png/ohpe_ic_sampler.png" class="tile-icon" alt="Sampler">
+            <span class="tile-label">SAMPLER</span>
+          </button>
         </div>
-        <div class="rpg-tabs-row">
-          <img src="assets/ui_sprites/png/tab_mint.png" class="rpg-tab" alt="Mint" />
-          <img src="assets/ui_sprites/png/tab_honey.png" class="rpg-tab" alt="Honey" />
-          <img src="assets/ui_sprites/png/tab_berry.png" class="rpg-tab" alt="Berry" />
-        </div>
-        <div class="panel-header">[SETLIST DECK] /// 100-SONG REPERTOIRE</div>
-        <div class="mission-tag active-tag">★ ACTIVE MISSION (STAR RECIPE)</div>
-        <div class="mission-card active-card" id="activeCard">
-          <div class="card-badge star-badge">
-            <img src="assets/ui_sprites/png/badge_star_pin.png" class="star-pin-img" alt="Star Pin" />
+
+        <div class="rail-footer-slider">
+          <div class="slider-info">
+            <span class="sub-label">SPLIT POINT</span>
+            <span class="slider-val" id="lblSplitPoint">C4 (50%)</span>
           </div>
-          <div class="card-details">
-            <span class="mission-title" id="activeMissionName">SENJA DUST</span>
-            <span class="mission-patch" id="activePatchName">> 01 • Vintage EP 1</span>
+          <div class="progress-track">
+            <div class="progress-bar pink" style="width: 50%;"></div>
           </div>
         </div>
+      </aside>
 
-        <div class="mission-tag next-tag">// NEXT MISSIONS</div>
-        <div class="next-missions-list" id="setlistGrid">
-          <button class="mission-card" data-index="1" data-msb="87" data-lsb="65" data-pc="4">
-            <div class="card-badge">02</div>
-            <div class="card-details">
-              <span class="mission-title">KELANA BEAT</span>
-              <span class="mission-patch">Fat Saw Lead • 128 BPM</span>
-            </div>
-          </button>
-          <button class="mission-card" data-index="2" data-msb="87" data-lsb="64" data-pc="1">
-            <div class="card-badge">03</div>
-            <div class="card-details">
-              <span class="mission-title">FAJAR REVERIE</span>
-              <span class="mission-patch">Warm Grand • 105 BPM</span>
-            </div>
-          </button>
-          <button class="mission-card" data-index="3" data-msb="87" data-lsb="66" data-pc="22">
-            <div class="card-badge">04</div>
-            <div class="card-details">
-              <span class="mission-title">OVERDRIVE ANTHEM</span>
-              <span class="mission-patch">Brass Punch • 140 BPM</span>
-            </div>
-          </button>
-        </div>
-      </section>
+      <!-- Center Stage: Dark Recessed OLED Display -->
+      <section class="ohpe-center-screen" id="mainCenterScreen">
+        <!-- Screen Top Bar -->
+        <div class="screen-topbar">
+          <div class="screen-title-group">
+            <span class="engine-title" id="activePatchName">ROLAND ZEN-CORE / STAGE LEAD</span>
+            <span class="badge-pill yellow">P1</span>
+            <span class="badge-pill purple">🎧 3D STEREO</span>
+          </div>
 
-      <!-- Center: Rhythm Coach & Strike Gauge -->
-      <section class="panel coach-panel">
-        <div class="scalloped-cloud-header">
-          <img src="assets/ui_sprites/png/scalloped_cloud_banner.png" class="cloud-banner-img" alt="AC Scalloped Canopy" />
-        </div>
-        <div class="minimetro-transit-container">
-          <img src="assets/ui_sprites/png/widget_minimetro_transit_map.png" class="transit-map-img" alt="Mini Metro Song Transit" />
-        </div>
-        <!-- Section Navigation Bar -->
-        <div class="section-bar" style="display: flex; gap: 6px; justify-content: center; margin: 4px 0 8px 0;">
-          <button class="stage-btn-mini section-btn" data-sec="INTRO" data-bar="1" style="padding: 2px 8px; font-size: 11px; cursor: pointer; background: #2b1f14; border: 1px solid #c8a86b; color: #fff; border-radius: 4px;">❖ INTRO</button>
-          <button class="stage-btn-mini section-btn" data-sec="VERSE" data-bar="5" style="padding: 2px 8px; font-size: 11px; cursor: pointer; background: #2b1f14; border: 1px solid #c8a86b; color: #fff; border-radius: 4px;">❖ VERSE</button>
-          <button class="stage-btn-mini section-btn" data-sec="CHORUS" data-bar="17" style="padding: 2px 8px; font-size: 11px; cursor: pointer; background: #2b1f14; border: 1px solid #c8a86b; color: #fff; border-radius: 4px;">✦ CHORUS</button>
-          <button class="stage-btn-mini section-btn" data-sec="SOLO" data-bar="29" style="padding: 2px 8px; font-size: 11px; cursor: pointer; background: #2b1f14; border: 1px solid #c8a86b; color: #fff; border-radius: 4px;">✪ SOLO</button>
-          <button class="stage-btn-mini section-btn" data-sec="OUTRO" data-bar="37" style="padding: 2px 8px; font-size: 11px; cursor: pointer; background: #2b1f14; border: 1px solid #c8a86b; color: #fff; border-radius: 4px;">◼ OUTRO</button>
-        </div>
-        <div class="panel-header">[PERFORMANCE COMBO / TIMING COACH]</div>
-        
-        <div class="arcade-badges-row">
-          <img src="assets/ui_sprites/png/badge_djmax_judgement_max.png" class="djmax-badge" alt="DJMAX Judgement" id="djmaxBadge" />
-          <img src="assets/ui_sprites/png/gauge_rpg_mana_bar.png" class="rpg-mana-gauge" alt="RPG Mana Reservoir" />
-          <img src="assets/ui_sprites/png/emoji_reaction_cheer.png" class="cheer-emoji" alt="Cheer Reaction Stamp" />
-          <img src="assets/ui_sprites/png/badge_hifi_comic_burst.png" class="hifi-burst" alt="Hi-Fi Burst" id="hifiBurst" />
-        </div>
-
-        <div class="accuracy-banner">
-          <span class="verdict-tag" id="timingVerdict">ACCURACY: [ PERFECT! ]</span>
-          <span class="score-tag" id="scoreAcc">SCORE ACC: 98.4%</span>
-        </div>
-
-        <div class="strike-gauge-box">
-          <div class="gauge-label">DYNAMIC STRIKE GAUGE</div>
-          <div class="gauge-meter" id="strikeGauge">STRIKE: [ |||||||||||||||| ] 118 (ff)</div>
-          <div class="rank-badge" id="rankBadge">RANK [S]</div>
-        </div>
-
-        <div class="beat-stepper">
-          <span class="step active" id="beat1">01</span>
-          <span class="step" id="beat2">02</span>
-          <span class="step" id="beat3">03</span>
-          <span class="step" id="beat4">04</span>
-        </div>
-
-        <button class="retro-btn" id="retroBtn">
-          RETRO-BUFFER: [ 5m CAPTURE ARMED ]
-        </button>
-      </section>
-
-      <!-- Right: Chord Tactical HUD & Lyric Teleprompter -->
-      <section class="panel chord-tactical-hud">
-        <div class="nostalgia-ornament-wrap">
-          <img src="assets/ui_sprites/png/ornament_nostalgia_gilded_corner.png" class="nostalgia-corner" alt="NOSTALGIA Gold Corner" />
-        </div>
-        <div class="panel-header">[CHORD TACTICAL HUD]</div>
-        <div class="mission-tag active-tag">// CURRENT HARMONY</div>
-        <div class="chord-hero-box">
-          <div class="chord-giant" id="currentChord">[ G#m7 ]</div>
-          <div class="transpose-row" style="display: flex; gap: 6px; justify-content: center; align-items: center; margin-top: 4px;">
-            <button class="stage-btn-mini" id="btnWebTransposeDown" style="padding: 2px 8px; font-size: 11px; cursor: pointer; background: #2b1f14; border: 1px solid #c8a86b; color: #fff; border-radius: 4px;">[-1]</button>
-            <div class="transpose-tag" id="transposeTag" style="margin: 0;">TRANSPOSE: [ +0 ]</div>
-            <button class="stage-btn-mini" id="btnWebTransposeUp" style="padding: 2px 8px; font-size: 11px; cursor: pointer; background: #2b1f14; border: 1px solid #c8a86b; color: #fff; border-radius: 4px;">[+1]</button>
+          <div class="screen-telemetry-group">
+            <span class="tele-item lock">⊙ C MAJ 🔒</span>
+            <button class="screen-tap-btn" id="btnTapTempo">TAP</button>
+            <span class="tele-item bpm" id="bpmDisplay">100.0 BPM</span>
+            <span class="tele-item meter">4/4</span>
+            <span class="tele-item page">◀ 1/17 ▶</span>
           </div>
         </div>
 
-        <div class="taiko-drum-widget">
-          <img src="assets/ui_sprites/png/icon_taiko_don_ka_pair.png" class="taiko-img" alt="Taiko Don Ka" id="taikoImg" />
-          <span class="taiko-label" id="taikoLabel">[L: DON (Bass) // R: KA (Lead)]</span>
+        <!-- Section Navigation Timeline -->
+        <div class="screen-section-bar">
+          <button class="sec-chip active" data-sec="INTRO">INTRO</button>
+          <button class="sec-chip" data-sec="VERSE">VERSE</button>
+          <button class="sec-chip" data-sec="CHORUS">CHORUS</button>
+          <button class="sec-chip" data-sec="SOLO">SOLO</button>
+          <button class="sec-chip" data-sec="OUTRO">OUTRO</button>
         </div>
 
-        <div class="mission-tag next-tag">// INCOMING TRANSITION</div>
-        <div class="next-chord-pill" id="nextChord">NEXT CHORD -> C#m7</div>
+        <!-- Screen Visualizer Body -->
+        <div class="screen-body-split">
+          <!-- Left: Cyber-Cascade Runway & Live Chord Prompter -->
+          <div class="screen-visualizer-area">
+            <div class="chord-banner">
+              <div class="chord-active-box">
+                <span class="chord-caption">CURRENT HARMONY</span>
+                <span class="chord-giant" id="currentChord">G</span>
+                <div class="transpose-pill" id="transposeTag">
+                  <button class="trans-btn" id="btnTransDown">-</button>
+                  <span class="trans-text">TRANSPOSE: +0</span>
+                  <button class="trans-btn" id="btnTransUp">+</button>
+                </div>
+              </div>
+              <div class="next-chord-box">
+                <span class="next-caption">NEXT TRANSITION</span>
+                <span class="next-chord" id="nextChord">Em</span>
+              </div>
+            </div>
 
-        <div class="mission-tag lyric-tag">// LYRIC TELEPROMPTER</div>
-        <div class="lyric-box" id="lyricBox">
-          <img src="assets/ui_sprites/png/sticker_snipperclips_pastel_note.png" class="snipperclips-sticker" alt="Snipperclips Note" />
-          <span id="lyricText">"Kala fajar tiba, melangkah di tanah tua"</span>
+            <!-- Kinetic Waveform / Runway Area -->
+            <div class="oscilloscope-viewport">
+              <div class="grid-mesh"></div>
+              <div class="waveform-line"></div>
+              <div class="lyric-subtitle" id="lyricSubtitle">"Dan - Sheila on 7 // Intro: G - Em - C - D"</div>
+            </div>
+          </div>
+
+          <!-- Right: Real-time Macro Sliders -->
+          <div class="screen-macros-panel">
+            <div class="macro-header">MACROS</div>
+            
+            <div class="macro-item">
+              <div class="macro-label-row">
+                <span class="macro-dot red"></span>
+                <span class="macro-name">Shape / Balance</span>
+                <span class="macro-val" id="valShape">35 %</span>
+              </div>
+              <div class="macro-slider-track">
+                <div class="macro-fill red" style="width: 35%;"></div>
+                <div class="macro-thumb red" style="left: 35%;"></div>
+              </div>
+            </div>
+
+            <div class="macro-item">
+              <div class="macro-label-row">
+                <span class="macro-dot yellow"></span>
+                <span class="macro-name">Detune / Transpose</span>
+                <span class="macro-val" id="valDetune">15 %</span>
+              </div>
+              <div class="macro-slider-track">
+                <div class="macro-fill yellow" style="width: 15%;"></div>
+                <div class="macro-thumb yellow" style="left: 15%;"></div>
+              </div>
+            </div>
+
+            <div class="macro-item">
+              <div class="macro-label-row">
+                <span class="macro-dot purple"></span>
+                <span class="macro-name">Cutoff / Brightness</span>
+                <span class="macro-val" id="valCutoff">3.00 kHz</span>
+              </div>
+              <div class="macro-slider-track">
+                <div class="macro-fill purple" style="width: 65%;"></div>
+                <div class="macro-thumb purple" style="left: 65%;"></div>
+              </div>
+            </div>
+
+            <div class="macro-item">
+              <div class="macro-label-row">
+                <span class="macro-dot pink"></span>
+                <span class="macro-name">Resonance / Reverb</span>
+                <span class="macro-val" id="valResonance">45 %</span>
+              </div>
+              <div class="macro-slider-track">
+                <div class="macro-fill pink" style="width: 45%;"></div>
+                <div class="macro-thumb pink" style="left: 45%;"></div>
+              </div>
+            </div>
+
+            <div class="strike-rank-box">
+              <span class="rank-title">VELOCITY IMPACT</span>
+              <span class="rank-grade" id="rankBadge">RANK [S]</span>
+              <span class="strike-metric" id="strikeGauge">118 (ff)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Screen Bottom Bar: 16-Step Beat Dots & Key Info -->
+        <div class="screen-footer-bar">
+          <div class="step-dots-row">
+            <span class="dot active"></span><span class="dot active"></span><span class="dot active"></span><span class="dot"></span>
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          </div>
+          <span class="root-info">C ROOT POSITION</span>
+          <span class="voices-info">VOICES: <b>61-KEY (PHYSICAL)</b></span>
         </div>
       </section>
+
+      <!-- Right Rail: Mode & Navigation Tiles (2x4 Grid) -->
+      <aside class="ohpe-rail right-rail">
+        <div class="rail-header">MODE SWITCHER</div>
+        <div class="tiles-grid">
+          <button class="ohpe-tile active" data-mode="STAGE">
+            <img src="assets/ui_sprites/png/ohpe_ic_stage.png" class="tile-icon" alt="Stage">
+            <span class="tile-label">STAGE</span>
+          </button>
+          <button class="ohpe-tile" data-mode="WATERFALL">
+            <img src="assets/ui_sprites/png/ohpe_ic_waterfall.png" class="tile-icon" alt="Waterfall">
+            <span class="tile-label">WATERFALL</span>
+          </button>
+          <button class="ohpe-tile" data-mode="CHORDS">
+            <img src="assets/ui_sprites/png/ohpe_ic_chords.png" class="tile-icon" alt="Chords">
+            <span class="tile-label">CHORDS</span>
+          </button>
+          <button class="ohpe-tile" data-mode="LYRICS">
+            <img src="assets/ui_sprites/png/ohpe_ic_lyrics.png" class="tile-icon" alt="Lyrics">
+            <span class="tile-label">LYRICS</span>
+          </button>
+          <button class="ohpe-tile" data-mode="ARRANGER">
+            <img src="assets/ui_sprites/png/ohpe_ic_arranger.png" class="tile-icon" alt="Arranger">
+            <span class="tile-label">ARRANGER</span>
+          </button>
+          <button class="ohpe-tile" data-mode="SEQUENCER">
+            <img src="assets/ui_sprites/png/ohpe_ic_sequencer.png" class="tile-icon" alt="Sequencer">
+            <span class="tile-label">SEQUENCER</span>
+          </button>
+          <button class="ohpe-tile" data-mode="TAPE">
+            <img src="assets/ui_sprites/png/ohpe_ic_tape.png" class="tile-icon" alt="Tape">
+            <span class="tile-label">TAPE REC</span>
+          </button>
+          <button class="ohpe-tile" data-mode="DRUM">
+            <img src="assets/ui_sprites/png/ohpe_ic_drum.png" class="tile-icon" alt="Drum">
+            <span class="tile-label">DRUM</span>
+          </button>
+        </div>
+
+        <div class="rail-footer-slider">
+          <div class="slider-info">
+            <span class="sub-label">RETRO RAM STASH</span>
+            <span class="slider-val">5m ARMED</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-bar yellow" style="width: 100%;"></div>
+          </div>
+        </div>
+      </aside>
+
     </main>
 
-    <!-- Bottom Keybed Split Banner -->
-    <footer class="split-footer">
-      <span class="zone-a">ZONE A: SUB-BASS (AMBER PULSE // C2-B3)</span>
-      <span class="split-divider">[ SPLIT POINT: C4 ]</span>
-      <span class="zone-b">ZONE B: NEO-SOLO LEAD (CYAN OVERDRIVE // C4-C7)</span>
+    <!-- Sub-Console Deck (Hardware Encoders & Transport Controls) -->
+    <section class="ohpe-control-deck">
+      <!-- Left: Transport Cluster -->
+      <div class="deck-transport">
+        <div class="mini-lcd">
+          <div class="lcd-item"><span class="lcd-k">TAPE</span><span class="lcd-v">0:02.7</span></div>
+          <div class="lcd-item"><span class="lcd-k">BPM</span><span class="lcd-v" id="lcdBpm">100.0</span></div>
+          <div class="lcd-item"><span class="lcd-k">BAR</span><span class="lcd-v">012.3</span></div>
+        </div>
+        <div class="transport-keys">
+          <button class="trans-key" title="To Start"><img src="assets/ui_sprites/png/ohpe_btn_to_start.png" alt="Start"><span>START</span></button>
+          <button class="trans-key" title="Stop"><img src="assets/ui_sprites/png/ohpe_btn_stop.png" alt="Stop"><span>STOP</span></button>
+          <button class="trans-key" title="Play"><img src="assets/ui_sprites/png/ohpe_btn_play.png" alt="Play"><span>PLAY</span></button>
+          <button class="trans-key" title="Rec"><img src="assets/ui_sprites/png/ohpe_btn_rec.png" alt="Rec"><span>REC</span></button>
+          <button class="trans-key" title="Loop"><img src="assets/ui_sprites/png/ohpe_btn_loop.png" alt="Loop"><span>LOOP</span></button>
+        </div>
+      </div>
+
+      <!-- Center: 4 Giant Hardware Encoders -->
+      <div class="deck-encoders">
+        <div class="encoder-cell">
+          <div class="knob-wrap">
+            <img src="assets/ui_sprites/png/ohpe_knob_red.png" class="ohpe-knob" alt="Knob Red">
+          </div>
+          <span class="knob-label">SPLIT BAL</span>
+          <span class="knob-value">50 / 50</span>
+        </div>
+
+        <div class="encoder-cell">
+          <div class="knob-wrap">
+            <img src="assets/ui_sprites/png/ohpe_knob_yellow.png" class="ohpe-knob" alt="Knob Yellow">
+          </div>
+          <span class="knob-label">TRANSPOSE</span>
+          <span class="knob-value">+0 st</span>
+        </div>
+
+        <div class="encoder-cell">
+          <div class="knob-wrap">
+            <img src="assets/ui_sprites/png/ohpe_knob_purple.png" class="ohpe-knob" alt="Knob Purple">
+          </div>
+          <span class="knob-label">CUTOFF</span>
+          <span class="knob-value">3.00 kHz</span>
+        </div>
+
+        <div class="encoder-cell">
+          <div class="knob-wrap">
+            <img src="assets/ui_sprites/png/ohpe_knob_pink.png" class="ohpe-knob" alt="Knob Pink">
+          </div>
+          <span class="knob-label">RESONANCE</span>
+          <span class="knob-value">45 %</span>
+        </div>
+      </div>
+
+      <!-- Right: Key & Octave Deck -->
+      <div class="deck-keynav">
+        <div class="mini-lcd">
+          <div class="lcd-item"><span class="lcd-k">KEYS</span><span class="lcd-v">C2–C7 ±0</span></div>
+        </div>
+        <div class="keynav-keys">
+          <button class="keynav-btn"><span class="kn-icon">◀</span><span>OCT -</span></button>
+          <button class="keynav-btn"><span class="kn-icon">▶</span><span>OCT +</span></button>
+          <button class="keynav-btn"><span class="kn-icon">⊞</span><span>GRID</span></button>
+          <button class="keynav-btn"><span class="kn-icon">⨀</span><span>MIDI CH4</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom Section: Hardware Keyboard & Pitch/Mod Wheels -->
+    <footer class="ohpe-keybed-section">
+      <!-- Left: Dual Pitch Bend & Mod Wheels -->
+      <div class="wheel-cluster">
+        <div class="wheel-slot">
+          <img src="assets/ui_sprites/png/ohpe_wheel_pitch.png" class="wheel-img" alt="Pitch Wheel">
+          <span class="wheel-label">PITCH</span>
+        </div>
+        <div class="wheel-slot">
+          <img src="assets/ui_sprites/png/ohpe_wheel_mod.png" class="wheel-img" alt="Mod Wheel">
+          <span class="wheel-label">MOD</span>
+        </div>
+      </div>
+
+      <!-- Center: 61-Key Piano Keybed with Split Zone Accent -->
+      <div class="piano-keybed-wrap">
+        <div class="zone-labels-row">
+          <span class="zone-tag amber">ZONE A: SUB-BASS (AMBER PULSE // C2-B3)</span>
+          <span class="split-point-tag">[ SPLIT POINT: C4 ]</span>
+          <span class="zone-tag cyan">ZONE B: STAGE LEAD (CYAN OVERDRIVE // C4-C7)</span>
+        </div>
+
+        <div class="physical-keybed" id="physicalKeybed">
+          <!-- Octave 2 (C2 to B2) -->
+          <div class="key white active-zone-a" data-note="36"><span class="k-lbl">C2</span><span class="k-dot"></span></div>
+          <div class="key black" data-note="37"></div>
+          <div class="key white" data-note="38"><span class="k-dot"></span></div>
+          <div class="key black" data-note="39"></div>
+          <div class="key white" data-note="40"><span class="k-dot"></span></div>
+          <div class="key white" data-note="41"><span class="k-dot"></span></div>
+          <div class="key black" data-note="42"></div>
+          <div class="key white" data-note="43"><span class="k-dot"></span></div>
+          <div class="key black" data-note="44"></div>
+          <div class="key white" data-note="45"><span class="k-dot"></span></div>
+          <div class="key black" data-note="46"></div>
+          <div class="key white" data-note="47"><span class="k-dot"></span></div>
+
+          <!-- Octave 3 (C3 to B3) -->
+          <div class="key white" data-note="48"><span class="k-lbl">C3</span><span class="k-dot"></span></div>
+          <div class="key black" data-note="49"></div>
+          <div class="key white" data-note="50"><span class="k-dot"></span></div>
+          <div class="key black" data-note="51"></div>
+          <div class="key white" data-note="52"><span class="k-dot"></span></div>
+          <div class="key white" data-note="53"><span class="k-dot"></span></div>
+          <div class="key black" data-note="54"></div>
+          <div class="key white" data-note="55"><span class="k-dot"></span></div>
+          <div class="key black" data-note="56"></div>
+          <div class="key white" data-note="57"><span class="k-dot"></span></div>
+          <div class="key black" data-note="58"></div>
+          <div class="key white" data-note="59"><span class="k-dot"></span></div>
+
+          <!-- Octave 4 (C4 to B4) - SPLIT BOUNDARY -->
+          <div class="key white split-boundary" data-note="60"><span class="k-lbl red">C4</span><span class="k-dot active-red"></span></div>
+          <div class="key black" data-note="61"></div>
+          <div class="key white active-zone-b" data-note="62"><span class="k-dot"></span></div>
+          <div class="key black" data-note="63"></div>
+          <div class="key white active-zone-b" data-note="64"><span class="k-dot active-red"></span></div>
+          <div class="key white active-zone-b" data-note="65"><span class="k-dot"></span></div>
+          <div class="key black" data-note="66"></div>
+          <div class="key white active-zone-b" data-note="67"><span class="k-dot active-red"></span></div>
+          <div class="key black" data-note="68"></div>
+          <div class="key white active-zone-b" data-note="69"><span class="k-dot"></span></div>
+          <div class="key black" data-note="70"></div>
+          <div class="key white active-zone-b" data-note="71"><span class="k-dot"></span></div>
+
+          <!-- Octave 5 (C5 to B5) -->
+          <div class="key white active-zone-b" data-note="72"><span class="k-lbl">C5</span><span class="k-dot"></span></div>
+          <div class="key black" data-note="73"></div>
+          <div class="key white active-zone-b" data-note="74"><span class="k-dot"></span></div>
+          <div class="key black" data-note="75"></div>
+          <div class="key white active-zone-b" data-note="76"><span class="k-dot"></span></div>
+          <div class="key white active-zone-b" data-note="77"><span class="k-dot"></span></div>
+          <div class="key black" data-note="78"></div>
+          <div class="key white active-zone-b" data-note="79"><span class="k-dot"></span></div>
+          <div class="key black" data-note="80"></div>
+          <div class="key white active-zone-b" data-note="81"><span class="k-dot"></span></div>
+          <div class="key black" data-note="82"></div>
+          <div class="key white active-zone-b" data-note="83"><span class="k-dot"></span></div>
+
+          <!-- Octave 6 (C6 to C7) -->
+          <div class="key white active-zone-b" data-note="84"><span class="k-lbl">C6</span><span class="k-dot"></span></div>
+          <div class="key black" data-note="85"></div>
+          <div class="key white active-zone-b" data-note="86"><span class="k-dot"></span></div>
+          <div class="key black" data-note="87"></div>
+          <div class="key white active-zone-b" data-note="88"><span class="k-dot"></span></div>
+          <div class="key white active-zone-b" data-note="89"><span class="k-dot"></span></div>
+          <div class="key black" data-note="90"></div>
+          <div class="key white active-zone-b" data-note="91"><span class="k-dot"></span></div>
+          <div class="key black" data-note="92"></div>
+          <div class="key white active-zone-b" data-note="93"><span class="k-dot"></span></div>
+          <div class="key black" data-note="94"></div>
+          <div class="key white active-zone-b" data-note="95"><span class="k-dot"></span></div>
+          <div class="key white active-zone-b" data-note="96"><span class="k-lbl">C7</span><span class="k-dot"></span></div>
+        </div>
+      </div>
+
+      <!-- Right: Portamento & Glide Controls -->
+      <div class="glide-cluster">
+        <div class="switch-box">
+          <span class="switch-lbl-top">PORTAMENTO</span>
+          <div class="rocker-switch">
+            <span class="sw-pos">AUTO</span>
+            <div class="sw-knob"></div>
+            <span class="sw-pos active">LEGATO</span>
+            <span class="sw-pos">ALWAYS</span>
+          </div>
+        </div>
+        <div class="glide-dial-box">
+          <div class="mini-dial"></div>
+          <span class="dial-name">GLIDE</span>
+          <span class="dial-val">0.0 ms</span>
+        </div>
+      </div>
     </footer>
+
+    <!-- Fullscreen Ohpe Library Overlay (Triggered by LIBRARY view-pill) -->
+    <div class="ohpe-library-modal" id="libraryModal" style="display: none;">
+      <div class="lib-header">
+        <div class="lib-title-group">
+          <span class="lib-title">REPERTOIRE LIBRARY</span>
+          <input type="text" class="lib-search" id="libSearchInput" placeholder="Search: song title, artist, genre, tone ...">
+        </div>
+        <div class="lib-actions">
+          <button class="lib-action-btn keep" id="btnLibKeep">KEEP</button>
+          <button class="lib-action-btn cancel" id="btnLibCancel">CLOSE</button>
+        </div>
+      </div>
+
+      <div class="lib-content-grid">
+        <!-- Categories Filter -->
+        <aside class="lib-cat-col">
+          <span class="lib-col-hdr">CATEGORIES</span>
+          <div class="cat-chips-list">
+            <button class="cat-chip active" data-cat="ALL">ALL (100)</button>
+            <button class="cat-chip" data-cat="INDO">INDO (50)</button>
+            <button class="cat-chip" data-cat="WEST">WEST (50)</button>
+            <button class="cat-chip" data-cat="POP">POP</button>
+            <button class="cat-chip" data-cat="ROCK">ROCK</button>
+            <button class="cat-chip" data-cat="FAVOURITES">★ FAVOURITES</button>
+          </div>
+        </aside>
+
+        <!-- Repertoire Table -->
+        <div class="lib-table-col">
+          <div class="lib-table-header">
+            <span class="th-star">★</span>
+            <span class="th-title">SONG TITLE & ARTIST</span>
+            <span class="th-engine">ROLAND TONE</span>
+            <span class="th-bpm">BPM</span>
+            <span class="th-key">KEY</span>
+          </div>
+          <div class="lib-table-body" id="libTableBody">
+            <!-- Dynamic 100-song rows will be rendered here by app.js -->
+          </div>
+        </div>
+
+        <!-- Song Details Card -->
+        <aside class="lib-details-col" id="libDetailsCol">
+          <h2 class="det-title" id="detSongTitle">Dan</h2>
+          <span class="det-artist" id="detSongArtist">Sheila on 7</span>
+          <div class="det-tags">
+            <span class="det-tag">Indonesian Pop</span>
+            <span class="det-tag">Vintage EP 1</span>
+          </div>
+          <p class="det-desc">Classic 90s Indonesian Pop ballad. Rich vintage electric piano with subtle chorus on Zone B, warm acoustic upright bass on Zone A.</p>
+          <div class="det-chords-preview">
+            <span class="ch-lbl">CHORD PROGRESSION:</span>
+            <span class="ch-seq">G - Em - C - D</span>
+          </div>
+          <button class="det-load-btn" id="btnLoadSelectedSong">LOAD REPERTOIRE</button>
+        </aside>
+      </div>
+    </div>
+
   </div>
 
   <script src="app.js"></script>

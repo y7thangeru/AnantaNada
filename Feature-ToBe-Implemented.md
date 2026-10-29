@@ -196,3 +196,20 @@
 - [x] **Unit Testing & Verification**:
   - [x] Added `[TEST 8]` in `src/Tests/VerificationHarness.cs` validating QR PNG headers and RPN transpose clamping
   - [x] All 8 tests passed with 100% success rate (8 passed, 0 failed)
+
+## 13. OHPE x Teenage Engineering OP-1 Industrial Hardware UI/UX Overhaul
+- [x] **Unibody Matte Cream Anodized Hardware Chassis**:
+  - [x] High-resolution procedural generator (`assets/ohpe_ui/generate_ohpe_ui_suite.py`) producing 34 pixel-perfect sprites (1920x1080 chassis, recessed OLED bezel, tactile tiles, 4 encoders, wheels, transport set, and line-art icons)
+  - [x] Synchronized across `assets/ui_sprites/png/` and `web/assets/ui_sprites/png/`
+  - [x] Godot 4 headless reimport verified with 100% asset cache generation
+- [x] **Web Remote & Android Companion Overhaul**:
+  - [x] Symmetrical 3-Column Grid: Left Rail (8 Roland categories), Center Stage (Recessed dark OLED screen), Right Rail (8 Mode switchers)
+  - [x] Sub-Console Deck: Mini LCD tape tracker, 5 hardware transport keys, 4 Giant Color-Coded Encoders (🔴 Split Bal, 🟡 Transpose, 🟣 Cutoff, 🌸 Resonance), and Octave/Grid deck
+  - [x] Hardware Keybed Footer: Pitch & Mod wheels with ribbed rubber texture, 61-key piano keybed with split zone labels, and portamento rocker switch + glide dial
+  - [x] Fullscreen Ohpe-style Repertoire Librarian modal with category filtering and real-time search
+- [x] **Godot 4 Desktop Console Integration**:
+  - [x] MainStageView background and panels updated to `ohpe_chassis_bg.png` and `ohpe_screen_bezel.png`
+- [x] **Tri-Platform Screenshot Verification**:
+  - [x] Desktop Stage View: `captures/screenshot_godot_stage.png` (1920x1080)
+  - [x] Web Remote: `captures/screenshot_web_remote.png` (1280x820)
+  - [x] Android Companion: `captures/screenshot_android_companion.png` (430x932)

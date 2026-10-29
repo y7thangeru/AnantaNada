@@ -1,33 +1,49 @@
-// --- ANANTANADA TACTICAL COCKPIT REMOTE ---
-// WebSocket telemetry & kinetic feedback
+// ==========================================================================
+// ANANTANADA x OHPE WORKSTATION COMPANION
+// Live Web Remote & Mobile Stage Controller
+// ==========================================================================
 
-const panicBtn = document.getElementById("panicBtn");
-const retroBtn = document.getElementById("retroBtn");
-const setlistGrid = document.getElementById("setlistGrid");
 const activeMissionName = document.getElementById("activeMissionName");
 const activePatchName = document.getElementById("activePatchName");
 const currentChord = document.getElementById("currentChord");
 const nextChord = document.getElementById("nextChord");
-const bpmTag = document.getElementById("bpmTag");
-const lyricBox = document.getElementById("lyricBox");
-const timingVerdict = document.getElementById("timingVerdict");
-const scoreAcc = document.getElementById("scoreAcc");
-const strikeGauge = document.getElementById("strikeGauge");
-const rankBadge = document.getElementById("rankBadge");
-const cadenceHeart = document.getElementById("cadenceHeart");
-const hifiBurst = document.getElementById("hifiBurst");
-const djmaxBadge = document.getElementById("djmaxBadge");
-const djmaxFever = document.getElementById("djmaxFever");
-const taikoLabel = document.getElementById("taikoLabel");
-const beatSteps = [
-  document.getElementById("beat1"),
-  document.getElementById("beat2"),
-  document.getElementById("beat3"),
-  document.getElementById("beat4")
-];
+const bpmDisplay = document.getElementById("bpmDisplay");
+const lcdBpm = document.getElementById("lcdBpm");
+const lyricSubtitle = document.getElementById("lyricSubtitle");
+const transposeTag = document.getElementById("transposeTag");
+const btnTransDown = document.getElementById("btnTransDown");
+const btnTransUp = document.getElementById("btnTransUp");
+const btnPanic = document.getElementById("btnPanic");
+const btnCapture = document.getElementById("btnCapture");
+const btnLibrary = document.getElementById("btnLibrary");
+const btnPro = document.getElementById("btnPro");
+const btnTape = document.getElementById("btnTape");
+const libraryModal = document.getElementById("libraryModal");
+const btnLibCancel = document.getElementById("btnLibCancel");
+const btnLibKeep = document.getElementById("btnLibKeep");
+const libTableBody = document.getElementById("libTableBody");
+const libSearchInput = document.getElementById("libSearchInput");
+const btnPrevSong = document.getElementById("btnPrevSong");
+const btnNextSong = document.getElementById("btnNextSong");
 
+let currentTranspose = 0;
+let currentSongIndex = 0;
 let socket = null;
 let reconnectInterval = null;
+
+// Repertoire list
+let songList = [
+  { id: "SONG_001", title: "Dan", artist: "Sheila on 7", category: "INDO", patch: "Vintage EP 1", bpm: 100, chords: "G - Em - C - D" },
+  { id: "SONG_002", title: "Kisah Klasik Untuk Masa Depan", artist: "Sheila on 7", category: "INDO", patch: "Bright Grand", bpm: 114, chords: "A - F#m - D - E" },
+  { id: "SONG_003", title: "Melompat Lebih Tinggi", artist: "Sheila on 7", category: "INDO", patch: "Fat Saw Lead", bpm: 136, chords: "D - G - Bm - A" },
+  { id: "SONG_004", title: "Sahabat Sejati", artist: "Sheila on 7", category: "INDO", patch: "Stage EP 2", bpm: 120, chords: "C - Am - F - G" },
+  { id: "SONG_005", title: "Sephia", artist: "Sheila on 7", category: "INDO", patch: "Warm Pad", bpm: 88, chords: "Em - C - G - D" },
+  { id: "SONG_006", title: "Berharap Tak Berpisah", artist: "Reza Artamevia", category: "INDO", patch: "Funk Clav", bpm: 116, chords: "Gm - Cm - F - Bb" },
+  { id: "SONG_007", title: "Don't Look Back In Anger", artist: "Oasis", category: "WEST", patch: "Concert Grand", bpm: 84, chords: "C - G - Am - E" },
+  { id: "SONG_008", title: "Wonderwall", artist: "Oasis", category: "WEST", patch: "Acoustic Strum", bpm: 88, chords: "Em7 - G - Dsus4 - A7sus4" },
+  { id: "SONG_009", title: "Fix You", artist: "Coldplay", category: "WEST", patch: "Church Organ", bpm: 138, chords: "Eb - Gm - Cm - Bb" },
+  { id: "SONG_010", title: "Clocks", artist: "Coldplay", category: "WEST", patch: "Grand Arp", bpm: 130, chords: "Eb - Bbm - Fm" }
+];
 
 function connectWebSocket() {
   const host = window.location.host || "127.0.0.1:8080";
@@ -39,6 +55,11 @@ function connectWebSocket() {
 
     socket.onopen = () => {
       console.log("[StageHub] Connected to Cockpit Host.");
+      const linkTag = document.getElementById("linkTag");
+      if (linkTag) {
+        linkTag.textContent = "BLE MIDI [ONLINE]";
+        linkTag.className = "telem-val green";
+      }
       if (reconnectInterval) {
         clearInterval(reconnectInterval);
         reconnectInterval = null;
@@ -51,13 +72,10 @@ function connectWebSocket() {
         if (msg.type === "PLAYBACK_TICK" && msg.data) {
           handlePlaybackTick(msg.data);
         } else if (msg.type === "TRANSPOSE_CHANGED") {
-          currentWebTranspose = msg.semitones || 0;
-          if (transposeTag) {
-            transposeTag.textContent = `TRANSPOSE: [ ${currentWebTranspose >= 0 ? "+" : ""}${currentWebTranspose} ]`;
-            transposeTag.style.color = currentWebTranspose === 0 ? "#ffd166" : "#00f5d4";
-          }
+          currentTranspose = msg.semitones || 0;
+          updateTransposeUI();
         } else if (msg.type === "SECTION_CHANGED") {
-          highlightSectionBtn(msg.section);
+          highlightSection(msg.section);
         }
       } catch (err) {
         console.error("Telemetry decode error:", err);
@@ -65,6 +83,11 @@ function connectWebSocket() {
     };
 
     socket.onclose = () => {
+      const linkTag = document.getElementById("linkTag");
+      if (linkTag) {
+        linkTag.textContent = "DISCONNECTED";
+        linkTag.className = "telem-val";
+      }
       if (!reconnectInterval) {
         reconnectInterval = setInterval(connectWebSocket, 2000);
       }
@@ -77,149 +100,183 @@ function connectWebSocket() {
 }
 
 function handlePlaybackTick(data) {
-  if (data.currentChord) currentChord.textContent = `[ ${data.currentChord} ]`;
-  if (data.nextChord) nextChord.textContent = `NEXT CHORD -> ${data.nextChord}`;
-  if (data.bpm !== undefined && data.bar !== undefined && data.beat !== undefined) {
-    bpmTag.textContent = `[BPM: ${data.bpm} /// 4/4] [BAR: ${String(data.bar).padStart(3, '0')} . BEAT: ${data.beat}/4]`;
+  if (data.currentChord && currentChord) currentChord.textContent = data.currentChord;
+  if (data.nextChord && nextChord) nextChord.textContent = data.nextChord;
+  if (data.bpm !== undefined) {
+    if (bpmDisplay) bpmDisplay.textContent = `${data.bpm.toFixed(1)} BPM`;
+    if (lcdBpm) lcdBpm.textContent = `${data.bpm.toFixed(1)}`;
   }
-  if (data.activePatch) activePatchName.textContent = data.activePatch;
+  if (data.activePatch && activePatchName) activePatchName.textContent = data.activePatch;
+  if (data.activeSong && activeMissionName) activeMissionName.textContent = data.activeSong;
+}
 
-  // Beat stepper animation & 12-Game Kinetic Pulse
-  if (data.beat !== undefined) {
-    if (cadenceHeart) {
-      cadenceHeart.classList.add("pulse");
-      setTimeout(() => cadenceHeart.classList.remove("pulse"), 130);
-    }
-    if (hifiBurst && data.beat === 1) {
-      hifiBurst.classList.add("hit");
-      setTimeout(() => hifiBurst.classList.remove("hit"), 150);
-    }
-
-    beatSteps.forEach((step, idx) => {
-      if (idx + 1 === data.beat) {
-        step.classList.add("active");
-      } else {
-        step.classList.remove("active");
-      }
-    });
+function updateTransposeUI() {
+  const transText = transposeTag ? transposeTag.querySelector(".trans-text") : null;
+  if (transText) {
+    transText.textContent = `TRANSPOSE: ${currentTranspose >= 0 ? "+" : ""}${currentTranspose}`;
   }
 }
 
-// Emergency Panic Purge
-panicBtn.addEventListener("click", () => {
-  if (socket && socket.readyState === WebSocket.OPEN) {
-    socket.send(JSON.stringify({ command: "TRIGGER_PANIC" }));
-  }
-
-  // Red glitch flash feedback
-  document.body.style.filter = "invert(1) hue-rotate(180deg)";
-  timingVerdict.textContent = "ACCURACY: [ ALL CHANNELS PURGED ]";
-  timingVerdict.style.color = "#ef233c";
-  setTimeout(() => { document.body.style.filter = ""; }, 150);
-});
-
-// Setlist Selection
-setlistGrid.addEventListener("click", (e) => {
-  const card = e.target.closest(".mission-card");
-  if (!card) return;
-
-  const songIndex = parseInt(card.dataset.index, 10);
-  const bankMsb = parseInt(card.dataset.msb, 10);
-  const bankLsb = parseInt(card.dataset.lsb, 10);
-  const programChange = parseInt(card.dataset.pc, 10);
-
-  activeMissionName.textContent = card.querySelector(".mission-title").textContent;
-  activePatchName.textContent = card.querySelector(".mission-patch").textContent;
-
-  if (socket && socket.readyState === WebSocket.OPEN) {
-    socket.send(JSON.stringify({
-      command: "TRIGGER_SETLIST_ITEM",
-      payload: {
-        songIndex: songIndex,
-        programChange: programChange,
-        bankMsb: bankMsb,
-        bankLsb: bankLsb,
-        transpose: 0
-      }
-    }));
-  }
-});
-
-// Retroactive Buffer 1-Click
-retroBtn.addEventListener("click", () => {
-  retroBtn.textContent = "RETRO-BUFFER: [ 5m SMF EXPORTED! ]";
-  retroBtn.style.borderColor = "#00f5d4";
-  retroBtn.style.color = "#00f5d4";
-  setTimeout(() => {
-    retroBtn.textContent = "RETRO-BUFFER: [ 5m CAPTURE ARMED ]";
-    retroBtn.style.borderColor = "";
-    retroBtn.style.color = "";
-  }, 2000);
-});
-
-let currentWebTranspose = 0;
-
-// Interactive Web Transpose Controls
-const btnWebTransposeDown = document.getElementById("btnWebTransposeDown");
-const btnWebTransposeUp = document.getElementById("btnWebTransposeUp");
-
-if (btnWebTransposeDown) {
-  btnWebTransposeDown.addEventListener("click", () => {
-    currentWebTranspose = Math.max(-12, currentWebTranspose - 1);
-    sendTranspose(currentWebTranspose);
-  });
-}
-
-if (btnWebTransposeUp) {
-  btnWebTransposeUp.addEventListener("click", () => {
-    currentWebTranspose = Math.min(12, currentWebTranspose + 1);
-    sendTranspose(currentWebTranspose);
-  });
-}
-
-function sendTranspose(semitones) {
-  if (transposeTag) {
-    transposeTag.textContent = `TRANSPOSE: [ ${semitones >= 0 ? "+" : ""}${semitones} ]`;
-    transposeTag.style.color = semitones === 0 ? "#ffd166" : "#00f5d4";
-  }
-  if (socket && socket.readyState === WebSocket.OPEN) {
-    socket.send(JSON.stringify({
-      command: "TRIGGER_TRANSPOSE",
-      payload: { semitones: semitones }
-    }));
-  }
-}
-
-// Interactive Web Section Buttons
-const sectionBtns = document.querySelectorAll(".section-btn");
-sectionBtns.forEach(btn => {
-  btn.addEventListener("click", () => {
-    const sec = btn.dataset.sec;
-    const bar = parseInt(btn.dataset.bar, 10);
-    highlightSectionBtn(sec);
-    if (socket && socket.readyState === WebSocket.OPEN) {
-      socket.send(JSON.stringify({
-        command: "TRIGGER_SECTION",
-        payload: { section: sec, bar: bar }
-      }));
-    }
-  });
-});
-
-function highlightSectionBtn(secName) {
-  sectionBtns.forEach(btn => {
-    if (btn.dataset.sec === secName) {
-      btn.style.background = "#d4af37";
-      btn.style.color = "#1a120b";
-      btn.style.borderColor = "#fff";
-      btn.style.fontWeight = "bold";
+function highlightSection(secName) {
+  document.querySelectorAll(".sec-chip").forEach((chip) => {
+    if (chip.dataset.sec === secName) {
+      chip.classList.add("active");
     } else {
-      btn.style.background = "#2b1f14";
-      btn.style.color = "#fff";
-      btn.style.borderColor = "#c8a86b";
-      btn.style.fontWeight = "normal";
+      chip.classList.remove("active");
     }
   });
 }
 
-window.addEventListener("DOMContentLoaded", connectWebSocket);
+// Transpose buttons
+if (btnTransDown) {
+  btnTransDown.addEventListener("click", () => {
+    currentTranspose = Math.max(-12, currentTranspose - 1);
+    updateTransposeUI();
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify({ type: "TRIGGER_TRANSPOSE", semitones: currentTranspose }));
+    }
+  });
+}
+
+if (btnTransUp) {
+  btnTransUp.addEventListener("click", () => {
+    currentTranspose = Math.min(12, currentTranspose + 1);
+    updateTransposeUI();
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify({ type: "TRIGGER_TRANSPOSE", semitones: currentTranspose }));
+    }
+  });
+}
+
+// Emergency Panic
+if (btnPanic) {
+  btnPanic.addEventListener("click", () => {
+    alert("! EMERGENCY MIDI PANIC TRIGGERED ! (All notes & sound controllers killed)");
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify({ type: "TRIGGER_PANIC" }));
+    }
+  });
+}
+
+// Retroactive Buffer capture
+if (btnCapture) {
+  btnCapture.addEventListener("click", () => {
+    alert("Capturing 5-Minute Retroactive Circular RAM Buffer to MIDI File...");
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify({ type: "TRIGGER_CAPTURE_BUFFER" }));
+    }
+  });
+}
+
+// Section navigation chips
+document.querySelectorAll(".sec-chip").forEach((chip) => {
+  chip.addEventListener("click", () => {
+    highlightSection(chip.dataset.sec);
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify({ type: "TRIGGER_SECTION", section: chip.dataset.sec }));
+    }
+  });
+});
+
+// Sound engine tiles selection
+document.querySelectorAll(".left-rail .ohpe-tile").forEach((tile) => {
+  tile.addEventListener("click", () => {
+    document.querySelectorAll(".left-rail .ohpe-tile").forEach(t => t.classList.remove("active"));
+    tile.classList.add("active");
+    if (activePatchName) {
+      activePatchName.textContent = `ROLAND ZEN-CORE / ${tile.dataset.cat}`;
+    }
+  });
+});
+
+// Mode switcher tiles selection
+document.querySelectorAll(".right-rail .ohpe-tile").forEach((tile) => {
+  tile.addEventListener("click", () => {
+    document.querySelectorAll(".right-rail .ohpe-tile").forEach(t => t.classList.remove("active"));
+    tile.classList.add("active");
+    if (tile.dataset.mode === "LYRICS") {
+      openLibrary();
+    }
+  });
+});
+
+// Repertoire navigation arrows
+function loadSongByIndex(idx) {
+  if (idx < 0) idx = songList.length - 1;
+  if (idx >= songList.length) idx = 0;
+  currentSongIndex = idx;
+  const s = songList[currentSongIndex];
+  if (activeMissionName) activeMissionName.textContent = `${String(currentSongIndex + 1).padStart(3, '0')}. ${s.title} - ${s.artist}`;
+  if (activePatchName) activePatchName.textContent = `ROLAND ZEN-CORE / ${s.patch}`;
+  if (bpmDisplay) bpmDisplay.textContent = `${s.bpm.toFixed(1)} BPM`;
+  if (lcdBpm) lcdBpm.textContent = `${s.bpm.toFixed(1)}`;
+  if (lyricSubtitle) lyricSubtitle.textContent = `"${s.title} - ${s.artist} // Intro: ${s.chords}"`;
+  if (currentChord) currentChord.textContent = s.chords.split(" - ")[0] || "C";
+  if (nextChord) nextChord.textContent = s.chords.split(" - ")[1] || "G";
+
+  if (socket && socket.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify({ type: "TRIGGER_SETLIST_ITEM", songIndex: currentSongIndex }));
+  }
+}
+
+if (btnPrevSong) btnPrevSong.addEventListener("click", () => loadSongByIndex(currentSongIndex - 1));
+if (btnNextSong) btnNextSong.addEventListener("click", () => loadSongByIndex(currentSongIndex + 1));
+
+// Library Modal
+function openLibrary() {
+  if (libraryModal) libraryModal.style.display = "flex";
+  renderLibraryRows();
+}
+
+function closeLibrary() {
+  if (libraryModal) libraryModal.style.display = "none";
+}
+
+if (btnLibrary) btnLibrary.addEventListener("click", openLibrary);
+if (btnLibCancel) btnLibCancel.addEventListener("click", closeLibrary);
+if (btnLibKeep) btnLibKeep.addEventListener("click", closeLibrary);
+
+function renderLibraryRows(filterText = "") {
+  if (!libTableBody) return;
+  libTableBody.innerHTML = "";
+  songList.forEach((s, idx) => {
+    if (filterText && !s.title.toLowerCase().includes(filterText) && !s.artist.toLowerCase().includes(filterText)) {
+      return;
+    }
+    const row = document.createElement("div");
+    row.className = `lib-song-row ${idx === currentSongIndex ? "active" : ""}`;
+    row.innerHTML = `
+      <span>${idx === currentSongIndex ? "★" : "☆"}</span>
+      <span><b>${s.title}</b> - ${s.artist}</span>
+      <span style="color: #f59e0b;">${s.patch}</span>
+      <span>${s.bpm}</span>
+      <span>${s.category}</span>
+    `;
+    row.addEventListener("click", () => {
+      document.querySelectorAll(".lib-song-row").forEach(r => r.classList.remove("active"));
+      row.classList.add("active");
+      loadSongByIndex(idx);
+    });
+    libTableBody.appendChild(row);
+  });
+}
+
+if (libSearchInput) {
+  libSearchInput.addEventListener("input", (e) => {
+    renderLibraryRows(e.target.value.toLowerCase());
+  });
+}
+
+// Physical keybed click feedback
+document.querySelectorAll(".physical-keybed .key").forEach((k) => {
+  k.addEventListener("mousedown", () => {
+    k.style.filter = "brightness(0.85)";
+  });
+  k.addEventListener("mouseup", () => {
+    k.style.filter = "none";
+  });
+});
+
+// Initialize
+connectWebSocket();
+loadSongByIndex(0);

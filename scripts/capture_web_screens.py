@@ -35,6 +35,8 @@ def main():
         "--headless=new",
         "--disable-gpu",
         "--window-size=1280,820",
+        "--run-all-compositor-stages-before-draw",
+        "--virtual-time-budget=3000",
         f"--screenshot={web_shot}",
         f"http://127.0.0.1:{PORT}/index.html"
     ]
@@ -47,6 +49,8 @@ def main():
         "--headless=new",
         "--disable-gpu",
         "--window-size=430,932",
+        "--run-all-compositor-stages-before-draw",
+        "--virtual-time-budget=3000",
         f"--screenshot={android_shot}",
         f"http://127.0.0.1:{PORT}/index.html"
     ]

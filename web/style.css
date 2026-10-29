@@ -1,650 +1,1557 @@
+/* ==========================================================================
+   OHPE DESIGN SUITE: THE GROOVEX / TEENAGE ENGINEERING OP-1 AESTHETIC
+   Designed for ANANTANADA (Roland Go:Keys 3 Companion Workstation)
+   ========================================================================== */
+
 :root {
-  --bg-desk: #1e150f;
-  --bg-parchment: #fbf7ee;
-  --bg-dark-wood: #2a1e15;
-  --border-brass: #b45309;
-  --border-leather: #8b5a2b;
-  --text-dark-ink: #23160b;
-  --text-warm-dim: #785a3c;
+  --chassis-bg: #eae7df;
+  --chassis-border: #d4cfc1;
+  --panel-bg: #f8f6f0;
+  --panel-border: #d5d0c2;
+  --screen-bg: #0e0d11;
+  --screen-border: #222028;
+  --text-dark: #2c2930;
+  --text-muted: #858079;
+  --text-screen: #f4f3f0;
   --text-gold: #f59e0b;
-  --text-white: #f8fafc;
-  --rune-purple: #7c3aed;
-  --mint-accent: #10b981;
-  --warning-crimson: #ef233c;
+  --macro-red: #ef4444;
+  --macro-yellow: #f59e0b;
+  --macro-purple: #8b5cf6;
+  --macro-pink: #ec4899;
+  --zone-amber: #f59e0b;
+  --zone-cyan: #06b6d4;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  -webkit-font-smoothing: antialiased;
   user-select: none;
-  -webkit-user-select: none;
 }
 
-body.cockpit-body {
-  background: var(--bg-desk) url('assets/ui_sprites/png/desk_wood_surface.png') center center / cover no-repeat;
-  color: var(--text-white);
-  font-family: "JetBrains Mono", "Courier New", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  height: 100vh;
-  overflow: hidden;
+body.ohpe-body {
+  background-color: #2a282f;
+  background-image: radial-gradient(circle at 50% 30%, #3a3842 0%, #1c1a21 100%);
+  color: var(--text-dark);
+  font-family: var(--font-sans);
+  min-height: 100vh;
   display: flex;
-  flex-direction: column;
-}
-
-.cockpit-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 12px;
-  gap: 10px;
-}
-
-/* --- Top System Telemetry Header (Mahogany & Brass) --- */
-.tactical-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: rgba(30, 20, 14, 0.94);
-  border: 2px solid #5d3d24;
-  border-radius: 8px;
-  padding: 8px 14px;
-  gap: 10px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.45);
-}
-
-.sys-badge {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 11px;
-  font-weight: 800;
-  color: #38bdf8;
-  letter-spacing: 0.5px;
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: #00f5d4;
-  box-shadow: 0 0 8px #00f5d4;
-}
-
-.link-badge, .bpm-badge {
-  font-size: 11px;
-  font-weight: 700;
-  color: #cbd5e1;
-  background: rgba(45, 30, 20, 0.85);
-  padding: 4px 10px;
-  border: 1px solid #785a3c;
-  border-radius: 4px;
-}
-
-.bpm-badge {
-  color: var(--text-gold);
-}
-
-.gold-coin-box {
-  display: flex;
-  align-items: center;
-}
-
-.gold-coin-img {
-  width: 32px;
-  height: 32px;
-  object-fit: contain;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
-}
-
-/* Emergency Purge / Panic Button */
-.hazard-purge-btn {
-  background: repeating-linear-gradient(
-    45deg,
-    #ef233c,
-    #ef233c 10px,
-    #990011 10px,
-    #990011 20px
-  );
-  color: white;
-  border: 1px solid #ff4d6d;
-  padding: 6px 14px;
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 1px;
-  cursor: pointer;
-  border-radius: 4px;
-  box-shadow: 0 0 12px rgba(239, 35, 60, 0.4);
-  transition: transform 0.08s ease;
-}
-
-.hazard-purge-btn:active {
-  transform: scale(0.96);
-}
-
-/* --- Main 3-Column Cockpit Grid --- */
-.cockpit-grid {
-  flex: 1;
-  display: grid;
-  grid-template-columns: 310px 1fr 340px;
-  gap: 12px;
-  overflow: hidden;
-}
-
-@media (max-width: 960px) {
-  body.cockpit-body {
-    overflow-y: auto;
-    height: auto;
-    min-height: 100vh;
-  }
-  .cockpit-container {
-    height: auto;
-    overflow: visible;
-  }
-  .cockpit-grid {
-    grid-template-columns: 1fr;
-    overflow: visible;
-  }
-}
-
-.panel {
-  border-radius: 10px;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  position: relative;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
-}
-
-.panel-header {
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 1px;
-  border-bottom: 1px solid rgba(139, 90, 43, 0.25);
-  padding-bottom: 4px;
-}
-
-/* --- Left: Diegetic Setlist Notebook (Moonlighter / Animal Crossing) --- */
-.panel.setlist-deck {
-  background: #fbf7ee url('assets/ui_sprites/png/notebook_page_parchment.png') center top / 100% 100% no-repeat;
-  border: 2px solid var(--border-leather);
-  color: var(--text-dark-ink);
-  overflow: hidden;
-  padding-right: 28px;
-}
-
-.setlist-deck::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 24px;
-  background: url('assets/ui_sprites/png/spiral_wire_binding.png') right center / contain repeat-y;
-  pointer-events: none;
-  z-index: 5;
-}
-
-.setlist-badge-banner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 4px;
-}
-
-.moonlighter-tab {
-  height: 24px;
-  object-fit: contain;
-}
-
-.washi-tape {
-  height: 20px;
-  object-fit: contain;
-}
-
-.rpg-tabs-row {
-  display: flex;
-  gap: 6px;
   justify-content: center;
-  margin-bottom: 6px;
-}
-
-.rpg-tab {
-  height: 24px;
-  object-fit: contain;
-  cursor: pointer;
-  transition: transform 0.1s ease;
-}
-
-.rpg-tab:hover {
-  transform: translateY(-2px);
-}
-
-.panel.setlist-deck .panel-header {
-  color: #3e2712;
-}
-
-.mission-tag {
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-}
-
-.active-tag { color: #b45309; }
-.next-tag { color: #2e5a36; }
-.lyric-tag { color: #6b46c1; }
-
-/* Animal Crossing DIY Recipe Cards */
-.mission-card {
-  background: #fffdf5 url('assets/ui_sprites/png/card_ac_recipe_item.png') center center / 100% 100% no-repeat;
-  border: 1px solid #d8c8af;
-  border-radius: 10px;
-  padding: 8px 12px;
-  display: flex;
-  flex-direction: row;
   align-items: center;
-  gap: 12px;
-  min-height: 52px;
-  text-align: left;
-  cursor: pointer;
-  transition: all 0.12s ease;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  padding: 12px;
+  overflow-x: hidden;
+}
+
+/* ==========================================================================
+   1. Unibody Hardware Chassis
+   ========================================================================== */
+.ohpe-chassis {
+  background: var(--chassis-bg) url('assets/ui_sprites/png/ohpe_chassis_bg.png') center center / cover no-repeat;
+  border: 2px solid var(--chassis-border);
+  border-radius: 20px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), 0 2px 4px rgba(0, 0, 0, 0.2);
   width: 100%;
-  box-sizing: border-box;
+  max-width: 1240px;
+  padding: 16px 20px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
 }
 
-.mission-card:active {
-  transform: scale(0.97);
-}
-
-.mission-card.active-card {
-  background: #fff8e8 url('assets/ui_sprites/png/card_ac_recipe_item.png') center center / 100% 100% no-repeat;
-  border: 2px solid var(--text-gold);
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
-}
-
-.card-badge {
-  width: 34px;
-  height: 34px;
-  min-width: 34px;
-  max-width: 34px;
-  border-radius: 8px;
-  background: #f4ecdc;
-  border: 1.5px solid #d4c2a5;
-  color: #b45309;
-  font-weight: 900;
-  font-size: 13px;
+/* ==========================================================================
+   2. Top Navigation Bar
+   ========================================================================== */
+.ohpe-topbar {
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+  justify-content: space-between;
+  padding: 4px 6px 8px 6px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-.card-badge.star-badge {
-  background: #fef3c7;
-  border-color: #f59e0b;
-}
-
-.star-pin-img {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
-}
-
-.card-details {
+.topbar-left {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  overflow: hidden;
-  flex: 1;
-  min-width: 0;
 }
 
-.mission-card .mission-title {
-  font-size: 13px;
-  font-weight: 900;
-  color: #3d2c1d;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  letter-spacing: 0.3px;
+.ohpe-version {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
 }
 
-.mission-card .mission-patch {
-  font-size: 11px;
-  color: #7c6853;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.next-missions-list {
+.ohpe-logo {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 6px;
 }
 
-/* --- Center Coach Panel --- */
-.coach-panel {
-  background: rgba(24, 18, 14, 0.92);
-  border: 2px solid #5a3d28;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 12px;
+.logo-mark {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--text-dark);
 }
 
-.scalloped-cloud-header {
-  width: 100%;
+.logo-text {
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: var(--text-dark);
+}
+
+.logo-dot {
+  color: var(--macro-red);
+}
+
+.logo-sub {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+.topbar-center {
   display: flex;
-  justify-content: center;
+  align-items: center;
+  gap: 18px;
 }
 
-.cloud-banner-img {
-  width: 100%;
-  max-height: 44px;
-  object-fit: contain;
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3));
+.top-label {
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+  display: block;
 }
 
-.minimetro-transit-container {
-  width: 100%;
-  background: rgba(15, 12, 10, 0.9);
-  padding: 4px;
+.part-pill-group {
+  display: flex;
+  background: #ded9cd;
   border-radius: 6px;
-  border: 1px solid #453020;
+  padding: 2px;
+  gap: 2px;
 }
 
-.transit-map-img {
-  width: 100%;
-  height: 32px;
+.part-pill {
+  border: none;
+  background: transparent;
+  font-size: 11px;
+  font-weight: 800;
+  color: #666;
+  width: 24px;
+  height: 22px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.part-pill.active {
+  background: #24222a;
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.preset-box {
+  display: flex;
+  align-items: center;
+  background: #18171d;
+  border: 1px solid #36343e;
+  border-radius: 6px;
+  padding: 2px 6px;
+  height: 26px;
+  min-width: 200px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.preset-arrow {
+  border: none;
+  background: transparent;
+  color: var(--text-gold);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.preset-name {
+  flex: 1;
+  text-align: center;
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.view-switchers {
+  display: flex;
+  gap: 6px;
+}
+
+.view-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  padding: 4px 12px;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--text-dark);
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: all 0.12s;
+}
+
+.view-pill.active {
+  background: #24222a;
+  border-color: #24222a;
+  color: #fff;
+}
+
+.view-icon {
+  width: 14px;
+  height: 14px;
   object-fit: contain;
 }
 
-.arcade-badges-row {
+.topbar-right {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 16px;
+}
+
+.quick-dials {
+  display: flex;
   gap: 10px;
 }
 
-.djmax-badge {
-  height: 26px;
-  object-fit: contain;
-}
-
-.rpg-mana-gauge {
-  height: 28px;
-  object-fit: contain;
-}
-
-.cheer-emoji {
-  width: 32px;
-  height: 32px;
-  object-fit: contain;
-  transition: transform 0.1s ease;
-}
-
-.cheer-emoji:hover {
-  transform: scale(1.15);
-}
-
-.hifi-burst {
-  height: 30px;
-  object-fit: contain;
-  transition: transform 0.1s ease;
-}
-
-.hifi-burst.hit {
-  transform: scale(1.25) rotate(-6deg);
-}
-
-.accuracy-banner {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.verdict-tag {
-  background: rgba(0, 245, 212, 0.15);
-  color: #00f5d4;
-  border: 1px solid #00f5d4;
-  padding: 4px 12px;
-  font-size: 13px;
-  font-weight: 900;
-  border-radius: 4px;
-  box-shadow: 0 0 10px rgba(0, 245, 212, 0.25);
-}
-
-.score-tag {
-  background: rgba(255, 183, 3, 0.15);
-  color: var(--text-gold);
-  border: 1px solid var(--text-gold);
-  padding: 4px 12px;
-  font-size: 13px;
-  font-weight: 900;
-  border-radius: 4px;
-}
-
-.strike-gauge-box {
+.circle-dial {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  width: 100%;
-}
-
-.gauge-label {
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 1.5px;
-  color: #94a3b8;
-}
-
-.gauge-meter {
-  font-size: 13px;
-  font-weight: 900;
-  color: #38bdf8;
-  letter-spacing: 1px;
-}
-
-.rank-badge {
-  font-size: 24px;
-  font-weight: 900;
-  color: #ef233c;
-  text-shadow: 0 0 12px rgba(239, 35, 60, 0.6);
-}
-
-.beat-stepper {
-  display: flex;
-  gap: 8px;
-}
-
-.beat-stepper .step {
-  padding: 3px 8px;
-  font-size: 11px;
-  font-weight: 800;
-  border: 1px solid #5a3d28;
-  border-radius: 3px;
-  color: #94a3b8;
-}
-
-.beat-stepper .step.active {
-  background: #00f5d4;
-  color: black;
-  border-color: #00f5d4;
-  box-shadow: 0 0 10px #00f5d4;
-}
-
-.retro-btn {
-  background: #2a1c12;
-  border: 1px solid var(--text-gold);
-  color: var(--text-gold);
-  font-weight: 900;
-  font-size: 11px;
-  padding: 8px 16px;
-  border-radius: 4px;
+  border: none;
+  background: transparent;
   cursor: pointer;
-  letter-spacing: 1px;
-  box-shadow: 0 0 10px rgba(255, 183, 3, 0.2);
+  gap: 2px;
 }
 
-.retro-btn:active {
-  background: var(--text-gold);
-  color: black;
+.circle-dial img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  transition: transform 0.1s ease;
 }
 
-/* --- Right: Chord Tactical HUD & Codex Scroll --- */
-.chord-tactical-hud {
-  background: rgba(24, 18, 14, 0.92);
-  border: 2px solid #5a3d28;
-  justify-content: flex-start;
+.circle-dial:active img {
+  transform: scale(0.92);
+}
+
+.dial-label {
+  font-size: 8px;
+  font-weight: 800;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+}
+
+.sys-telemetry {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+  padding-left: 12px;
+}
+
+.telem-row {
+  display: flex;
+  gap: 6px;
+}
+
+.telem-key {
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.telem-val {
+  color: var(--text-dark);
+  font-weight: 800;
+}
+
+.telem-val.green {
+  color: #059669;
+}
+
+/* ==========================================================================
+   3. Main Symmetrical Grid (Left Rail | Center Screen | Right Rail)
+   ========================================================================== */
+.ohpe-main-grid {
+  display: grid;
+  grid-template-columns: 200px 1fr 200px;
+  gap: 14px;
+  align-items: stretch;
+}
+
+.rail-header {
+  font-size: 9px;
+  font-weight: 900;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.tiles-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
 
-.nostalgia-ornament-wrap {
-  position: absolute;
-  top: 4px;
-  right: 6px;
-  pointer-events: none;
+.ohpe-tile {
+  background: #f8f6f0 url('assets/ui_sprites/png/ohpe_tile_normal.png') center center / 100% 100% no-repeat;
+  border: 1px solid #dcd7ca;
+  border-radius: 8px;
+  height: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.1s ease;
+  position: relative;
 }
 
-.nostalgia-corner {
-  width: 32px;
-  height: 32px;
+.ohpe-tile:active {
+  transform: translateY(1px);
+}
+
+.ohpe-tile.active {
+  background: #fffdf9 url('assets/ui_sprites/png/ohpe_tile_active.png') center center / 100% 100% no-repeat;
+  border-color: #c8c0ae;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.tile-icon {
+  width: 22px;
+  height: 22px;
   object-fit: contain;
   opacity: 0.85;
 }
 
-/* Arcane RPG Spell Card */
-.chord-hero-box {
+.tile-label {
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--text-dark);
+  letter-spacing: 0.4px;
+}
+
+.rail-footer-slider {
+  margin-top: 10px;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.slider-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 8px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.sub-label {
+  color: var(--text-muted);
+}
+
+.slider-val {
+  color: var(--text-dark);
+  font-family: var(--font-mono);
+}
+
+.progress-track {
+  width: 100%;
+  height: 4px;
+  background: #d8d4c7;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar.pink {
+  background: var(--macro-pink);
+  height: 100%;
+}
+
+.progress-bar.yellow {
+  background: var(--macro-yellow);
+  height: 100%;
+}
+
+/* ==========================================================================
+   4. Center Recessed OLED Display
+   ========================================================================== */
+.ohpe-center-screen {
+  background: #0e0d11 url('assets/ui_sprites/png/ohpe_screen_bezel.png') center center / 100% 100% no-repeat;
+  border: 2px solid #201e26;
+  border-radius: 12px;
+  padding: 10px 14px;
+  color: var(--text-screen);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-height: 270px;
+}
+
+.screen-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #24222b;
+  padding-bottom: 6px;
+}
+
+.screen-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.engine-title {
+  font-size: 11px;
+  font-weight: 800;
+  color: #eee;
+  letter-spacing: 0.5px;
+}
+
+.badge-pill {
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.badge-pill.yellow {
+  background: var(--text-gold);
+  color: #000;
+}
+
+.badge-pill.purple {
+  background: #36284e;
+  border: 1px solid var(--macro-purple);
+  color: #c4b5fd;
+}
+
+.screen-telemetry-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.tele-item.lock {
+  color: #888;
+}
+
+.screen-tap-btn {
+  background: #24222b;
+  border: 1px solid #444050;
+  border-radius: 4px;
+  color: #ddd;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 2px 6px;
+  cursor: pointer;
+}
+
+.tele-item.bpm {
+  color: var(--text-gold);
+  font-weight: 800;
+}
+
+.tele-item.meter {
+  color: #aaa;
+}
+
+.tele-item.page {
+  color: #888;
+}
+
+/* Section Bar */
+.screen-section-bar {
+  display: flex;
+  gap: 4px;
+  margin: 6px 0;
+}
+
+.sec-chip {
+  flex: 1;
+  background: #18171f;
+  border: 1px solid #2e2b36;
+  border-radius: 4px;
+  color: #999;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 3px 0;
+  cursor: pointer;
+}
+
+.sec-chip.active {
+  background: #2b2538;
+  border-color: var(--text-gold);
+  color: #fff;
+}
+
+/* Split Visualizer & Macros */
+.screen-body-split {
+  display: grid;
+  grid-template-columns: 1fr 180px;
+  gap: 12px;
+  margin: 4px 0;
+  flex: 1;
+}
+
+.screen-visualizer-area {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.chord-banner {
+  display: flex;
+  gap: 10px;
+}
+
+.chord-active-box {
+  flex: 1;
+  background: #15131a;
+  border: 1px solid #2d2936;
+  border-radius: 6px;
+  padding: 6px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.chord-caption {
+  font-size: 8px;
+  font-weight: 800;
+  color: #888;
+  letter-spacing: 0.5px;
+}
+
+.chord-giant {
+  font-size: 32px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+  font-family: var(--font-sans);
+  line-height: 1.1;
+}
+
+.transpose-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #000;
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 1px 8px;
+  margin-top: 2px;
+}
+
+.trans-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-gold);
+  font-weight: 900;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.trans-text {
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--text-gold);
+  font-family: var(--font-mono);
+}
+
+.next-chord-box {
+  width: 90px;
+  background: #15131a;
+  border: 1px solid #2d2936;
+  border-radius: 6px;
+  padding: 6px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #181024 url('assets/ui_sprites/png/card_rpg_spell_harmony.png') center center / 100% 100% no-repeat;
-  border: 2px solid #8b5cf6;
-  border-radius: 10px;
-  padding: 12px 14px;
-  min-height: 128px;
-  box-sizing: border-box;
-  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.35);
 }
 
-.chord-giant {
-  font-size: 48px;
-  line-height: 1.1;
-  font-weight: 900;
-  color: #fffaf0;
-  text-shadow: 0 0 16px rgba(245, 158, 11, 0.6), 2px 2px 4px #000;
-  font-family: "Impact", sans-serif;
-  margin-bottom: 4px;
-}
-
-.transpose-tag {
-  font-size: 11px;
+.next-caption {
+  font-size: 7px;
   font-weight: 800;
-  color: #fbbf24;
-  background: rgba(0, 0, 0, 0.45);
-  padding: 2px 10px;
-  border-radius: 12px;
-  border: 1px solid rgba(251, 191, 36, 0.3);
-  letter-spacing: 0.5px;
+  color: #777;
 }
 
-.taiko-drum-widget {
+.next-chord {
+  font-size: 18px;
+  font-weight: 800;
+  color: #ccc;
+}
+
+.oscilloscope-viewport {
+  flex: 1;
+  min-height: 80px;
+  background: #08070a;
+  border: 1px solid #201e26;
+  border-radius: 6px;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  margin: 4px 0;
-  padding: 4px;
-  background: rgba(20, 15, 12, 0.85);
+  overflow: hidden;
+}
+
+.grid-mesh {
+  position: absolute;
+  inset: 0;
+  background-size: 16px 16px;
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+}
+
+.waveform-line {
+  position: absolute;
+  width: 80%;
+  height: 2px;
+  background: linear-gradient(90deg, #ef4444, #f59e0b, #8b5cf6, #ec4899);
+  box-shadow: 0 0 12px #ec4899;
+}
+
+.lyric-subtitle {
+  position: absolute;
+  bottom: 6px;
+  font-size: 10px;
+  color: #eee;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 2px 8px;
   border-radius: 4px;
 }
 
-.taiko-img {
-  height: 24px;
-  object-fit: contain;
+/* Macros Right Panel */
+.screen-macros-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.taiko-label {
-  font-size: 11px;
-  color: #00f5d4;
-  font-weight: 700;
-}
-
-.next-chord-pill {
-  background: #fffcf5 url('assets/ui_sprites/png/card_ac_recipe_item.png') center center / 100% 100% no-repeat;
-  border: 1px solid #d4c2a5;
-  border-radius: 8px;
-  color: var(--text-dark-ink);
-  padding: 8px;
-  text-align: center;
-  font-size: 14px;
+.macro-header {
+  font-size: 9px;
   font-weight: 900;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  color: #888;
+  letter-spacing: 0.5px;
 }
 
-/* Rolled Archival Codex Scroll (AC Mirage) */
-.lyric-box {
-  position: relative;
-  background: #fbf7ee url('assets/ui_sprites/png/parchment_codex_scroll.png') center center / 100% 100% no-repeat;
-  border: none;
-  border-radius: 6px;
-  padding: 24px 16px;
-  font-size: 13px;
+.macro-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.macro-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 8px;
   font-weight: 700;
-  color: #2b1d0c;
-  text-align: center;
-  line-height: 1.5;
-  font-style: italic;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
 }
 
-.snipperclips-sticker {
+.macro-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+.macro-dot.red { background: var(--macro-red); }
+.macro-dot.yellow { background: var(--macro-yellow); }
+.macro-dot.purple { background: var(--macro-purple); }
+.macro-dot.pink { background: var(--macro-pink); }
+
+.macro-name {
+  color: #aaa;
+  flex: 1;
+}
+
+.macro-val {
+  font-family: var(--font-mono);
+  color: #fff;
+}
+
+.macro-slider-track {
+  width: 100%;
+  height: 3px;
+  background: #25222e;
+  border-radius: 2px;
+  position: relative;
+}
+
+.macro-fill.red { background: var(--macro-red); height: 100%; }
+.macro-fill.yellow { background: var(--macro-yellow); height: 100%; }
+.macro-fill.purple { background: var(--macro-purple); height: 100%; }
+.macro-fill.pink { background: var(--macro-pink); height: 100%; }
+
+.macro-thumb {
   position: absolute;
-  top: -8px;
-  right: -6px;
-  width: 38px;
-  height: 38px;
-  object-fit: contain;
-  transform: rotate(8deg);
-  pointer-events: none;
+  top: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid #fff;
+  transform: translateX(-50%);
+}
+.macro-thumb.red { background: var(--macro-red); }
+.macro-thumb.yellow { background: var(--macro-yellow); }
+.macro-thumb.purple { background: var(--macro-purple); }
+.macro-thumb.pink { background: var(--macro-pink); }
+
+.strike-rank-box {
+  background: #141219;
+  border: 1px solid #2b2734;
+  border-radius: 4px;
+  padding: 4px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2px;
 }
 
-/* Bottom Split Footer */
-.split-footer {
+.rank-title { font-size: 7px; color: #777; font-weight: 800; }
+.rank-grade { font-size: 11px; font-weight: 900; color: var(--macro-red); }
+.strike-metric { font-family: var(--font-mono); font-size: 9px; color: #888; }
+
+/* Screen Bottom Bar */
+.screen-footer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #24222b;
+  padding-top: 6px;
+  font-size: 8px;
+  font-weight: 800;
+  color: #888;
+}
+
+.step-dots-row {
+  display: flex;
+  gap: 4px;
+}
+
+.step-dots-row .dot {
+  width: 5px;
+  height: 5px;
+  background: #333;
+  border-radius: 50%;
+}
+
+.step-dots-row .dot.active {
+  background: var(--macro-pink);
+  box-shadow: 0 0 4px var(--macro-pink);
+}
+
+.voices-info b {
+  color: #fff;
+}
+
+/* ==========================================================================
+   5. Sub-Console Deck (Encoders & Transport)
+   ========================================================================== */
+.ohpe-control-deck {
+  display: grid;
+  grid-template-columns: 200px 1fr 200px;
+  gap: 14px;
+  align-items: center;
+  padding: 4px 0;
+}
+
+/* Transport Cluster */
+.deck-transport {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mini-lcd {
+  background: #16151a;
+  border: 1px solid #2d2b36;
+  border-radius: 6px;
+  padding: 4px 8px;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.lcd-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lcd-k { color: #666; font-size: 7px; }
+.lcd-v { color: var(--text-gold); font-weight: 800; }
+
+.transport-keys {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+
+.trans-key {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  height: 38px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  cursor: pointer;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.06);
+}
+
+.trans-key img {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+
+.trans-key span {
+  font-size: 7px;
+  font-weight: 800;
+  color: var(--text-dark);
+}
+
+/* 4 Encoders Cluster */
+.deck-encoders {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.encoder-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.knob-wrap {
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ohpe-knob {
+  width: 66px;
+  height: 66px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.ohpe-knob:active {
+  transform: rotate(15deg);
+}
+
+.knob-label {
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-top: 2px;
+  letter-spacing: 0.3px;
+}
+
+.knob-value {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+/* Key & Octave Deck */
+.deck-keynav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.keynav-keys {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+
+.keynav-btn {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  height: 38px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  cursor: pointer;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.06);
+}
+
+.kn-icon {
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--text-dark);
+}
+
+.keynav-btn span:last-child {
+  font-size: 7px;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   6. Bottom Hardware Keybed & Wheels
+   ========================================================================== */
+.ohpe-keybed-section {
+  display: grid;
+  grid-template-columns: 80px 1fr 100px;
+  gap: 14px;
+  align-items: center;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  padding-top: 10px;
+}
+
+.wheel-cluster {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.wheel-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.wheel-img {
+  width: 32px;
+  height: 84px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.wheel-label {
+  font-size: 8px;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+.piano-keybed-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.zone-labels-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.zone-tag.amber { color: #d97706; }
+.split-point-tag { color: var(--macro-red); }
+.zone-tag.cyan { color: #0284c7; }
+
+.physical-keybed {
+  display: flex;
+  height: 90px;
+  background: #24222a;
+  padding: 2px 4px;
+  border-radius: 8px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.physical-keybed .key.white {
+  flex: 1;
+  background: #fbfaf7;
+  border: 1px solid #d0cbc0;
+  border-radius: 0 0 5px 5px;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding-bottom: 4px;
+  box-shadow: inset 0 -2px 3px rgba(0, 0, 0, 0.1);
+}
+
+.physical-keybed .key.white:active {
+  background: #eeeae0;
+}
+
+.physical-keybed .key.black {
+  width: 14px;
+  height: 56px;
+  background: #1c1a20;
+  border: 1px solid #111;
+  border-radius: 0 0 3px 3px;
+  margin-left: -7px;
+  margin-right: -7px;
+  z-index: 2;
+  cursor: pointer;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+}
+
+.k-lbl {
+  font-size: 8px;
+  font-weight: 800;
+  color: #888;
+}
+
+.k-lbl.red {
+  color: var(--macro-red);
+}
+
+.k-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  margin-top: 2px;
+}
+
+.k-dot.active-red {
+  background: var(--macro-red);
+}
+
+/* Glide Cluster */
+.glide-cluster {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.switch-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.switch-lbl-top {
+  font-size: 7px;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+.rocker-switch {
+  background: #ded9cc;
+  border: 1px solid #b8b2a3;
+  border-radius: 12px;
+  padding: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 7px;
+  font-weight: 800;
+  color: #666;
+  text-align: center;
+}
+
+.sw-pos.active {
+  color: var(--text-dark);
+}
+
+.sw-knob {
+  width: 16px;
+  height: 10px;
+  background: #24222a;
+  border-radius: 5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.glide-dial-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.mini-dial {
+  width: 24px;
+  height: 24px;
+  background: #f4f1ea;
+  border: 1px solid #c8c3b4;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dial-name { font-size: 7px; font-weight: 800; color: var(--text-muted); }
+.dial-val { font-size: 7px; font-family: var(--font-mono); font-weight: 700; color: var(--text-dark); }
+
+/* ==========================================================================
+   7. Fullscreen Ohpe Library Modal (Preset & Repertoire View)
+   ========================================================================== */
+.ohpe-library-modal {
+  position: absolute;
+  inset: 12px;
+  background: #18171e;
+  border: 2px solid #33303d;
+  border-radius: 16px;
+  z-index: 100;
+  color: #eee;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+}
+
+.lib-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(30, 20, 14, 0.94);
-  border: 2px solid #5d3d24;
-  border-radius: 6px;
-  padding: 6px 14px;
-  font-size: 11px;
-  font-weight: 800;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  border-bottom: 1px solid #2a2734;
+  padding-bottom: 10px;
 }
 
-.zone-a { color: var(--text-gold); }
-.split-divider { color: #f43f5e; }
-.zone-b { color: #00f5d4; }
-
-/* Cadence Beat Heart Animation */
-.cadence-beat-widget {
+.lib-title-group {
   display: flex;
   align-items: center;
-  height: 30px;
+  gap: 16px;
+  flex: 1;
 }
 
-.beat-pulse-img {
-  height: 26px;
-  object-fit: contain;
-  transition: transform 0.08s ease, filter 0.08s ease;
+.lib-title {
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  color: #fff;
 }
 
-.beat-pulse-img.pulse {
-  transform: scale(1.15);
-  filter: drop-shadow(0 0 10px #ff0055);
+.lib-search {
+  background: #0e0d12;
+  border: 1px solid #363242;
+  border-radius: 6px;
+  padding: 6px 12px;
+  color: #fff;
+  font-size: 11px;
+  width: 320px;
+}
+
+.lib-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.lib-action-btn {
+  border: none;
+  border-radius: 6px;
+  padding: 6px 16px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.lib-action-btn.keep {
+  background: var(--text-gold);
+  color: #000;
+}
+
+.lib-action-btn.cancel {
+  background: #2a2734;
+  color: #ccc;
+}
+
+.lib-content-grid {
+  display: grid;
+  grid-template-columns: 160px 1fr 240px;
+  gap: 14px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.lib-cat-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-right: 1px solid #2a2734;
+  padding-right: 12px;
+}
+
+.lib-col-hdr {
+  font-size: 9px;
+  font-weight: 800;
+  color: #888;
+  letter-spacing: 0.5px;
+}
+
+.cat-chips-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cat-chip {
+  background: #22202a;
+  border: 1px solid #333040;
+  border-radius: 6px;
+  padding: 6px 10px;
+  color: #bbb;
+  font-size: 10px;
+  font-weight: 800;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cat-chip.active {
+  background: var(--text-gold);
+  border-color: var(--text-gold);
+  color: #000;
+}
+
+.lib-table-col {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.lib-table-header {
+  display: grid;
+  grid-template-columns: 24px 1fr 140px 60px 50px;
+  padding: 4px 8px;
+  border-bottom: 1px solid #2a2734;
+  font-size: 8px;
+  font-weight: 800;
+  color: #777;
+}
+
+.lib-table-body {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lib-song-row {
+  display: grid;
+  grid-template-columns: 24px 1fr 140px 60px 50px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  align-items: center;
+}
+
+.lib-song-row:hover {
+  background: #24222c;
+}
+
+.lib-song-row.active {
+  background: #2f2a3c;
+  border-left: 2px solid var(--text-gold);
+}
+
+.lib-details-col {
+  background: #121117;
+  border: 1px solid #2a2734;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.det-title { font-size: 16px; font-weight: 900; color: #fff; }
+.det-artist { font-size: 11px; color: var(--text-gold); font-weight: 700; }
+.det-tags { display: flex; gap: 4px; }
+.det-tag { background: #24222e; padding: 2px 6px; border-radius: 4px; font-size: 9px; color: #aaa; }
+.det-desc { font-size: 10px; color: #888; line-height: 1.4; }
+.det-chords-preview { background: #0a090e; padding: 6px; border-radius: 4px; font-family: var(--font-mono); }
+.ch-lbl { font-size: 8px; color: #666; display: block; margin-bottom: 2px; }
+.ch-seq { font-size: 11px; color: #fff; font-weight: 800; }
+.det-load-btn {
+  margin-top: auto;
+  background: var(--text-gold);
+  border: none;
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 11px;
+  font-weight: 900;
+  color: #000;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   8. Mobile Portrait Responsive Layout (Android Companion 430x932)
+   ========================================================================== */
+@media (max-width: 800px) {
+  body.ohpe-body {
+    padding: 2px;
+    align-items: flex-start;
+  }
+
+  .ohpe-chassis {
+    padding: 8px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 420px;
+    overflow-x: hidden;
+    gap: 8px;
+  }
+
+  .ohpe-topbar {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    padding: 2px;
+  }
+
+  .topbar-left {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  .logo-sub {
+    display: none;
+  }
+
+  .topbar-center {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .part-selector {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .preset-navigator {
+    width: 100%;
+  }
+
+  .preset-box {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .view-switchers {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .view-pill {
+    flex: 1;
+    justify-content: center;
+    padding: 4px 6px;
+    font-size: 9px;
+  }
+
+  .topbar-right {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .ohpe-main-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .ohpe-rail.left-rail, .ohpe-rail.right-rail {
+    display: none; /* Hide side rails on mobile portrait for clean focused live display */
+  }
+
+  .ohpe-center-screen {
+    padding: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    min-height: auto;
+  }
+
+  .screen-topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    width: 100%;
+  }
+
+  .screen-title-group {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .engine-title {
+    font-size: 10px;
+  }
+
+  .screen-telemetry-group {
+    width: 100%;
+    justify-content: space-between;
+    font-size: 8px;
+  }
+
+  .screen-section-bar {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .sec-chip {
+    padding: 4px 2px;
+    font-size: 8px;
+  }
+
+  .screen-body-split {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .chord-banner {
+    flex-direction: row;
+    width: 100%;
+  }
+
+  .chord-active-box {
+    flex: 2;
+  }
+
+  .next-chord-box {
+    flex: 1;
+    width: auto;
+  }
+
+  .chord-giant {
+    font-size: 24px;
+  }
+
+  .screen-macros-panel {
+    border-top: 1px solid #22202a;
+    padding-top: 6px;
+    width: 100%;
+  }
+
+  .screen-footer-bar {
+    width: 100%;
+    font-size: 7px;
+  }
+
+  .voices-info {
+    font-size: 7px;
+  }
+
+  .ohpe-control-deck {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .deck-transport, .deck-keynav {
+    display: none;
+  }
+
+  .deck-encoders {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    width: 100%;
+  }
+
+  .knob-wrap {
+    width: 44px;
+    height: 44px;
+  }
+
+  .ohpe-knob {
+    width: 42px;
+    height: 42px;
+  }
+
+  .knob-label {
+    font-size: 7px;
+  }
+
+  .knob-value {
+    font-size: 6px;
+  }
+
+  .ohpe-keybed-section {
+    grid-template-columns: 1fr;
+    padding-top: 6px;
+    width: 100%;
+  }
+
+  .wheel-cluster, .glide-cluster {
+    display: none;
+  }
+
+  .piano-keybed-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
+  }
+
+  .zone-labels-row {
+    font-size: 7px;
+    min-width: 480px;
+  }
+
+  .physical-keybed {
+    height: 60px;
+    width: 100%;
+    min-width: 480px;
+    box-sizing: border-box;
+  }
+
+  .physical-keybed .key.white {
+    padding-bottom: 2px;
+  }
+
+  .k-lbl {
+    font-size: 5px;
+  }
 }
