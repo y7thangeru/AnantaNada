@@ -169,8 +169,7 @@ func _ready() -> void:
 		waterfall_material.set_shader_parameter("note_stream_texture", waterfall_texture)
 
 	# 1b. Stage Compass Preloaded High-Res QR Texture
-	if qr_texture_rect and ResourceLoader.exists("res://assets/qr_stage_hub.png"):
-		qr_texture_rect.texture = load("res://assets/qr_stage_hub.png")
+	_load_qr_image_direct()
 
 	# 2. Wire UI Buttons
 	btn_panic.pressed.connect(_on_panic_pressed)
@@ -506,10 +505,25 @@ func _update_section_buttons_visual(station: int) -> void:
 func _show_qr_modal() -> void:
 	if qr_modal:
 		qr_modal.visible = true
-		if qr_texture_rect and qr_texture_rect.texture == null:
-			if ResourceLoader.exists("res://assets/qr_stage_hub.png"):
-				qr_texture_rect.texture = load("res://assets/qr_stage_hub.png")
+		_load_qr_image_direct()
 		_fetch_qr_code()
+
+func _load_qr_image_direct() -> void:
+	if not qr_texture_rect:
+		return
+	if ResourceLoader.exists("res://assets/qr_stage_hub.png"):
+		var res = load("res://assets/qr_stage_hub.png")
+		if res:
+			qr_texture_rect.texture = res
+			print("[Stage Compass] Preloaded QR resource applied.")
+			return
+	var global_path = ProjectSettings.globalize_path("res://assets/qr_stage_hub.png")
+	if FileAccess.file_exists(global_path):
+		var img = Image.load_from_file(global_path)
+		if img and not img.is_empty():
+			var tex = ImageTexture.create_from_image(img)
+			qr_texture_rect.texture = tex
+			print("[Stage Compass] Direct QR texture loaded successfully.")
 
 func _hide_qr_modal() -> void:
 	if qr_modal:

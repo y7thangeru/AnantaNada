@@ -453,3 +453,13 @@ This file logs all file creations, modifications, deletions, refactorings, and f
 ### [2026-10-29 09:50:00 +07:00] - [NEW] `SWOT_UI_UX_BENCHMARK_ANALYSIS.md`
 - **Action**: Created strategic UI/UX SWOT and 50-Competitor Benchmark Analysis document based on `swot_and_50_competitor_benchmark.md`.
 - **Reason**: Compares AnantaNada's Sweet RPG & Cyber-Rhythm UI/UX against 50 global competitors across 5 core clusters (Live Stage Hosts, Visualizers & Waterfall HUDs, Hardware Companions, Live DAWs & Arranger Rigs, and Diegetic Rhythm Action Engines). Establishes head-to-head feature matrix, SWOT positioning, and a 5-step Golden-Tier UI/UX upgrade roadmap (Interactive Transpose Pill, Section Transit Jumper, Arranger Grimoire Bar, Stage Compass QR Pairing, and Inertial Touch Carousel).
+
+### [2026-10-29 10:55:00 +07:00] - [FIX] Stage Compass QR Code Display & Cross-Platform TcpListener Web Remote
+- **Action**:
+  1. `scenes/MainStageView.tscn`: Removed `StageEngineBridge.cs` Node attachment that was causing Godot 4 scene parser failure (`ERROR: No loader found for resource: res://src/UI/StageEngineBridge.cs`). Standard Godot 4 now loads the scene graph, UI controls, and QR modal with zero parse errors.
+  2. `src/Network/StageHubServer.cs`: Refactored embedded HTTP/WebSocket server from Windows `HttpListener` (which relies on HTTP.sys and throws Error 5 Access Denied for non-elevated LAN bindings) to standard cross-platform `TcpListener` on `IPAddress.Any` (`0.0.0.0:8080`). Priority sorting in `GetLocalIpAddresses()` places physical Wi-Fi/Ethernet (`192.168.1.88`) first ahead of Tailscale/VPN virtual adapters.
+  3. `src/UI/MainStageController.gd`: Upgraded `_load_qr_image_direct()` to leverage `ResourceLoader.load("res://assets/qr_stage_hub.png")` with fallback to `Image.load_from_file()`. Guaranteed instant display of Stage Compass QR code on click.
+  4. `assets/qr_stage_hub.png`: Regenerated high-resolution QR code encoding `http://192.168.1.88:8080` and re-imported into Godot engine assets.
+  5. Verified all 8 unit tests in `src/Tests/VerificationHarness.cs` pass with 100% compliance.
+- **Reason**: Resolves user issue where Stage Compass QR code was blank/failing to open and `http://192.168.1.88:8080` was returning connection refused/bad request. Both desktop and smartphone LAN access are now fully operational.
+

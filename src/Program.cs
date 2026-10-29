@@ -164,25 +164,31 @@ public static class Program
             }
         };
 
-        // Connect MIDI (Scan for Go:Keys or any USB/Bluetooth MIDI hardware)
-        Console.WriteLine("[1/3] Scanning and connecting to MIDI Devices...");
-        bool midiConnected = midiEngine.Connect("Go:Keys");
-        if (!midiConnected)
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine(">> Note: Roland Go:Keys 3 not detected yet. Connect via Bluetooth/USB to auto-link.");
-            Console.ResetColor();
-        }
-
-        // Start StageHub Mini-Server
-        Console.WriteLine("[2/3] Starting StageHub HTTP/WebSocket Server...");
+        // 1. Start StageHub HTTP/WebSocket Mini-Server IMMEDIATELY
+        Console.WriteLine("[1/3] Starting StageHub HTTP/WebSocket Server on port " + httpPort + "...");
         hubServer.Start();
         var localIps = StageHubServer.GetLocalIpAddresses();
-        string ipText = localIps.Count > 0 ? localIps[0] : "127.0.0.1";
+        string lanHostIp = localIps.FirstOrDefault(ip => !ip.StartsWith("127.") && !ip.StartsWith("169.254")) ?? "127.0.0.1";
         Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($">> Web Remote URL: http://{ipText}:{httpPort}");
+        Console.WriteLine($">> Web Remote URL: http://{lanHostIp}:{httpPort}");
         Console.WriteLine($">> WebSocket Hub: ws://127.0.0.1:{httpPort}/ws");
         Console.ResetColor();
+
+        // 2. Connect MIDI (Scan for Go:Keys or any USB/Bluetooth MIDI hardware in background)
+        Console.WriteLine("[2/3] Scanning and connecting to MIDI Devices in background...");
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await midiEngine.ConnectAsync("Go:Keys");
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"\n>> [MIDI Warning] {ex.Message}");
+                Console.ResetColor();
+            }
+        });
 
         // Status Summary
         Console.WriteLine($"[3/3] Tone Library Loaded: {toneService.AllSongs.Count} Songs in Master Repertoire.");
@@ -194,47 +200,77 @@ public static class Program
         Console.WriteLine("  [Q] Exit Workstation");
         Console.WriteLine("-------------------------------------------------------------\n");
 
-        // Interactive Console Loop
-        bool running = true;
-        while (running)
+        // Interactive Console or Background Service Loop
+        bool hasInteractiveConsole = true;
+        try
         {
-            if (Console.KeyAvailable)
+            if (Console.IsInputRedirected) hasInteractiveConsole = false;
+            else _ = Console.KeyAvailable;
+        }
+        catch
+        {
+            hasInteractiveConsole = false;
+        }
+
+        if (hasInteractiveConsole)
+        {
+            bool running = true;
+            while (running)
             {
-                var key = Console.ReadKey(true).Key;
-                switch (key)
+                try
                 {
-                    case ConsoleKey.P:
-                        midiEngine.TriggerPanic();
-                        await hubServer.BroadcastPanicAsync();
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("\n[HOTKEY] PANIC BROADCASTED (CC120/CC123/CC64 on all 16 Ch)");
-                        Console.ResetColor();
-                        break;
-
-                    case ConsoleKey.M:
-                        string stamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-                        string outPath = Path.Combine(Directory.GetCurrentDirectory(), "captures", $"session_{stamp}.mid");
-                        bool ok = buffer.ExportToMidi(outPath, out int count, out int bars);
-                        if (ok)
+                    if (Console.KeyAvailable)
+                    {
+                        var key = Console.ReadKey(true).Key;
+                        switch (key)
                         {
-                            Console.ForegroundColor = ConsoleColor.Cyan;
-                            Console.WriteLine($"\n[HOTKEY] Exported {count} events ({bars} bars) -> {outPath}");
-                            Console.ResetColor();
+                            case ConsoleKey.P:
+                                midiEngine.TriggerPanic();
+                                await hubServer.BroadcastPanicAsync();
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("\n[HOTKEY] PANIC BROADCASTED (CC120/CC123/CC64 on all 16 Ch)");
+                                Console.ResetColor();
+                                break;
+
+                            case ConsoleKey.M:
+                                string stamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                                string outPath = Path.Combine(Directory.GetCurrentDirectory(), "captures", $"session_{stamp}.mid");
+                                bool ok = buffer.ExportToMidi(outPath, out int count, out int bars);
+                                if (ok)
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Cyan;
+                                    Console.WriteLine($"\n[HOTKEY] Exported {count} events ({bars} bars) -> {outPath}");
+                                    Console.ResetColor();
+                                }
+                                break;
+
+                            case ConsoleKey.R:
+                                Console.WriteLine("\n[HOTKEY] Rescanning MIDI ports...");
+                                await midiEngine.ConnectAsync("Go:Keys");
+                                break;
+
+                            case ConsoleKey.Q:
+                                running = false;
+                                break;
                         }
-                        break;
-
-                    case ConsoleKey.R:
-                        Console.WriteLine("\n[HOTKEY] Rescanning MIDI ports...");
-                        midiEngine.Connect("Go:Keys");
-                        break;
-
-                    case ConsoleKey.Q:
-                        running = false;
-                        break;
+                    }
                 }
-            }
+                catch
+                {
+                    // Fall back to passive daemon wait if console becomes detached
+                    break;
+                }
 
-            await Task.Delay(50);
+                await Task.Delay(50);
+            }
+        }
+        else
+        {
+            // Background daemon mode (runs smoothly when launched from GUI shortcut or headless)
+            Console.WriteLine("[DAEMON MODE] StageHub Server active in background. Press Ctrl+C to terminate.");
+            var tcs = new TaskCompletionSource();
+            Console.CancelKeyPress += (s, e) => { e.Cancel = true; tcs.TrySetResult(); };
+            await tcs.Task;
         }
 
         Console.WriteLine("\n[ANANTANADA] Shutting down gracefully...");
