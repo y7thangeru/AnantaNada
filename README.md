@@ -135,6 +135,35 @@ flowchart TD
 
 ---
 
+## 🎹 Ohpe Master Performance & Audio Suite (thegroovex/Ohpe Inspiration)
+
+Diadaptasi dari arsitektur synthesizer workstation modern **[thegroovex/Ohpe](https://github.com/thegroovex/Ohpe)**, modul ini melengkapi ANANTANADA dengan kemampuan live performance dan audio generatif canggih:
+
+1. **Tactical Performance Pads (`PerformancePadsEngine.cs`)**:
+   - **Quantized Stutter**: Mengulang held notes secara terkuantisasi (1/4 s/d 1/32 beat).
+   - **Tape Stop (Vinyl Brake)**: Penurunan pitch bend eksponensial hingga `-8192` dengan cutoff senyap.
+   - **Pitch Riser**: Sapuan pitch naik (+8191) diiringi crescendo Filter Cutoff (CC 74).
+   - **Filter Sweep**: Otomatisasi resonansi (CC 71) dan cutoff (CC 74) menjelang drop lagu.
+   - **Reverb Freeze**: Melempar akord aktif ke awan ambient sustain tak terhingga (CC 91 & CC 64 = 127).
+2. **Euclidean & Orbit Polymetric Sequencer (`SequencerEngine.cs`)**:
+   - Menggunakan algoritma Bjorklund untuk mendistribusikan ketukan secara merata ($E(3,8)$ Tresillo, $E(5,8)$ Cinquillo, $E(7,16)$ Bossa).
+   - 4 Cincin *Orbit Polymetric* independen yang memicu kick, snare, hi-hat, dan arpeggio synth tanpa repetisi yang membosankan.
+   - Kuantisasi tangga nada (*Scale Quantizer*) mendukung Major, Minor, Pentatonic, Dorian, Mixolydian, Blues, dan Hirajoshi.
+3. **Harmony Brain & Real-Time Key Gravity (`HarmonyBrain.cs`)**:
+   - Deteksi akord polifonik real-time (Major, Minor, 7th, maj7, m7, sus2, sus4, add9, dan slash bass inversions).
+   - **Key Gravity (Stage-Safe Pitch Clamping)**: Menarik nada-nada slip/salah pencet kembali ke tangga nada aktif secara real-time.
+4. **Motion CC Recorder & Looper (`MotionRecorder.cs`)**:
+   - Merekam gerakan Modulation Wheel (CC 01), Expression (CC 11), Filter Cutoff (CC 74), dan Pitch Bend selama 2-4 bar.
+   - Memutar ulang kurva modulasi secara mulus (interpolasi linier sub-milidetik), membebaskan kedua tangan musisi untuk bermain piano.
+5. **Parametric 3D Head Model Spatializer (`SpatialAudioMatrix.cs`)**:
+   - Model kepala parametrik matematis berbasis formula Woodworth: $\Delta t = \frac{r}{c}(\theta + \sin\theta)$.
+   - Menghasilkan pemisahan spasial 3D untuk In-Ear Monitor (IEM) musisi: Metronome Click (Atas Kiri), Audio Cue Prompts (Atas Kanan), Keyboard (Tengah), Backing Track (Lebar Depan).
+6. **Sound Genome & Preset Breeder (`SoundGenomeBreeder.cs`)**:
+   - Mengawinkan dua preset suara Roland Go:Keys 3 menggunakan algoritma genetika (crossover & mutation) untuk menghasilkan suara hybrid unik secara instan.
+
+
+---
+
 ## 📖 Cara Menggunakan Project & Aplikasi (Quick Operational Guide)
 
 > Untuk panduan langkah-demi-langkah mendalam dan SOP panggung, buka [USER_GUIDE.md](USER_GUIDE.md).

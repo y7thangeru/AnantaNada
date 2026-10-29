@@ -32,6 +32,10 @@ public sealed class StageHubServer : IDisposable
     public event Action? OnExportMidiTriggered;
     public event Action<int>? OnTransposeTriggered;
     public event Action<string, int>? OnSectionTriggered;
+    public event Action<string, bool, byte>? OnPerformancePadTriggered;
+    public event Action<int, int, int, int>? OnEuclideanConfigTriggered;
+    public event Action<string, byte, string>? OnKeyGravityTriggered;
+    public event Action<string, double>? OnMotionRecorderTriggered;
     public event Action<string>? OnLog;
     public event Action<int>? OnClientCountChanged;
 
@@ -412,6 +416,38 @@ public sealed class StageHubServer : IDisposable
                         }
                         break;
 
+                    case "TRIGGER_PERFORMANCE_PAD":
+                        string padType = root.TryGetProperty("padType", out var ptProp) ? ptProp.GetString() ?? "Stutter" : "Stutter";
+                        bool active = !root.TryGetProperty("active", out var actProp) || actProp.GetBoolean();
+                        byte channel = root.TryGetProperty("channel", out var chProp) ? chProp.GetByte() : (byte)0;
+                        OnLog?.Invoke($"[StageHub Remote] Pad Triggered: {padType} (Active: {active})");
+                        OnPerformancePadTriggered?.Invoke(padType, active, channel);
+                        break;
+
+                    case "SET_EUCLIDEAN_CONFIG":
+                        int rIdx = root.TryGetProperty("ringIndex", out var riProp) ? riProp.GetInt32() : 0;
+                        int steps = root.TryGetProperty("steps", out var stProp) ? stProp.GetInt32() : 16;
+                        int pulses = root.TryGetProperty("pulses", out var puProp) ? puProp.GetInt32() : 4;
+                        int rot = root.TryGetProperty("rotation", out var roProp) ? roProp.GetInt32() : 0;
+                        OnLog?.Invoke($"[StageHub Remote] Euclidean Ring #{rIdx} -> E({pulses},{steps}) rot:{rot}");
+                        OnEuclideanConfigTriggered?.Invoke(rIdx, steps, pulses, rot);
+                        break;
+
+                    case "SET_KEY_GRAVITY":
+                        string mode = root.TryGetProperty("mode", out var mdProp) ? mdProp.GetString() ?? "SnapNearest" : "SnapNearest";
+                        byte rootNote = root.TryGetProperty("rootNote", out var rnProp) ? rnProp.GetByte() : (byte)0;
+                        string scale = root.TryGetProperty("scale", out var scProp) ? scProp.GetString() ?? "Major" : "Major";
+                        OnLog?.Invoke($"[StageHub Remote] Key Gravity Mode: {mode} (Scale: {rootNote} {scale})");
+                        OnKeyGravityTriggered?.Invoke(mode, rootNote, scale);
+                        break;
+
+                    case "TRIGGER_MOTION_REC":
+                        string mAction = root.TryGetProperty("action", out var maProp) ? maProp.GetString() ?? "START" : "START";
+                        double dur = root.TryGetProperty("duration", out var duProp) ? duProp.GetDouble() : 2.0;
+                        OnLog?.Invoke($"[StageHub Remote] Motion Action: {mAction} ({dur}s)");
+                        OnMotionRecorderTriggered?.Invoke(mAction, dur);
+                        break;
+
                     default:
                         OnLog?.Invoke($"[StageHub Remote] Unrecognized command: {command}");
                         break;
@@ -468,6 +504,18 @@ public sealed class StageHubServer : IDisposable
     public async Task BroadcastCaptureToastAsync(string filename, int eventsCount, int bars)
     {
         string json = $"{{\"type\":\"CAPTURE_SAVED\",\"filename\":\"{filename}\",\"events\":{eventsCount},\"bars\":{bars}}}";
+        await BroadcastRawJsonAsync(json);
+    }
+
+    public async Task BroadcastHarmonyUpdateAsync(string chordName, string root, string quality, string bass, string gravityMode)
+    {
+        string json = $"{{\"type\":\"HARMONY_UPDATE\",\"chordName\":\"{chordName}\",\"root\":\"{root}\",\"quality\":\"{quality}\",\"bass\":\"{bass}\",\"gravityMode\":\"{gravityMode}\"}}";
+        await BroadcastRawJsonAsync(json);
+    }
+
+    public async Task BroadcastEuclideanTickAsync(string ringName, int currentStep, int totalSteps)
+    {
+        string json = $"{{\"type\":\"EUCLIDEAN_TICK\",\"ringName\":\"{ringName}\",\"currentStep\":{currentStep},\"totalSteps\":{totalSteps}}}";
         await BroadcastRawJsonAsync(json);
     }
 

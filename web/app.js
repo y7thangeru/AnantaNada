@@ -76,6 +76,22 @@ function connectWebSocket() {
           updateTransposeUI();
         } else if (msg.type === "SECTION_CHANGED") {
           highlightSection(msg.section);
+        } else if (msg.type === "HARMONY_UPDATE") {
+          const badge = document.getElementById("realtimeChordBadge");
+          if (badge) {
+            badge.textContent = `HARMONY: ${msg.chordName} [${msg.gravityMode}]`;
+            badge.style.display = "inline-block";
+          }
+        } else if (msg.type === "EUCLIDEAN_TICK") {
+          // Highlight active step dots
+          const dots = document.querySelectorAll(".step-dots-row .dot");
+          if (dots.length > 0) {
+            const step = msg.currentStep % dots.length;
+            dots.forEach((d, i) => {
+              if (i === step) d.classList.add("active");
+              else d.classList.remove("active");
+            });
+          }
         }
       } catch (err) {
         console.error("Telemetry decode error:", err);
@@ -275,6 +291,33 @@ document.querySelectorAll(".physical-keybed .key").forEach((k) => {
   k.addEventListener("mouseup", () => {
     k.style.filter = "none";
   });
+});
+
+// Ohpe-Inspired Tactical Performance Throw Pads
+document.querySelectorAll(".performance-action-strip .pad-btn").forEach((btn) => {
+  const padType = btn.dataset.pad;
+
+  const trigger = (active) => {
+    if (active) btn.classList.add("active");
+    else btn.classList.remove("active");
+
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify({
+        command: "TRIGGER_PERFORMANCE_PAD",
+        padType: padType,
+        active: active,
+        channel: 0
+      }));
+    }
+  };
+
+  btn.addEventListener("mousedown", (e) => { e.preventDefault(); trigger(true); });
+  btn.addEventListener("mouseup", (e) => { e.preventDefault(); trigger(false); });
+  btn.addEventListener("mouseleave", () => { trigger(false); });
+
+  btn.addEventListener("touchstart", (e) => { e.preventDefault(); trigger(true); }, { passive: false });
+  btn.addEventListener("touchend", (e) => { e.preventDefault(); trigger(false); }, { passive: false });
+  btn.addEventListener("touchcancel", (e) => { e.preventDefault(); trigger(false); }, { passive: false });
 });
 
 // Initialize

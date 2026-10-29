@@ -76,3 +76,85 @@ public sealed class InboundCommandEnvelope
     [JsonPropertyName("command")]
     public string? Command { get; set; }
 }
+
+/// <summary>
+/// Inbound command from Mobile Remote requesting a Performance Pad action (Ohpe-inspired).
+/// </summary>
+public sealed class TriggerPerformancePadCommand
+{
+    [JsonPropertyName("command")]
+    public string Command { get; set; } = "TRIGGER_PERFORMANCE_PAD";
+
+    [JsonPropertyName("padType")]
+    public string PadType { get; set; } = "Stutter"; // Stutter, TapeStop, PitchRiser, FilterSweep, ReverbFreeze
+
+    [JsonPropertyName("active")]
+    public bool Active { get; set; } = true;
+
+    [JsonPropertyName("channel")]
+    public byte Channel { get; set; } = 0;
+}
+
+/// <summary>
+/// Inbound command to configure Euclidean & Orbit Polymetric Sequencer.
+/// </summary>
+public sealed class SetEuclideanConfigCommand
+{
+    [JsonPropertyName("command")]
+    public string Command { get; set; } = "SET_EUCLIDEAN_CONFIG";
+
+    [JsonPropertyName("ringIndex")]
+    public int RingIndex { get; set; }
+
+    [JsonPropertyName("steps")]
+    public int Steps { get; set; } = 16;
+
+    [JsonPropertyName("pulses")]
+    public int Pulses { get; set; } = 4;
+
+    [JsonPropertyName("rotation")]
+    public int Rotation { get; set; } = 0;
+}
+
+/// <summary>
+/// Inbound command to configure Harmony Brain Key Gravity.
+/// </summary>
+public sealed class SetKeyGravityCommand
+{
+    [JsonPropertyName("command")]
+    public string Command { get; set; } = "SET_KEY_GRAVITY";
+
+    [JsonPropertyName("mode")]
+    public string Mode { get; set; } = "SnapNearest"; // Off, SnapNearest, HighlightOnly
+
+    [JsonPropertyName("rootNote")]
+    public byte RootNote { get; set; } = 0;
+
+    [JsonPropertyName("scale")]
+    public string Scale { get; set; } = "Major";
+}
+
+/// <summary>
+/// Outbound telemetry broadcast when Harmony Brain recognizes chords or active scales.
+/// </summary>
+public sealed class HarmonyUpdateMessage
+{
+    [JsonPropertyName("type")]
+    public string Type { get; set; } = "HARMONY_UPDATE";
+
+    [JsonPropertyName("chordName")]
+    public string ChordName { get; set; } = "None";
+
+    [JsonPropertyName("root")]
+    public string Root { get; set; } = "";
+
+    [JsonPropertyName("quality")]
+    public string Quality { get; set; } = "";
+
+    [JsonPropertyName("bass")]
+    public string Bass { get; set; } = "";
+
+    [JsonPropertyName("gravityMode")]
+    public string GravityMode { get; set; } = "SnapNearest";
+}
+

@@ -524,6 +524,41 @@ public sealed class NativeMidiEngine : IDisposable
     }
 
     /// <summary>
+    /// Sends a standard MIDI Note On message.
+    /// </summary>
+    public void SendNoteOn(byte channel, byte note, byte velocity)
+    {
+        SendShortMessage((byte)(0x90 | (channel & 0x0F)), (byte)(note & 0x7F), (byte)(velocity & 0x7F));
+    }
+
+    /// <summary>
+    /// Sends a standard MIDI Note Off message.
+    /// </summary>
+    public void SendNoteOff(byte channel, byte note)
+    {
+        SendShortMessage((byte)(0x80 | (channel & 0x0F)), (byte)(note & 0x7F), 0);
+    }
+
+    /// <summary>
+    /// Sends a standard MIDI Control Change (CC) message.
+    /// </summary>
+    public void SendControlChange(byte channel, byte controller, byte value)
+    {
+        SendShortMessage((byte)(0xB0 | (channel & 0x0F)), (byte)(controller & 0x7F), (byte)(value & 0x7F));
+    }
+
+    /// <summary>
+    /// Sends a standard MIDI Pitch Bend message (-8192 to +8191, centered at 0).
+    /// </summary>
+    public void SendPitchBend(byte channel, int bend)
+    {
+        int normalized = Math.Clamp(bend, -8192, 8191) + 8192;
+        byte lsb = (byte)(normalized & 0x7F);
+        byte msb = (byte)((normalized >> 7) & 0x7F);
+        SendShortMessage((byte)(0xE0 | (channel & 0x0F)), lsb, msb);
+    }
+
+    /// <summary>
     /// Hardware-Safe Volatile Patch Selector.
     /// Adheres strictly to Section 2 of ANANTANADA_SPEC.md:
     /// NEVER triggers EEPROM or flash ROM writes on the Roland Go:Keys 3.

@@ -1,9 +1,14 @@
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
+using AnantaNada.Core.Audio;
 using AnantaNada.Core.Data;
+using AnantaNada.Core.Harmony;
 using AnantaNada.Core.Midi;
 using AnantaNada.Core.Models;
+using AnantaNada.Core.Motion;
+using AnantaNada.Core.Performance;
+using AnantaNada.Core.Sequencer;
 using AnantaNada.Core.Services;
 using AnantaNada.Network;
 
@@ -354,6 +359,258 @@ public static class VerificationHarness
             else
             {
                 Console.WriteLine($"FAIL (Invalid QR PNG byte payload. Size: {qrBytes.Length})");
+                failed++;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"FAIL: {ex.Message}");
+            failed++;
+        }
+
+        // Test 9: Ohpe Performance Pads Engine (Stutter, Tape Stop, Pitch Riser, Reverb Freeze)
+        try
+        {
+            Console.Write("[TEST 9] Ohpe Performance Pads Engine (Stutter, Tape Stop, Riser, Freeze)... ");
+            var pads = new PerformancePadsEngine();
+            int pitchBendsDispatched = 0;
+            int ccDispatched = 0;
+            int notesDispatched = 0;
+
+            pads.OnPitchBend += (ch, bend) => pitchBendsDispatched++;
+            pads.OnControlChange += (ch, cc, val) => ccDispatched++;
+            pads.OnNoteTriggered += (ch, n, v) => notesDispatched++;
+
+            // Trigger Stutter with active note
+            pads.NoteOn(0, 60, 100);
+            pads.SetStutterDivision(120, 16);
+            pads.TriggerPad(PerformancePadType.Stutter, true, 0);
+            pads.Tick(0.15); // Exceeds 125ms interval, triggers note
+            pads.TriggerPad(PerformancePadType.Stutter, false, 0);
+
+            // Trigger Tape Stop
+            pads.TriggerPad(PerformancePadType.TapeStop, true, 0);
+            pads.Tick(0.7); // Past 0.65s duration -> pitch drop + note off
+            pads.TriggerPad(PerformancePadType.TapeStop, false, 0);
+
+            // Trigger Reverb Freeze
+            pads.TriggerPad(PerformancePadType.ReverbFreeze, true, 0);
+            pads.TriggerPad(PerformancePadType.ReverbFreeze, false, 0);
+
+            if (notesDispatched > 0 && pitchBendsDispatched > 0 && ccDispatched >= 2)
+            {
+                Console.WriteLine($"PASS (Pads evaluated: {notesDispatched} note bursts, {pitchBendsDispatched} pitch drops, {ccDispatched} CC events)");
+                passed++;
+            }
+            else
+            {
+                Console.WriteLine($"FAIL (Insufficient pad events: notes={notesDispatched}, bends={pitchBendsDispatched}, cc={ccDispatched})");
+                failed++;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"FAIL: {ex.Message}");
+            failed++;
+        }
+
+        // Test 10: Ohpe Euclidean & Orbit Polymetric Sequencer
+        try
+        {
+            Console.Write("[TEST 10] Ohpe Euclidean & Orbit Polymetric Sequencer... ");
+            // 1. Validate Bjorklund algorithm
+            bool[] tresillo = SequencerEngine.GenerateEuclidean(steps: 8, pulses: 3, rotation: 0);
+            bool[] cinquillo = SequencerEngine.GenerateEuclidean(steps: 8, pulses: 5, rotation: 0);
+            bool[] bossa = SequencerEngine.GenerateEuclidean(steps: 16, pulses: 7, rotation: 0);
+
+            int tresilloHits = tresillo.Count(x => x);
+            int cinquilloHits = cinquillo.Count(x => x);
+            int bossaHits = bossa.Count(x => x);
+
+            // 2. Validate Orbit ring step dispatch
+            var seq = new SequencerEngine();
+            int seqNotesDispatched = 0;
+            seq.OnNoteTriggered += (ch, note, vel) => seqNotesDispatched++;
+
+            seq.Start();
+            for (int i = 0; i < 16; i++)
+            {
+                seq.StepTick();
+            }
+            seq.Stop();
+
+            // 3. Validate Scale Quantization (C# -> C or D in C Major)
+            byte quantized = SequencerEngine.QuantizeToScale(61, 60, MusicalScale.Major);
+            bool scaleOk = (quantized == 60 || quantized == 62);
+
+            if (tresilloHits == 3 && cinquilloHits == 5 && bossaHits == 7 && seqNotesDispatched > 0 && scaleOk)
+            {
+                Console.WriteLine($"PASS (Euclid E(3,8)={tresilloHits}, E(5,8)={cinquilloHits}, E(7,16)={bossaHits}; 16-step Orbit notes: {seqNotesDispatched})");
+                passed++;
+            }
+            else
+            {
+                Console.WriteLine($"FAIL (Euclidean count mismatch or scale quantization failed)");
+                failed++;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"FAIL: {ex.Message}");
+            failed++;
+        }
+
+        // Test 11: Ohpe Harmony Brain & Real-Time Key Gravity
+        try
+        {
+            Console.Write("[TEST 11] Ohpe Harmony Brain & Real-Time Key Gravity... ");
+            var brain = new HarmonyBrain();
+            brain.SetScale(0, MusicalScale.Major); // C Major
+            brain.GravityMode = KeyGravityMode.SnapNearest;
+
+            // Test chord recognition
+            var chordC = HarmonyBrain.IdentifyChord([0, 4, 7], "C");       // C, E, G -> C Major
+            var chordAm = HarmonyBrain.IdentifyChord([9, 0, 4], "A");      // A, C, E -> Am
+            var chordG7 = HarmonyBrain.IdentifyChord([7, 11, 2, 5], "G");   // G, B, D, F -> G7
+            var chordCmaj7 = HarmonyBrain.IdentifyChord([0, 4, 7, 11], "C"); // C, E, G, B -> Cmaj7
+
+            bool chordsOk = chordC.Name == "C" && chordAm.Name == "Am" && chordG7.Name == "G7" && chordCmaj7.Name == "Cmaj7";
+
+            // Test Key Gravity clamping
+            byte inScaleNote = brain.ProcessNoteOn(62, 100);  // D (in C Major) -> unchanged 62
+            byte offScaleNote = brain.ProcessNoteOn(61, 100); // C# (out of scale) -> snapped to 60 or 62
+
+            bool gravityOk = (inScaleNote == 62) && (offScaleNote == 60 || offScaleNote == 62);
+
+            if (chordsOk && gravityOk)
+            {
+                Console.WriteLine($"PASS (Recognized: {chordC.Name}, {chordAm.Name}, {chordG7.Name}, {chordCmaj7.Name}; Clamping: 62->{inScaleNote}, 61->{offScaleNote})");
+                passed++;
+            }
+            else
+            {
+                Console.WriteLine($"FAIL (Chord recognition or Key Gravity mismatch: chordsOk={chordsOk}, gravityOk={gravityOk})");
+                failed++;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"FAIL: {ex.Message}");
+            failed++;
+        }
+
+        // Test 12: Ohpe Motion CC Recorder & Polymetric Automation Looper
+        try
+        {
+            Console.Write("[TEST 12] Ohpe Motion CC Recorder & Looper... ");
+            var motion = new MotionRecorder();
+            int ccDispatched = 0;
+            motion.OnControlChange += (ch, cc, val) => ccDispatched++;
+
+            // Record a 2.0s gesture for CC 74 (Filter Cutoff)
+            motion.StartRecording(targetDuration: 2.0);
+            motion.RecordInput(controllerId: 74, value: 20); // at t=0
+            motion.Tick(1.0);
+            motion.RecordInput(controllerId: 74, value: 100); // at t=1.0
+            motion.Tick(1.0); // reached 2.0s -> stops automatically and starts looping
+
+            // Tick playback
+            motion.Tick(0.2);
+            motion.Tick(0.3);
+
+            if (ccDispatched > 0 && motion.IsGlobalPlaying)
+            {
+                Console.WriteLine($"PASS (Recorded 2.0s lane; interpolated playback dispatched {ccDispatched} CC events)");
+                passed++;
+            }
+            else
+            {
+                Console.WriteLine($"FAIL (Motion recorder playback failed: ccDispatched={ccDispatched})");
+                failed++;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"FAIL: {ex.Message}");
+            failed++;
+        }
+
+        // Test 13: Ohpe Parametric 3D Head Model Spatializer (In-Ear Monitor Matrix)
+        try
+        {
+            Console.Write("[TEST 13] Ohpe Parametric 3D Head Model Spatializer... ");
+            var spatial = new SpatialAudioMatrix();
+
+            // Compute Click (Azimuth -45°, Elevation +35°)
+            var clickParams = spatial.ComputeBinauralParameters("Click");
+            // Sound is on left -> right delay should be > 0, left delay == 0
+            bool clickDelayOk = clickParams.RightDelayMs > 0 && clickParams.LeftDelayMs == 0;
+            bool clickPinnaOk = clickParams.PinnaNotchHz > 7000.0; // elevated
+
+            // Compute Keyboard (Center 0°)
+            var keyParams = spatial.ComputeBinauralParameters("Keyboard");
+            bool keyDelaysOk = Math.Abs(keyParams.LeftDelayMs - keyParams.RightDelayMs) < 0.001;
+
+            if (clickDelayOk && clickPinnaOk && keyDelaysOk)
+            {
+                Console.WriteLine($"PASS (Woodworth ITD Right={clickParams.RightDelayMs:F2}ms, Pinna={clickParams.PinnaNotchHz:F0}Hz, Center ITD Diff=0ms)");
+                passed++;
+            }
+            else
+            {
+                Console.WriteLine($"FAIL (Spatial math failed: clickDelayOk={clickDelayOk}, clickPinnaOk={clickPinnaOk}, keyDelaysOk={keyDelaysOk})");
+                failed++;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"FAIL: {ex.Message}");
+            failed++;
+        }
+
+        // Test 14: Ohpe Sound Genome & Preset Breeding Engine
+        try
+        {
+            Console.Write("[TEST 14] Ohpe Sound Genome & Preset Breeding Engine... ");
+            var breeder = new SoundGenomeBreeder();
+
+            var parentA = new ToneItem
+            {
+                Id = "T01",
+                Name = "Concert Grand",
+                Category = "PIANO",
+                Msb = 0,
+                Lsb = 68,
+                Pc = 1
+            };
+
+            var parentB = new ToneItem
+            {
+                Id = "T02",
+                Name = "Cyber Synth Brass",
+                Category = "SYNTH",
+                Msb = 0,
+                Lsb = 67,
+                Pc = 15
+            };
+
+            var genomeA = breeder.CreateGenomeFromTone(parentA);
+            var genomeB = breeder.CreateGenomeFromTone(parentB);
+
+            var child = breeder.Breed(genomeA, genomeB, biasTowardsA: 0.5, mutationRate: 0.0);
+
+            bool childOk = child.Generation == 1 &&
+                           child.Parents.Contains("Concert Grand") &&
+                           child.Cutoff >= 0 && child.Cutoff <= 127;
+
+            if (childOk)
+            {
+                Console.WriteLine($"PASS (Bred '{child.Name}' Gen {child.Generation}: Parents '{child.Parents}')");
+                passed++;
+            }
+            else
+            {
+                Console.WriteLine($"FAIL (Genome breeding validation failed)");
                 failed++;
             }
         }
