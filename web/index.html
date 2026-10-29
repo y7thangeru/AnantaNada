@@ -84,6 +84,14 @@
         <div class="minimetro-transit-container">
           <img src="assets/ui_sprites/png/widget_minimetro_transit_map.png" class="transit-map-img" alt="Mini Metro Song Transit" />
         </div>
+        <!-- Section Navigation Bar -->
+        <div class="section-bar" style="display: flex; gap: 6px; justify-content: center; margin: 4px 0 8px 0;">
+          <button class="stage-btn-mini section-btn" data-sec="INTRO" data-bar="1" style="padding: 2px 8px; font-size: 11px; cursor: pointer; background: #2b1f14; border: 1px solid #c8a86b; color: #fff; border-radius: 4px;">❖ INTRO</button>
+          <button class="stage-btn-mini section-btn" data-sec="VERSE" data-bar="5" style="padding: 2px 8px; font-size: 11px; cursor: pointer; background: #2b1f14; border: 1px solid #c8a86b; color: #fff; border-radius: 4px;">❖ VERSE</button>
+          <button class="stage-btn-mini section-btn" data-sec="CHORUS" data-bar="17" style="padding: 2px 8px; font-size: 11px; cursor: pointer; background: #2b1f14; border: 1px solid #c8a86b; color: #fff; border-radius: 4px;">✦ CHORUS</button>
+          <button class="stage-btn-mini section-btn" data-sec="SOLO" data-bar="29" style="padding: 2px 8px; font-size: 11px; cursor: pointer; background: #2b1f14; border: 1px solid #c8a86b; color: #fff; border-radius: 4px;">✪ SOLO</button>
+          <button class="stage-btn-mini section-btn" data-sec="OUTRO" data-bar="37" style="padding: 2px 8px; font-size: 11px; cursor: pointer; background: #2b1f14; border: 1px solid #c8a86b; color: #fff; border-radius: 4px;">◼ OUTRO</button>
+        </div>
         <div class="panel-header">[PERFORMANCE COMBO / TIMING COACH]</div>
         
         <div class="arcade-badges-row">
@@ -125,7 +133,11 @@
         <div class="mission-tag active-tag">// CURRENT HARMONY</div>
         <div class="chord-hero-box">
           <div class="chord-giant" id="currentChord">[ G#m7 ]</div>
-          <div class="transpose-tag" id="transposeTag">TRANSPOSE: [ +0 SEMITONES ]</div>
+          <div class="transpose-row" style="display: flex; gap: 6px; justify-content: center; align-items: center; margin-top: 4px;">
+            <button class="stage-btn-mini" id="btnWebTransposeDown" style="padding: 2px 8px; font-size: 11px; cursor: pointer; background: #2b1f14; border: 1px solid #c8a86b; color: #fff; border-radius: 4px;">[-1]</button>
+            <div class="transpose-tag" id="transposeTag" style="margin: 0;">TRANSPOSE: [ +0 ]</div>
+            <button class="stage-btn-mini" id="btnWebTransposeUp" style="padding: 2px 8px; font-size: 11px; cursor: pointer; background: #2b1f14; border: 1px solid #c8a86b; color: #fff; border-radius: 4px;">[+1]</button>
+          </div>
         </div>
 
         <div class="taiko-drum-widget">

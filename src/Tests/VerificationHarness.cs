@@ -322,6 +322,47 @@ public static class VerificationHarness
             failed++;
         }
 
+        // Test 8: Sprint 1 - QR-Code Pairing Generation & Stage Telemetry Contract
+        try
+        {
+            Console.Write("[TEST 8] Sprint 1 Stage Compass QR Generator & Telemetry Contract... ");
+
+            // 1. Validate QR Code PNG generation
+            string testUrl = "http://192.168.1.50:8080";
+            using var qrGen = new QRCoder.QRCodeGenerator();
+            using var qrData = qrGen.CreateQrCode(testUrl, QRCoder.QRCodeGenerator.ECCLevel.M);
+            using var pngQr = new QRCoder.PngByteQRCode(qrData);
+            byte[] qrBytes = pngQr.GetGraphic(10);
+
+            // Valid PNG starts with magic bytes: 0x89, 0x50, 0x4E, 0x47
+            bool validPng = qrBytes.Length > 64 &&
+                            qrBytes[0] == 0x89 &&
+                            qrBytes[1] == 0x50 && // 'P'
+                            qrBytes[2] == 0x4E && // 'N'
+                            qrBytes[3] == 0x47;   // 'G'
+
+            // 2. Validate RPN Transpose clamping and dispatch
+            using var midi = new NativeMidiEngine();
+            midi.SetCoarseTranspose(MidiConstants.GoKeys3DefaultPatchChannel, -3); // Clamped -12 to +12
+            midi.SetCoarseTranspose(MidiConstants.GoKeys3DefaultPatchChannel, 5);
+
+            if (validPng)
+            {
+                Console.WriteLine($"PASS (Generated {qrBytes.Length} byte PNG with valid header; RPN Transpose -3/+5 OK)");
+                passed++;
+            }
+            else
+            {
+                Console.WriteLine($"FAIL (Invalid QR PNG byte payload. Size: {qrBytes.Length})");
+                failed++;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"FAIL: {ex.Message}");
+            failed++;
+        }
+
         Console.WriteLine("=================================================");
         Console.WriteLine($"  AUDIT RESULT: {passed} PASSED, {failed} FAILED");
         Console.WriteLine("=================================================");

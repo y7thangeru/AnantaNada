@@ -50,6 +50,14 @@ function connectWebSocket() {
         const msg = JSON.parse(event.data);
         if (msg.type === "PLAYBACK_TICK" && msg.data) {
           handlePlaybackTick(msg.data);
+        } else if (msg.type === "TRANSPOSE_CHANGED") {
+          currentWebTranspose = msg.semitones || 0;
+          if (transposeTag) {
+            transposeTag.textContent = `TRANSPOSE: [ ${currentWebTranspose >= 0 ? "+" : ""}${currentWebTranspose} ]`;
+            transposeTag.style.color = currentWebTranspose === 0 ? "#ffd166" : "#00f5d4";
+          }
+        } else if (msg.type === "SECTION_CHANGED") {
+          highlightSectionBtn(msg.section);
         }
       } catch (err) {
         console.error("Telemetry decode error:", err);
@@ -148,5 +156,70 @@ retroBtn.addEventListener("click", () => {
     retroBtn.style.color = "";
   }, 2000);
 });
+
+let currentWebTranspose = 0;
+
+// Interactive Web Transpose Controls
+const btnWebTransposeDown = document.getElementById("btnWebTransposeDown");
+const btnWebTransposeUp = document.getElementById("btnWebTransposeUp");
+
+if (btnWebTransposeDown) {
+  btnWebTransposeDown.addEventListener("click", () => {
+    currentWebTranspose = Math.max(-12, currentWebTranspose - 1);
+    sendTranspose(currentWebTranspose);
+  });
+}
+
+if (btnWebTransposeUp) {
+  btnWebTransposeUp.addEventListener("click", () => {
+    currentWebTranspose = Math.min(12, currentWebTranspose + 1);
+    sendTranspose(currentWebTranspose);
+  });
+}
+
+function sendTranspose(semitones) {
+  if (transposeTag) {
+    transposeTag.textContent = `TRANSPOSE: [ ${semitones >= 0 ? "+" : ""}${semitones} ]`;
+    transposeTag.style.color = semitones === 0 ? "#ffd166" : "#00f5d4";
+  }
+  if (socket && socket.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify({
+      command: "TRIGGER_TRANSPOSE",
+      payload: { semitones: semitones }
+    }));
+  }
+}
+
+// Interactive Web Section Buttons
+const sectionBtns = document.querySelectorAll(".section-btn");
+sectionBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    const sec = btn.dataset.sec;
+    const bar = parseInt(btn.dataset.bar, 10);
+    highlightSectionBtn(sec);
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify({
+        command: "TRIGGER_SECTION",
+        payload: { section: sec, bar: bar }
+      }));
+    }
+  });
+});
+
+function highlightSectionBtn(secName) {
+  sectionBtns.forEach(btn => {
+    if (btn.dataset.sec === secName) {
+      btn.style.background = "#d4af37";
+      btn.style.color = "#1a120b";
+      btn.style.borderColor = "#fff";
+      btn.style.fontWeight = "bold";
+    } else {
+      btn.style.background = "#2b1f14";
+      btn.style.color = "#fff";
+      btn.style.borderColor = "#c8a86b";
+      btn.style.fontWeight = "normal";
+    }
+  });
+}
 
 window.addEventListener("DOMContentLoaded", connectWebSocket);

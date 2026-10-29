@@ -4,6 +4,16 @@ This file logs all file creations, modifications, deletions, refactorings, and f
 
 ---
 
+### [2026-10-29 10:10:00 +07:00] - [SPRINT 1] Live Stage Transposition, Mini Metro Section Navigation & Stage Compass QR Pairing
+- **Action**: [MODIFY] `scenes/MainStageView.tscn`, `src/UI/MainStageController.gd`, `src/UI/MainStageController.cs`, `src/Network/StageHubServer.cs`, `src/Tests/VerificationHarness.cs`, `AnantaNada.csproj`, `web/index.html`, `web/app.js`, `Feature-ToBe-Implemented.md`.
+- **Reason**: Executed Sprint 1 derived from 50-competitor benchmark and Sweet RPG Atelier UX analysis:
+  1. **Interactive Transpose Pill on Arcane Spell Card**: Transformed static text into `TransposeRow` (`[-1]`, `[+1]`, `[RST]`) with real-time GDScript chord transposition math and Roland Go:Keys 3 RPN Coarse Tuning dispatch on Channel 4.
+  2. **Interactive Section Navigation**: Converted transit progression into 5 tactile section buttons (`[ ❖ INTRO ]`, `[ ❖ VERSE ]`, `[ ✦ CHORUS ]`, `[ ✪ SOLO ]`, `[ ◼ OUTRO ]`) with instant bar seeking, teleprompter updates, glowing golden feedback, and multi-client WebSocket synchronization.
+  3. **Stage Compass QR-Code Pairing Modal**: Integrated `QRCoder` 1.8.1 to serve `/api/lan-info` and binary `/api/qrcode` PNG graphics via StageHub HTTP server, triggered via TopBar compass button `[ 🧭 ]`.
+  4. **Verification Harness**: Added `[TEST 8]` verifying QR PNG binary header integrity and RPN transpose clamping. All 8 tests passed with 0 failures.
+
+---
+
 ### [2026-10-28 12:36:28 +07:00] - [NEW] `ANANTANADA_SPEC.md`
 - **Action**: Created architectural specification baseline.
 - **Reason**: Single source of truth defining target instrument (Roland Go:Keys 3), runtime topology, hardware-safety rules, application modules, game-grade UI aesthetic, and WebSocket telemetry contracts.

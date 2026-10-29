@@ -305,9 +305,18 @@ flowchart TD
   - Tangan Kiri (Bass / Akord, tuts 1–24): **Electric Amber** (`#ffb703`).
   - Tangan Kanan (Melodi / Lead, tuts 25–61): **Cyber Cyan** (`#00f5d4`).
 - **Ekspor Melodi Instan**: Klik tombol **"⚡ AMBIL IDE TADI (5-MIN RETROACTIVE)"** di bar bawah kapan saja untuk menyimpan 5 menit permainan terakhir Anda ke file MIDI `captures/jam_YYYYMMDD_HHmmss.mid`.
+- **Transposisi 1-Klik di Layar (Sprint 1)**:
+  - Tekan `[-1]` atau `[+1]` pada Kartu Mantra Arcana untuk menaikkan/menurunkan nada panggung secara instan (-12 hingga +12 semitone).
+  - Teks akord di layar dan teleprompter otomatis berpindah tangga nada (*auto-transposed progression*).
+  - Sistem langsung memancarkan perintah MIDI RPN Coarse Tuning ke Roland Go:Keys 3 di Channel 4 tanpa jeda. Tekan `[RST]` untuk mereset ke nada dasar asli lagu.
+- **Navigasi Bagian Lagu (Sprint 1 - Mini Metro Section Bar)**:
+  - Tekan tombol `[ ❖ INTRO ]` (Bar 1), `[ ❖ VERSE ]` (Bar 5), `[ ✦ CHORUS ]` (Bar 17), `[ ✪ SOLO ]` (Bar 29), atau `[ ◼ OUTRO ]` (Bar 37) untuk melompatkan posisi birama, lirik teleprompter, dan harmoni akord secara instan.
+  - Tombol bagian yang sedang aktif memancarkan pendaran emas cerah (*golden glow*).
 - **Tombol Darurat (Panic)**: Klik tombol merah **[ ! PANIC / PURGE ! ]** jika terjadi nada macet karena kabel tersenggol.
 
-### 4. Menghubungkan HP / Tablet ke StageHub Mobile Remote
+### 4. Menghubungkan HP / Tablet ke StageHub Mobile Remote (Stage Compass QR)
+1. Di konsol panggung AnantaNada, klik tombol **Stage Compass `[ 🧭 ]`** di bar atas untuk memunculkan pop-up kode QR beresolusi tinggi (dihasilkan oleh engine internal `QRCoder`).
+2. Arahkan kamera smartphone atau tablet Anda ke kode QR di layar untuk membuka teleprompter lirik dan akord secara instan tanpa perlu mengetik alamat IP secara manual.
 1. Sambungkan HP atau tablet ke jaringan Wi-Fi yang sama dengan laptop (atau nyalakan **Mobile Hotspot** di laptop Anda).
 2. Buka browser (Chrome / Safari) di HP/tablet, lalu ketik alamat yang tertera di layar panggung, misalnya:
    ```text

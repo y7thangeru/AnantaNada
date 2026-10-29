@@ -29,6 +29,8 @@ public sealed class StageHubServer : IDisposable
     public event Action<TriggerSetlistItemPayload>? OnSetlistItemTriggered;
     public event Action? OnPanicTriggered;
     public event Action? OnExportMidiTriggered;
+    public event Action<int>? OnTransposeTriggered;
+    public event Action<string, int>? OnSectionTriggered;
     public event Action<string>? OnLog;
     public event Action<int>? OnClientCountChanged;
 
@@ -271,6 +273,27 @@ public sealed class StageHubServer : IDisposable
                         OnExportMidiTriggered?.Invoke();
                         break;
 
+                    case "TRIGGER_TRANSPOSE":
+                        if (root.TryGetProperty("payload", out var tProp) && tProp.TryGetProperty("semitones", out var sProp))
+                        {
+                            int semitones = sProp.GetInt32();
+                            OnLog?.Invoke($"[StageHub Remote] Received TRIGGER_TRANSPOSE: {semitones:+#;-#;0} semitones");
+                            OnTransposeTriggered?.Invoke(semitones);
+                            _ = BroadcastRawJsonAsync($"{{\"type\":\"TRANSPOSE_CHANGED\",\"semitones\":{semitones}}}");
+                        }
+                        break;
+
+                    case "TRIGGER_SECTION":
+                        if (root.TryGetProperty("payload", out var secProp))
+                        {
+                            string section = secProp.TryGetProperty("section", out var nameProp) ? (nameProp.GetString() ?? "INTRO") : "INTRO";
+                            int bar = secProp.TryGetProperty("bar", out var barProp) ? barProp.GetInt32() : 1;
+                            OnLog?.Invoke($"[StageHub Remote] Received TRIGGER_SECTION: {section} (Bar {bar})");
+                            OnSectionTriggered?.Invoke(section, bar);
+                            _ = BroadcastRawJsonAsync($"{{\"type\":\"SECTION_CHANGED\",\"section\":\"{section}\",\"bar\":{bar}}}");
+                        }
+                        break;
+
                     case "TRIGGER_SETLIST_ITEM":
                         if (root.TryGetProperty("payload", out var payloadProp))
                         {
@@ -418,6 +441,55 @@ public sealed class StageHubServer : IDisposable
         try
         {
             string rawUrl = context.Request.Url?.AbsolutePath ?? "/";
+
+            // 1. Dynamic API Endpoints: LAN Info & QR Code
+            if (rawUrl.Equals("/api/lan-info", StringComparison.OrdinalIgnoreCase))
+            {
+                var ips = GetLocalIpAddresses();
+                string primaryIp = ips.FirstOrDefault(ip => ip != "127.0.0.1") ?? "127.0.0.1";
+                string targetUrl = $"http://{primaryIp}:{_port}";
+
+                using var qrGen = new QRCoder.QRCodeGenerator();
+                using var qrData = qrGen.CreateQrCode(targetUrl, QRCoder.QRCodeGenerator.ECCLevel.M);
+                using var pngQr = new QRCoder.PngByteQRCode(qrData);
+                byte[] qrBytes = pngQr.GetGraphic(10);
+                string base64 = Convert.ToBase64String(qrBytes);
+
+                var info = new
+                {
+                    primaryIp,
+                    allIps = ips,
+                    port = _port,
+                    url = targetUrl,
+                    qrDataUrl = $"data:image/png;base64,{base64}"
+                };
+
+                byte[] jsonBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(info));
+                context.Response.ContentType = "application/json; charset=utf-8";
+                context.Response.StatusCode = (int)HttpStatusCode.OK;
+                await context.Response.OutputStream.WriteAsync(jsonBytes);
+                context.Response.Close();
+                return;
+            }
+
+            if (rawUrl.Equals("/api/qrcode", StringComparison.OrdinalIgnoreCase))
+            {
+                var ips = GetLocalIpAddresses();
+                string primaryIp = ips.FirstOrDefault(ip => ip != "127.0.0.1") ?? "127.0.0.1";
+                string targetUrl = $"http://{primaryIp}:{_port}";
+
+                using var qrGen = new QRCoder.QRCodeGenerator();
+                using var qrData = qrGen.CreateQrCode(targetUrl, QRCoder.QRCodeGenerator.ECCLevel.M);
+                using var pngQr = new QRCoder.PngByteQRCode(qrData);
+                byte[] qrBytes = pngQr.GetGraphic(12);
+
+                context.Response.ContentType = "image/png";
+                context.Response.StatusCode = (int)HttpStatusCode.OK;
+                await context.Response.OutputStream.WriteAsync(qrBytes);
+                context.Response.Close();
+                return;
+            }
+
             if (rawUrl == "/" || string.IsNullOrWhiteSpace(rawUrl))
             {
                 rawUrl = "/index.html";

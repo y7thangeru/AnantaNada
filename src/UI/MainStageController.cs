@@ -193,6 +193,8 @@ public partial class MainStageController : Control
         HubServer.OnLog += msg => GD.Print(msg);
         HubServer.OnPanicTriggered += () => CallDeferred(nameof(TriggerPanicPurge));
         HubServer.OnSetlistItemTriggered += payload => CallDeferred(nameof(SelectMission), payload.SongIndex);
+        HubServer.OnTransposeTriggered += semitones => CallDeferred(nameof(ApplyCoarseTranspose), semitones);
+        HubServer.OnSectionTriggered += (section, bar) => CallDeferred(nameof(JumpToSection), section, bar);
 
         // 8. Wire UI Button Actions & Repertoire Filtering
         _btnPanic.Pressed += TriggerPanicPurge;
@@ -715,6 +717,22 @@ public partial class MainStageController : Control
         _keybedMaterial?.SetShaderParameter("split_point_norm", splitNorm);
 
         GD.PrintRich($"[color=cyan][b]100-Repertoire Mission Activated:[/b] '{song.Title}' ({song.Artist}) -> Ch4 MSB:{primaryTone?.Msb} LSB:{primaryTone?.Lsb} PC:{primaryTone?.Pc} Transpose:{song.Transpose}[/color]");
+    }
+
+    public void ApplyCoarseTranspose(int semitones)
+    {
+        int clamped = Math.Clamp(semitones, -12, 12);
+        MidiEngine.SetCoarseTranspose(MidiConstants.GoKeys3DefaultPatchChannel, clamped);
+        _lblTranspose.Text = $"TRANSPOSE: [ {(clamped >= 0 ? "+" : "")}{clamped} SEMITONES ]";
+        GD.PrintRich($"[color=yellow][Roland Go:Keys 3 Transpose Active][/color] Semitones: {clamped:+#;-#;0}");
+    }
+
+    public void JumpToSection(string section, int bar)
+    {
+        _currentBar = bar;
+        _currentBeat = 1;
+        _lblLyricBar.Text = $">> CURRENT BAR {_currentBar:D3} // BEAT 1 OF 4 [{section}]";
+        GD.PrintRich($"[color=green][Section Jump][/color] Navigated to {section} at bar {bar}");
     }
 
     public void TriggerPanicPurge()

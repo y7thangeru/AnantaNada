@@ -56,7 +56,23 @@ const HIGHEST_NOTE: int = 96 # C7
 @onready var chord_hud: VBoxContainer = $HUD/CenterSplit/ChordHud
 @onready var current_chord_box: PanelContainer = $HUD/CenterSplit/ChordHud/CurrentChordBox
 @onready var lbl_current_chord: Label = $HUD/CenterSplit/ChordHud/CurrentChordBox/ChordMargin/VBox/ChordLabel
-@onready var lbl_transpose: Label = $HUD/CenterSplit/ChordHud/CurrentChordBox/ChordMargin/VBox/TransposePill
+@onready var lbl_transpose: Label = $HUD/CenterSplit/ChordHud/CurrentChordBox/ChordMargin/VBox/TransposeRow/TransposePill
+@onready var btn_transpose_down: Button = $HUD/CenterSplit/ChordHud/CurrentChordBox/ChordMargin/VBox/TransposeRow/BtnTransposeDown
+@onready var btn_transpose_up: Button = $HUD/CenterSplit/ChordHud/CurrentChordBox/ChordMargin/VBox/TransposeRow/BtnTransposeUp
+@onready var btn_transpose_reset: Button = $HUD/CenterSplit/ChordHud/CurrentChordBox/ChordMargin/VBox/TransposeRow/BtnTransposeReset
+
+@onready var btn_section_intro: Button = $HUD/CenterSplit/CenterCascade/SectionBar/BtnSectionIntro
+@onready var btn_section_verse: Button = $HUD/CenterSplit/CenterCascade/SectionBar/BtnSectionVerse
+@onready var btn_section_chorus: Button = $HUD/CenterSplit/CenterCascade/SectionBar/BtnSectionChorus
+@onready var btn_section_solo: Button = $HUD/CenterSplit/CenterCascade/SectionBar/BtnSectionSolo
+@onready var btn_section_outro: Button = $HUD/CenterSplit/CenterCascade/SectionBar/BtnSectionOutro
+
+@onready var btn_compass: Button = $HUD/TopBar/CompassBtn
+@onready var qr_modal: PanelContainer = $HUD/QrPairingModal
+@onready var qr_texture_rect: TextureRect = $HUD/QrPairingModal/ModalMargin/ModalVBox/QrTextureRect
+@onready var modal_url_label: Label = $HUD/QrPairingModal/ModalMargin/ModalVBox/ModalUrlLabel
+@onready var btn_close_qr: Button = $HUD/QrPairingModal/ModalMargin/ModalVBox/BtnCloseQr
+
 @onready var taiko_don_ka: TextureRect = $HUD/CenterSplit/ChordHud/TaikoRow/TaikoDonKa
 @onready var taiko_label: Label = $HUD/CenterSplit/ChordHud/TaikoRow/TaikoLabel
 @onready var next_chord_box: PanelContainer = $HUD/CenterSplit/ChordHud/NextChordBox
@@ -72,6 +88,11 @@ const HIGHEST_NOTE: int = 96 # C7
 const CARDS_PER_PAGE: int = 6
 var cards: Array[PanelContainer] = []
 var card_labels: Array[Label] = []
+
+# Transpose & Musical Scale State
+var base_song_transpose: int = 0
+var current_transpose_offset: int = 0
+const SEMITONE_NAMES: Array[String] = ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"]
 
 # State
 var ws: WebSocketPeer = WebSocketPeer.new()
@@ -157,6 +178,32 @@ func _ready() -> void:
 	btn_filter_western.pressed.connect(func(): _set_category("Western_Band"))
 	btn_prev_page.pressed.connect(_on_prev_page)
 	btn_next_page.pressed.connect(_on_next_page)
+
+	# Sprint 1: Interactive Transpose Controls
+	if btn_transpose_down:
+		btn_transpose_down.pressed.connect(func(): _adjust_transpose(-1))
+	if btn_transpose_up:
+		btn_transpose_up.pressed.connect(func(): _adjust_transpose(1))
+	if btn_transpose_reset:
+		btn_transpose_reset.pressed.connect(_reset_transpose)
+
+	# Sprint 1: Interactive Section Navigation
+	if btn_section_intro:
+		btn_section_intro.pressed.connect(func(): _on_jump_section(1, "INTRO"))
+	if btn_section_verse:
+		btn_section_verse.pressed.connect(func(): _on_jump_section(2, "VERSE"))
+	if btn_section_chorus:
+		btn_section_chorus.pressed.connect(func(): _on_jump_section(3, "CHORUS"))
+	if btn_section_solo:
+		btn_section_solo.pressed.connect(func(): _on_jump_section(4, "SOLO"))
+	if btn_section_outro:
+		btn_section_outro.pressed.connect(func(): _on_jump_section(5, "OUTRO"))
+
+	# Sprint 1: Stage Compass QR Pairing Modal
+	if btn_compass:
+		btn_compass.pressed.connect(_show_qr_modal)
+	if btn_close_qr:
+		btn_close_qr.pressed.connect(_hide_qr_modal)
 
 	active_card.gui_input.connect(func(event):
 		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
@@ -290,18 +337,10 @@ func _select_song(idx: int) -> void:
 	if lbl_active_meta:
 		lbl_active_meta.text = "%s • %s • %d BPM" % [str(song.get("artist", "")), str(song.get("keySignature", "C")), current_bpm]
 	lbl_bpm_beat.text = "[BPM: %d /// %s] [BEAT: 01/4]" % [current_bpm, str(song.get("timeSignature", "4/4"))]
-	var tr = int(song.get("transpose", 0))
-	lbl_transpose.text = "TRANSPOSE: [ %s%d SEMITONES ]" % ["+" if tr >= 0 else "", tr]
-
-	# Chords & Lyrics
-	var prog = song.get("chordProgression", {})
-	var intro_chords = prog.get("intro", "C - G - Am - F")
-	var chord_tokens = intro_chords.split("-", false)
-	var cur_chord = chord_tokens[0].strip_edges() if chord_tokens.size() > 0 else "C"
-	var nxt_chord = chord_tokens[1].strip_edges() if chord_tokens.size() > 1 else "G"
-	lbl_current_chord.text = "[ %s ]" % cur_chord
-	lbl_next_chord.text = "NEXT CHORD -> %s" % nxt_chord
-	lbl_lyric_teleprompter.text = "\"%s - %s // Intro: %s\"" % [str(song.get("title", "")), str(song.get("artist", "")), intro_chords]
+	base_song_transpose = int(song.get("transpose", 0))
+	current_transpose_offset = 0
+	_apply_transpose(false)
+	_update_section_buttons_visual(1)
 
 	# Split Zone
 	var split_pt = int(song.get("splitPoint", 60))
@@ -332,10 +371,170 @@ func _select_song(idx: int) -> void:
 				"programChange": int(pt.get("pc", 1)) - 1,
 				"bankMsb": int(pt.get("msb", 71)),
 				"bankLsb": int(pt.get("lsb", 96)),
-				"transpose": tr
+				"transpose": base_song_transpose
 			}
 		}
 		ws.send_text(JSON.stringify(cmd))
+
+# ==========================================
+# SPRINT 1: TRANSPOSE, SECTION & QR COMPASS
+# ==========================================
+
+func _adjust_transpose(delta_semi: int) -> void:
+	current_transpose_offset += delta_semi
+	_apply_transpose(true)
+
+func _reset_transpose() -> void:
+	current_transpose_offset = 0
+	_apply_transpose(true)
+
+func _apply_transpose(dispatch_midi: bool = true) -> void:
+	var total_tr = clampi(base_song_transpose + current_transpose_offset, -12, 12)
+	if lbl_transpose:
+		lbl_transpose.text = "TRANSPOSE: [ %s%d ]" % ["+" if total_tr >= 0 else "", total_tr]
+		lbl_transpose.modulate = Color(1.0, 0.85, 0.25) if total_tr == 0 else Color(0.2, 0.95, 0.85)
+
+	# Update chords and lyric teleprompter
+	if all_songs.size() > 0 and current_song_index < all_songs.size():
+		var song = all_songs[current_song_index]
+		var prog = song.get("chordProgression", {})
+		var intro_chords = prog.get("intro", "C - G - Am - F")
+		var transposed_intro = transpose_progression(intro_chords, total_tr)
+		var tokens = transposed_intro.split("-", false)
+		var cur_chord = tokens[0].strip_edges() if tokens.size() > 0 else "C"
+		var nxt_chord = tokens[1].strip_edges() if tokens.size() > 1 else "G"
+		lbl_current_chord.text = "[ %s ]" % cur_chord
+		lbl_next_chord.text = "NEXT CHORD -> %s" % nxt_chord
+		lbl_lyric_teleprompter.text = "\"%s - %s // %s\"" % [str(song.get("title", "")), str(song.get("artist", "")), transposed_intro]
+
+	if dispatch_midi and is_ws_connected:
+		var cmd = {
+			"command": "TRIGGER_TRANSPOSE",
+			"payload": {
+				"semitones": total_tr
+			}
+		}
+		ws.send_text(JSON.stringify(cmd))
+
+func transpose_chord(chord: String, semitones: int) -> String:
+	if semitones == 0 or chord.is_empty():
+		return chord
+	var root = ""
+	var suffix = ""
+	if chord.length() >= 2 and (chord[1] == "#" or chord[1] == "b"):
+		root = chord.substr(0, 2)
+		suffix = chord.substr(2)
+	elif chord.length() >= 1:
+		root = chord.substr(0, 1)
+		suffix = chord.substr(1)
+	else:
+		return chord
+
+	var note_map = {
+		"C": 0, "B#": 0, "C#": 1, "Db": 1, "D": 2, "D#": 3, "Eb": 3,
+		"E": 4, "Fb": 4, "F": 5, "E#": 5, "F#": 6, "Gb": 6, "G": 7,
+		"G#": 8, "Ab": 8, "A": 9, "A#": 10, "Bb": 10, "B": 11, "Cb": 11
+	}
+	if not note_map.has(root):
+		return chord
+	var idx = int(note_map[root])
+	var new_idx = posmod(idx + semitones, 12)
+	return SEMITONE_NAMES[new_idx] + suffix
+
+func transpose_progression(prog: String, semitones: int) -> String:
+	if semitones == 0:
+		return prog
+	var parts = prog.split("-")
+	var new_parts: Array[String] = []
+	for p in parts:
+		var c = p.strip_edges()
+		new_parts.append(transpose_chord(c, semitones))
+	return " - ".join(new_parts)
+
+func _on_jump_section(station_idx: int, sec_name: String) -> void:
+	active_station = station_idx
+	match station_idx:
+		1: current_bar = 1
+		2: current_bar = 5
+		3: current_bar = 17
+		4: current_bar = 29
+		5: current_bar = 37
+	current_beat = 1
+
+	_update_section_buttons_visual(station_idx)
+
+	if all_songs.size() > 0 and current_song_index < all_songs.size():
+		var song = all_songs[current_song_index]
+		var prog = song.get("chordProgression", {})
+		var sec_key = sec_name.to_lower()
+		var sec_chords = prog.get(sec_key, prog.get("intro", "C - G - Am - F"))
+		var total_tr = clampi(base_song_transpose + current_transpose_offset, -12, 12)
+		var transposed_chords = transpose_progression(sec_chords, total_tr)
+		var tokens = transposed_chords.split("-", false)
+		var cur = tokens[0].strip_edges() if tokens.size() > 0 else "C"
+		var nxt = tokens[1].strip_edges() if tokens.size() > 1 else "G"
+		lbl_current_chord.text = "[ %s ]" % cur
+		lbl_next_chord.text = "NEXT CHORD -> %s" % nxt
+		lbl_lyric_teleprompter.text = "[SECTION: %s] %s" % [sec_name, transposed_chords]
+		lbl_lyric_bar.text = ">> CURRENT BAR %03d // BEAT 1 OF 4 [%s]" % [current_bar, sec_name]
+
+	if is_ws_connected:
+		var cmd = {
+			"command": "TRIGGER_SECTION",
+			"payload": {
+				"section": sec_name,
+				"bar": current_bar
+			}
+		}
+		ws.send_text(JSON.stringify(cmd))
+
+func _update_section_buttons_visual(station: int) -> void:
+	var btns = [btn_section_intro, btn_section_verse, btn_section_chorus, btn_section_solo, btn_section_outro]
+	for i in range(btns.size()):
+		var b = btns[i]
+		if b:
+			if i + 1 == station:
+				b.modulate = Color(1.8, 1.4, 0.4) # Glowing gold active section
+			else:
+				b.modulate = Color(0.85, 0.85, 0.85) # Normal
+
+func _show_qr_modal() -> void:
+	if qr_modal:
+		qr_modal.visible = true
+		_fetch_qr_code()
+
+func _hide_qr_modal() -> void:
+	if qr_modal:
+		qr_modal.visible = false
+
+func _fetch_qr_code() -> void:
+	var http = HTTPRequest.new()
+	add_child(http)
+	http.request_completed.connect(func(_result, response_code, _headers, body):
+		if response_code == 200:
+			var json_str = body.get_string_from_utf8()
+			var parsed = JSON.parse_string(json_str)
+			if parsed is Dictionary and modal_url_label:
+				var url = str(parsed.get("url", "http://127.0.0.1:8080"))
+				modal_url_label.text = url
+		http.queue_free()
+		_fetch_qr_image()
+	)
+	http.request("http://127.0.0.1:8080/api/lan-info")
+
+func _fetch_qr_image() -> void:
+	var img_http = HTTPRequest.new()
+	add_child(img_http)
+	img_http.request_completed.connect(func(_result, response_code, _headers, body):
+		if response_code == 200 and qr_texture_rect:
+			var img = Image.new()
+			var err = img.load_png_from_buffer(body)
+			if err == OK:
+				var tex = ImageTexture.create_from_image(img)
+				qr_texture_rect.texture = tex
+		img_http.queue_free()
+	)
+	img_http.request("http://127.0.0.1:8080/api/qrcode")
 
 func _on_panic_pressed() -> void:
 	glitch_intensity = 1.0
@@ -444,6 +643,7 @@ func _process(delta: float) -> void:
 
 	if target_station != active_station:
 		active_station = target_station
+		_update_section_buttons_visual(active_station)
 		if minimetro_map:
 			minimetro_map.modulate = Color(1.4, 1.3, 0.8)
 	elif minimetro_map and minimetro_map.modulate != Color.WHITE:
@@ -590,6 +790,16 @@ func _handle_ws_packet(json_text: String) -> void:
 			lbl_next_chord.text = "NEXT CHORD -> %s" % str(data.get("nextChord", "G"))
 		elif type == "PANIC":
 			_on_panic_pressed()
+		elif type == "TRANSPOSE_CHANGED":
+			var semi = int(parsed.get("semitones", 0))
+			current_transpose_offset = semi - base_song_transpose
+			_apply_transpose(false)
+		elif type == "SECTION_CHANGED":
+			var sec = str(parsed.get("section", "INTRO"))
+			var bar = int(parsed.get("bar", 1))
+			current_bar = bar
+			current_beat = 1
+			lbl_lyric_bar.text = ">> CURRENT BAR %03d // BEAT 1 OF 4 [%s]" % [current_bar, sec]
 		elif type == "CAPTURE_SAVED":
 			var fn = str(parsed.get("filename", "session.mid"))
 			var bars = int(parsed.get("bars", 0))

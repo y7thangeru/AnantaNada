@@ -149,15 +149,15 @@
 
 ## 11. Top Features Harvested from 50-Competitor Benchmark (Strategic Roadmap)
 - [ ] **Dynamic Nashville Chord Transposer & Real-time Voicing Suggester** (Inspired by OnSong, iReal Pro):
-  - [ ] 1-Click `[ +1 ]` / `[ -1 ]` semitone transposer buttons on HUD updating chord progression display in real time
-  - [ ] Automated MIDI RPN Coarse Tuning dispatch to Roland Go:Keys 3 in sync with transposer clicks
+  - [x] 1-Click `[ +1 ]` / `[ -1 ]` / `[ RST ]` semitone transposer buttons on HUD updating chord progression display in real time
+  - [x] Automated MIDI RPN Coarse Tuning dispatch to Roland Go:Keys 3 in sync with transposer clicks
   - [ ] Chord voicing diagram hints (piano fingering dots) on keybed visualizer
 - [ ] **Roland Go:Keys 3 Arranger Controller Bridge** (Inspired by vArranger 2):
   - [ ] Dedicated tactile stage buttons for drum accompaniment: `[ START/STOP ]`, `[ INTRO ]`, `[ MAIN/VAR ]`, `[ FILL-IN ]`, `[ ENDING ]`
   - [ ] Dispatching Roland Arranger control SysEx / CC messages on Channel 10 / Control channel
 - [ ] **Song Section Navigation & Real-time Jump Markers** (Inspired by MultiTracks Playback, Stage Traxx 3):
-  - [ ] Giant touch buttons for song sections: `[ INTRO ]`, `[ VERSE ]`, `[ CHORUS ]`, `[ SOLO ]`, `[ OUTRO ]`
-  - [ ] Instant teleprompter and waterfall scroll jump upon clicking section buttons
+  - [x] Tactile stage section buttons: `[ ❖ INTRO ]`, `[ ❖ VERSE ]`, `[ ✦ CHORUS ]`, `[ ✪ SOLO ]`, `[ ◼ OUTRO ]`
+  - [x] Instant teleprompter, bar seek, and chord HUD jump upon clicking section buttons
 - [ ] **Dual-Mode Sheet Music Teleprompter: Lead Sheet vs Grand Staff** (Inspired by Synthesia, MobileSheets):
   - [ ] HUD Toggle: `[ CHORD TELEPROMPTER ]` <-> `[ GRAND STAFF NOTATION ]`
   - [ ] Scrolling dual-stave (Treble & Bass Clef) rendering for pianists reading standard notation
@@ -166,8 +166,9 @@
 - [ ] **Smart Auto-Tempo Tap & Audio Beat Tracker** (Inspired by Soundbrenner, Ableton Live):
   - [ ] Large `[ TAP TEMPO ]` button computing running BPM average over 4 taps
   - [ ] Microphone transient detection for acoustic snare/drum tempo following
-- [ ] **Local Network QR-Code Pairing Modal** (Inspired by BandHelper, Steinberg VST Live):
-  - [ ] Pop-up modal in header displaying local LAN IP and generated QR code for 1-second mobile phone camera pairing
+- [x] **Local Network QR-Code Pairing Modal** (Inspired by BandHelper, Steinberg VST Live):
+  - [x] Pop-up modal in header displaying local LAN IP and generated QR code (`QRCoder` pure PNG generator) for 1-second mobile phone camera pairing
+  - [x] Real-time `/api/lan-info` and `/api/qrcode` endpoints served by embedded StageHub HTTP server
 - [ ] **Infinite Smooth Kinetic Carousel for Repertoire Deck** (Inspired by Bitwig, Persona 5):
   - [ ] Smooth flick/wheel/gesture scrolling replacing rigid page buttons
   - [ ] Active card scaling and kinetic particle glow during scrolling
@@ -175,3 +176,23 @@
   - [ ] Real-time slider on HUD controlling Zone A (Bass/Pad) vs Zone B (Lead/Piano) volume balance via MIDI CC 07
 - [ ] **Community Cloud Setlist Exchanger** (Inspired by Yamaha Soundmondo):
   - [ ] Export/import setlist bundles (.zip/.json) for sharing high school band repertoires with peers
+
+## 12. Sprint 1 Execution: Live Stage Transposer, Section Transit & Stage Compass QR Pairing
+- [x] **Interactive Transpose Pill on Arcane Spell Card**:
+  - [x] Replaced static label with `TransposeRow` containing `BtnTransposeDown` (`[-1]`), `TransposePill`, `BtnTransposeUp` (`[+1]`), and `BtnTransposeReset` (`[RST]`)
+  - [x] Full mathematical chord transposer in GDScript (`transpose_chord` & `transpose_progression`) updating `lbl_current_chord`, `lbl_next_chord`, and `lbl_lyric_teleprompter` in real-time
+  - [x] Automated MIDI RPN Coarse Tuning dispatch to Roland Go:Keys 3 on Channel 4 (RPN MSB 0, RPN LSB 2, Data Entry 64 + transpose, RPN Null)
+  - [x] Synchronized bidirectional WebSocket telemetry (`TRIGGER_TRANSPOSE` & `TRANSPOSE_CHANGED`) across Desktop and Web Remote
+- [x] **Interactive Section Navigation Bar (Mini Metro Jumper)**:
+  - [x] 5 Tactile stage section buttons: `[ ❖ INTRO ]` (Bar 1), `[ ❖ VERSE ]` (Bar 5), `[ ✦ CHORUS ]` (Bar 17), `[ ✪ SOLO ]` (Bar 29), and `[ ◼ OUTRO ]` (Bar 37)
+  - [x] Real-time bar seeking and dynamic section chord injection into teleprompter and chord HUD
+  - [x] Golden glowing highlight feedback on the active section button during natural song progression or manual click
+  - [x] Bidirectional WebSocket broadcast (`TRIGGER_SECTION` & `SECTION_CHANGED`) updating connected bandmate mobiles
+- [x] **Stage Compass QR-Code Pairing Modal**:
+  - [x] Embedded `QRCoder` 1.8.1 library into C# backend producing high-fidelity PNG binary QR graphics
+  - [x] Dynamic `/api/lan-info` and `/api/qrcode` HTTP endpoints serving local IP configuration and QR images
+  - [x] Tactile Compass button `[ 🧭 ]` in TopBar opening the centered `QrPairingModal`
+  - [x] Asynchronous `HTTPRequest` pipeline in GDScript retrieving QR code and displaying clean LAN pairing URL
+- [x] **Unit Testing & Verification**:
+  - [x] Added `[TEST 8]` in `src/Tests/VerificationHarness.cs` validating QR PNG headers and RPN transpose clamping
+  - [x] All 8 tests passed with 100% success rate (8 passed, 0 failed)
