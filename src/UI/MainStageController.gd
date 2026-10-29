@@ -68,10 +68,10 @@ const HIGHEST_NOTE: int = 96 # C7
 @onready var btn_section_outro: Button = $HUD/CenterSplit/CenterCascade/SectionBar/BtnSectionOutro
 
 @onready var btn_compass: Button = $HUD/TopBar/CompassBtn
-@onready var qr_modal: PanelContainer = $HUD/QrPairingModal
-@onready var qr_texture_rect: TextureRect = $HUD/QrPairingModal/ModalMargin/ModalVBox/QrTextureRect
-@onready var modal_url_label: Label = $HUD/QrPairingModal/ModalMargin/ModalVBox/ModalUrlLabel
-@onready var btn_close_qr: Button = $HUD/QrPairingModal/ModalMargin/ModalVBox/BtnCloseQr
+@onready var qr_modal: ColorRect = $QrPairingModal
+@onready var qr_texture_rect: TextureRect = $QrPairingModal/ModalDialog/ModalMargin/ModalVBox/QrTextureRect
+@onready var modal_url_label: Label = $QrPairingModal/ModalDialog/ModalMargin/ModalVBox/ModalUrlLabel
+@onready var btn_close_qr: Button = $QrPairingModal/ModalDialog/ModalMargin/ModalVBox/BtnCloseQr
 
 @onready var taiko_don_ka: TextureRect = $HUD/CenterSplit/ChordHud/TaikoRow/TaikoDonKa
 @onready var taiko_label: Label = $HUD/CenterSplit/ChordHud/TaikoRow/TaikoLabel
@@ -163,9 +163,14 @@ func _ready() -> void:
 
 	# Dynamic 64x128 RGBA8 Falling Note Stream Runway for Waterfall Visualizer
 	waterfall_image = Image.create_empty(64, 128, false, Image.FORMAT_RGBA8)
+	waterfall_image.fill(Color.BLACK)
 	waterfall_texture = ImageTexture.create_from_image(waterfall_image)
 	if waterfall_material:
 		waterfall_material.set_shader_parameter("note_stream_texture", waterfall_texture)
+
+	# 1b. Stage Compass Preloaded High-Res QR Texture
+	if qr_texture_rect and ResourceLoader.exists("res://assets/qr_stage_hub.png"):
+		qr_texture_rect.texture = load("res://assets/qr_stage_hub.png")
 
 	# 2. Wire UI Buttons
 	btn_panic.pressed.connect(_on_panic_pressed)
@@ -501,6 +506,9 @@ func _update_section_buttons_visual(station: int) -> void:
 func _show_qr_modal() -> void:
 	if qr_modal:
 		qr_modal.visible = true
+		if qr_texture_rect and qr_texture_rect.texture == null:
+			if ResourceLoader.exists("res://assets/qr_stage_hub.png"):
+				qr_texture_rect.texture = load("res://assets/qr_stage_hub.png")
 		_fetch_qr_code()
 
 func _hide_qr_modal() -> void:
@@ -702,21 +710,22 @@ func _advance_beat() -> void:
 	if current_beat > 4:
 		current_beat = 1
 		current_bar += 1
+		_update_chord_hud_on_bar()
 
 	beat_pulse = 1.0
 	lbl_bpm_beat.text = "[BPM: %d /// 4/4] [BAR: %03d . BEAT: %d/4]" % [current_bpm, current_bar, current_beat]
 	lbl_lyric_bar.text = ">> CURRENT BAR %03d // BEAT %d OF 4" % [current_bar, current_beat]
 
-	_inject_chord_falling_notes()
-
-func _inject_chord_falling_notes() -> void:
-	if not waterfall_image or all_songs.size() <= current_song_index:
+func _update_chord_hud_on_bar() -> void:
+	if all_songs.size() <= current_song_index:
 		return
 
 	var song = all_songs[current_song_index]
 	var prog = song.get("chordProgression", {})
 	var intro_chords = str(prog.get("intro", "C - G - Am - F"))
-	var tokens = intro_chords.split("-", false)
+	var total_tr = clampi(base_song_transpose + current_transpose_offset, -12, 12)
+	var transposed_intro = transpose_progression(intro_chords, total_tr)
+	var tokens = transposed_intro.split("-", false)
 	if tokens.is_empty():
 		return
 
@@ -728,19 +737,6 @@ func _inject_chord_falling_notes() -> void:
 	# Dynamically update HUD chord display on bar change
 	lbl_current_chord.text = "[ %s ]" % cur_chord
 	lbl_next_chord.text = "NEXT CHORD -> %s" % next_chord
-
-	var notes = _get_chord_notes(cur_chord)
-	var split_pt = int(song.get("splitPoint", 60))
-
-	# Spawn chord note pills at top row (rows 0, 1, 2)
-	for n in notes:
-		var idx = n - LOWEST_NOTE
-		if idx >= 0 and idx < 61:
-			var is_zone_b = 1.0 if n >= split_pt else 0.0
-			var col = Color(0.95, is_zone_b, 0.0, 1.0)
-			waterfall_image.set_pixel(idx, 0, col)
-			waterfall_image.set_pixel(idx, 1, col)
-			waterfall_image.set_pixel(idx, 2, col)
 
 func _get_chord_notes(chord_str: String) -> Array[int]:
 	var result: Array[int] = []

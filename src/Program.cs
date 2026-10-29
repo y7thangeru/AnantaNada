@@ -16,6 +16,20 @@ public static class Program
             return await VerificationHarness.RunAll();
         }
 
+        if (args.Length > 0 && args[0] == "--qr")
+        {
+            string lanIp = StageHubServer.GetLocalIpAddresses().FirstOrDefault(ip => !ip.StartsWith("127.") && !ip.StartsWith("169.254")) ?? "127.0.0.1";
+            string targetUrl = $"http://{lanIp}:8080";
+            using var qrGen = new QRCoder.QRCodeGenerator();
+            using var qrData = qrGen.CreateQrCode(targetUrl, QRCoder.QRCodeGenerator.ECCLevel.Q);
+            using var pngQr = new QRCoder.PngByteQRCode(qrData);
+            byte[] bytes = pngQr.GetGraphic(16);
+            string outPath = Path.Combine(Directory.GetCurrentDirectory(), "assets", "qr_stage_hub.png");
+            File.WriteAllBytes(outPath, bytes);
+            Console.WriteLine($"[QR Generator] Wrote {bytes.Length} bytes QR for {targetUrl} to {outPath}");
+            return 0;
+        }
+
         if (args.Length > 0 && args[0] == "--scan")
         {
             Console.WriteLine("[ANANTANADA] Scanning All Windows MIDI Devices (WinRT BLE + WinMM)...");

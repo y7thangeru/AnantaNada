@@ -4,6 +4,15 @@ This file logs all file creations, modifications, deletions, refactorings, and f
 
 ---
 
+### [2026-10-29 10:35:00 +07:00] - [FIX] Stage Compass Modal Placement, Waterfall 36-Key Alignment & Beat Metronome Clarification
+- **Action**: [FIX] `scenes/MainStageView.tscn`, `src/Shaders/waterfall_visualizer.gdshader`, `src/UI/MainStageController.gd`, `assets/qr_stage_hub.png`.
+- **Reason**: Addressed 3 user feedback points:
+  1. **QR Modal Placement & Asset Preload**: Moved `QrPairingModal` out of `HUD` VBox into root fullscreen overlay `ColorRect` (1920x1080) with centered modal dialog. Preloaded high-resolution generated QR asset `assets/qr_stage_hub.png` (`http://192.168.1.88:8080`) ensuring instant zero-latency popup.
+  2. **Waterfall Visualizer Clean-up & 36-Key Precision Alignment**: Removed artificial `_inject_chord_falling_notes()` that spawned ugly flickering vertical chord pills. Calibrated `waterfall_visualizer.gdshader` to 36 white-key lanes matching 61-key Roland keybed geometry 1:1, rendering pure live reactive laser columns for physical keys played.
+  3. **Visual Beat Pulse Clarification**: Documented the `>>> ♢ <<<` *Cadence of Hyrule* 16-bit heart pulse meter designed as a silent stage metronome.
+
+---
+
 ### [2026-10-29 10:10:00 +07:00] - [SPRINT 1] Live Stage Transposition, Mini Metro Section Navigation & Stage Compass QR Pairing
 - **Action**: [MODIFY] `scenes/MainStageView.tscn`, `src/UI/MainStageController.gd`, `src/UI/MainStageController.cs`, `src/Network/StageHubServer.cs`, `src/Tests/VerificationHarness.cs`, `AnantaNada.csproj`, `web/index.html`, `web/app.js`, `Feature-ToBe-Implemented.md`.
 - **Reason**: Executed Sprint 1 derived from 50-competitor benchmark and Sweet RPG Atelier UX analysis:

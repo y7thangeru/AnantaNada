@@ -30,6 +30,7 @@
 [ext_resource type="Texture2D" path="res://assets/ui_sprites/png/gauge_rpg_mana_bar.png" id="28_rpg_mana_gauge"]
 [ext_resource type="Texture2D" path="res://assets/ui_sprites/png/parchment_codex_scroll.png" id="29_codex_scroll"]
 [ext_resource type="Texture2D" path="res://assets/ui_sprites/png/card_rpg_spell_harmony.png" id="30_spell_card"]
+[ext_resource type="Texture2D" path="res://assets/qr_stage_hub.png" id="31_qr_code"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_keybed"]
 shader = ExtResource("2_keybed_shader")
@@ -1291,67 +1292,77 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="QrPairingModal" type="PanelContainer" parent="HUD"]
+[node name="QrPairingModal" type="ColorRect" parent="."]
 visible = false
-custom_minimum_size = Vector2(420, 380)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.04, 0.03, 0.02, 0.82)
+
+[node name="ModalDialog" type="PanelContainer" parent="QrPairingModal"]
+custom_minimum_size = Vector2(460, 430)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -210.0
-offset_top = -190.0
-offset_right = 210.0
-offset_bottom = 190.0
+offset_left = -230.0
+offset_top = -215.0
+offset_right = 230.0
+offset_bottom = 215.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ModalMargin" type="MarginContainer" parent="HUD/QrPairingModal"]
+[node name="ModalMargin" type="MarginContainer" parent="QrPairingModal/ModalDialog"]
 layout_mode = 2
 theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 20
+theme_override_constants/margin_top = 22
 theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 20
+theme_override_constants/margin_bottom = 22
 
-[node name="ModalVBox" type="VBoxContainer" parent="HUD/QrPairingModal/ModalMargin"]
+[node name="ModalVBox" type="VBoxContainer" parent="QrPairingModal/ModalDialog/ModalMargin"]
 layout_mode = 2
 theme_override_constants/separation = 12
 alignment = 1
 
-[node name="ModalTitle" type="Label" parent="HUD/QrPairingModal/ModalMargin/ModalVBox"]
+[node name="ModalTitle" type="Label" parent="QrPairingModal/ModalDialog/ModalMargin/ModalVBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
-theme_override_font_sizes/font_size = 15
+theme_override_font_sizes/font_size = 16
 text = "🧭 STAGE COMPASS // BAND PAIRING"
 horizontal_alignment = 1
 
-[node name="ModalDesc" type="Label" parent="HUD/QrPairingModal/ModalMargin/ModalVBox"]
+[node name="ModalDesc" type="Label" parent="QrPairingModal/ModalDialog/ModalMargin/ModalVBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.8, 0.7, 1)
 theme_override_font_sizes/font_size = 11
-text = "Scan with your smartphone camera to connect to the live teleprompter:"
+text = "Arahkan kamera smartphone/tablet Anda (Wi-Fi/Hotspot yang sama) untuk membuka teleprompter lirik dan akord secara instan:"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="QrTextureRect" type="TextureRect" parent="HUD/QrPairingModal/ModalMargin/ModalVBox"]
-custom_minimum_size = Vector2(180, 180)
+[node name="QrTextureRect" type="TextureRect" parent="QrPairingModal/ModalDialog/ModalMargin/ModalVBox"]
+custom_minimum_size = Vector2(210, 210)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+texture = ExtResource("31_qr_code")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="ModalUrlLabel" type="Label" parent="HUD/QrPairingModal/ModalMargin/ModalVBox"]
+[node name="ModalUrlLabel" type="Label" parent="QrPairingModal/ModalDialog/ModalMargin/ModalVBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.2, 0.95, 0.85, 1)
-theme_override_font_sizes/font_size = 13
-text = "http://127.0.0.1:8080"
+theme_override_font_sizes/font_size = 14
+text = "http://192.168.1.88:8080"
 horizontal_alignment = 1
 
-[node name="BtnCloseQr" type="Button" parent="HUD/QrPairingModal/ModalMargin/ModalVBox"]
-custom_minimum_size = Vector2(160, 32)
+[node name="BtnCloseQr" type="Button" parent="QrPairingModal/ModalDialog/ModalMargin/ModalVBox"]
+custom_minimum_size = Vector2(180, 34)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 12
-text = "[ CLOSE COMPASS ]"
+text = "[ ✕ TUTUP COMPASS ]"
